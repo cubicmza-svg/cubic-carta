@@ -47,9 +47,43 @@ function doPost(e) {
     var sheet = ss.getSheetByName('carta');
     var data = JSON.parse(e.postData.contents);
 
+    // ── EDITAR ítem existente ──────────────────────────────
+    if (data.action === 'update') {
+      var lastRow = sheet.getLastRow();
+      if (lastRow < 2) throw new Error('Sheet vacío');
+
+      var dataRange = sheet.getRange(2, 1, lastRow - 1, 10).getValues();
+      var rowIndex = -1;
+
+      for (var i = 0; i < dataRange.length; i++) {
+        // Buscar por id (col H = índice 7) si existe, sino por nombre (col C = índice 2)
+        if (data.id && dataRange[i][7] === data.id) { rowIndex = i + 2; break; }
+        if (!data.id && dataRange[i][2] === data.nombre) { rowIndex = i + 2; break; }
+      }
+
+      if (rowIndex === -1) throw new Error('Ítem no encontrado: ' + data.nombre);
+
+      sheet.getRange(rowIndex, 1, 1, 10).setValues([[
+        data.categoria      || '',
+        data.subcategoria   || '',
+        data.nombre         || '',
+        data.descripcion    || '',
+        data.precio         || 0,
+        data.precio_alternativo || '',
+        data.imagen_url     || '',
+        data.id             || '',
+        data.activo !== false ? 'TRUE' : 'FALSE',
+        data.orden          || 0
+      ]]);
+
+      return ContentService
+        .createTextOutput(JSON.stringify({ success: true }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // ── AGREGAR ítem nuevo ────────────────────────────────
     var id = Utilities.getUuid();
-    var lastRow = sheet.getLastRow();
-    var orden = lastRow; // orden = número de fila, ajustable
+    var orden = sheet.getLastRow();
 
     sheet.appendRow([
       data.categoria      || '',
@@ -75,6 +109,8 @@ function doPost(e) {
   }
 }
 ```
+
+> ⚠ **Si ya tenías el script anterior**, reemplazá todo el código con este nuevo y volvé a **Implementar → Nueva implementación** (no editar la existente). Copiá la nueva URL y actualizá `APPS_SCRIPT_URL` en Vercel.
 
 4. Guardar (Ctrl+S) → nombre del proyecto: `cubic-admin`
 5. Click **"Implementar"** → **"Nueva implementación"**
