@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #1A1721;
+  --bg-card: #211D2A;
+  --bg-card-hover: #2D2840;
+  --accent: #4ADE80;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9B97A8;
+  --border: #2D2840;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+/* Hide scrollbar for nav pills on mobile but keep functionality */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
