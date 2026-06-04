@@ -1,7 +1,188 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+
+// ─── Utilidad de compresión ──────────────────────────────────────────────────
+const MAX_PX = 420;      // dimensión máxima en px
+const QUALITY = 0.72;    // calidad JPEG (0–1)
+const CHAR_LIMIT = 49000; // límite seguro de Google Sheets
+
+function compressToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height) {
+          if (width > MAX_PX) { height = Math.round((height * MAX_PX) / width); width = MAX_PX; }
+        } else {
+          if (height > MAX_PX) { width = Math.round((width * MAX_PX) / height); height = MAX_PX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', QUALITY));
+      };
+      img.src = ev.target!.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ─── Componente de campo de imagen ──────────────────────────────────────────
+interface ImageFieldProps {
+  value: string;
+  onChange: (url: string) => void;
+}
+
+function ImageField({ value, onChange }: ImageFieldProps) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [mode, setMode] = useState<'url' | 'file'>('url');
+  const [compressing, setCompressing] = useState(false);
+  const [sizeWarning, setSizeWarning] = useState('');
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { setSizeWarning('Solo JPG o PNG'); return; }
+    setSizeWarning('');
+    setCompressing(true);
+    try {
+      const dataUrl = await compressToBase64(file);
+      if (dataUrl.length > CHAR_LIMIT) {
+        setSizeWarning(`Imagen demasiado grande después de comprimir (${Math.round(dataUrl.length / 1000)}k chars). Usá una foto más pequeña o pegá una URL.`);
+        return;
+      }
+      if (dataUrl.length > 40000) {
+        setSizeWarning(`⚠ La imagen es grande (${Math.round(dataUrl.length / 1000)}k chars). Puede funcionar, pero preferí una URL de Drive si hay problemas.`);
+      }
+      onChange(dataUrl);
+    } catch {
+      setSizeWarning('Error al procesar la imagen');
+    } finally {
+      setCompressing(false);
+      // Reset input so el mismo archivo puede re-seleccionarse
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  }
+
+  const isBase64 = value.startsWith('data:');
+  const hasValue = Boolean(value);
+
+  const inputClass = 'w-full px-3 py-2.5 rounded-lg bg-[#211D2A] border border-[#2D2840] text-white font-dm text-sm placeholder-[#9B97A8] focus:outline-none focus:border-[#4ADE80] transition-colors';
+
+  return (
+    <div className="space-y-2">
+      {/* Toggle URL / Archivo */}
+      <div className="flex gap-1 p-1 rounded-lg bg-[#211D2A] border border-[#2D2840] w-fit">
+        {(['url', 'file'] as const).map((m) => (
+          <button
+            key={m}
+            type="button"
+            onClick={() => { setMode(m); setSizeWarning(''); }}
+            className={`px-3 py-1 rounded-md font-dm text-xs transition-all duration-150
+              ${mode === m ? 'bg-[#2D2840] text-white' : 'text-[#9B97A8] hover:text-white'}`}
+          >
+            {m === 'url' ? '🔗 URL' : '📁 Archivo'}
+          </button>
+        ))}
+      </div>
+
+      {/* Modo URL */}
+      {mode === 'url' && (
+        <div>
+          <input
+            type="url"
+            value={isBase64 ? '' : value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="https://drive.google.com/uc?export=view&id=..."
+            className={inputClass}
+          />
+          <p className="mt-1 font-dm text-xs text-[#9B97A8]">
+            Drive: compartir → obtener enlace → usar{' '}
+            <code className="text-[#4ADE80]">uc?export=view&id=FILE_ID</code>
+          </p>
+        </div>
+      )}
+
+      {/* Modo Archivo */}
+      {mode === 'file' && (
+        <div>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleFile}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={compressing}
+            className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-dashed transition-all duration-200 font-dm text-sm
+              ${compressing
+                ? 'border-[#4ADE80]/40 text-[#4ADE80] animate-pulse cursor-wait'
+                : 'border-[#2D2840] text-[#9B97A8] hover:border-[#4ADE80]/60 hover:text-white cursor-pointer'
+              }`}
+          >
+            {compressing ? (
+              <>⏳ Comprimiendo...</>
+            ) : (
+              <>📷 Seleccionar JPG / PNG</>
+            )}
+          </button>
+          <p className="mt-1 font-dm text-xs text-[#9B97A8]">
+            Se comprime automáticamente a ≤{MAX_PX}px y se guarda en el Sheet.
+          </p>
+        </div>
+      )}
+
+      {/* Preview */}
+      {hasValue && (
+        <div className="flex items-start gap-3 p-3 rounded-lg bg-[#211D2A] border border-[#2D2840]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={value}
+            alt="Preview"
+            className="w-16 h-16 rounded-lg object-cover flex-shrink-0 bg-[#2D2840]"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
+          <div className="flex-1 min-w-0">
+            <p className="font-dm text-xs text-[#9B97A8] truncate">
+              {isBase64
+                ? `Base64 · ${Math.round(value.length / 1000)}k chars`
+                : value}
+            </p>
+            <button
+              type="button"
+              onClick={() => { onChange(''); setSizeWarning(''); }}
+              className="mt-1.5 font-dm text-xs text-red-400/70 hover:text-red-400 transition-colors"
+            >
+              ✕ Quitar imagen
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Advertencias de tamaño */}
+      {sizeWarning && (
+        <p className={`font-dm text-xs px-3 py-2 rounded-lg ${
+          sizeWarning.startsWith('⚠')
+            ? 'text-amber-400 bg-amber-500/10 border border-amber-500/20'
+            : 'text-red-400 bg-red-500/10 border border-red-500/20'
+        }`}>
+          {sizeWarning}
+        </p>
+      )}
+    </div>
+  );
+}
 
 const SHEET_ID = process.env.NEXT_PUBLIC_SHEET_ID ?? '';
 
@@ -262,19 +443,13 @@ export default function AdminPanel() {
               </div>
             </div>
 
-            {/* Imagen URL */}
+            {/* Imagen */}
             <div>
-              <label className={labelClass}>URL de imagen</label>
-              <input
-                type="url"
+              <label className={labelClass}>Imagen</label>
+              <ImageField
                 value={form.imagen_url}
-                onChange={(e) => set('imagen_url', e.target.value)}
-                placeholder="https://drive.google.com/uc?export=view&id=..."
-                className={inputClass}
+                onChange={(url) => set('imagen_url', url)}
               />
-              <p className="mt-1 font-dm text-xs text-[#9B97A8]">
-                Drive: compartir foto → obtener enlace → convertir a <code className="text-[#4ADE80]">uc?export=view&id=ID</code>
-              </p>
             </div>
 
             {/* Activo */}
