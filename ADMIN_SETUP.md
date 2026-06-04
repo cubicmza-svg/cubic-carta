@@ -1,163 +1,100 @@
-# Setup del Panel de Admin — CUBIC Café & Bar
+# Setup — CUBIC Carta Digital (Vercel KV)
 
-El panel vive en `/admin`. Solo necesitás configurar 3 cosas:
+## Arquitectura
+
+```
+Carta pública  →  Next.js  →  Vercel KV (Redis)
+Panel admin    →  Next.js  →  Vercel KV (Redis)
+Imágenes       →  base64 en KV  o  URL externa
+```
+
+Sin Google Sheets, sin Apps Script, sin servicios externos.
 
 ---
 
-## 1. Contraseña de acceso
+## 1. Crear la base de datos Vercel KV
 
-En Vercel → Settings → Environment Variables, agregar:
+1. Ir a [vercel.com](https://vercel.com) → tu proyecto → pestaña **Storage**
+2. Click **Create Database** → elegir **KV**
+3. Nombre: `cubic-kv` → **Create**
+4. En la pestaña **.env.local** del KV recién creado → copiar las 3 variables:
+   ```
+   KV_REST_API_URL=https://...upstash.io
+   KV_REST_API_TOKEN=...
+   KV_REST_API_READ_ONLY_TOKEN=...
+   ```
+5. Pegar en tu `.env.local` local
 
-```
-ADMIN_PASSWORD = cubic2024
-```
-
-> Cambiar por una contraseña segura antes de deployar.
-
----
-
-## 2. Mostrar el Sheet en el panel
-
-La variable `NEXT_PUBLIC_SHEET_ID` ya está configurada con el ID de tu Sheet.
-Verificar que en `.env.local` y en Vercel diga:
-
-```
-NEXT_PUBLIC_SHEET_ID = 1TC8UYlQR0wpF4cUQYyYYqs6bUQpZvjRCVAsfXR6PfZg
-```
-
-El panel abre el Sheet embebido. Para **editar**, el dueño del Sheet necesita estar
-logueado en su cuenta de Google en ese navegador.
+> Las variables se agregan automáticamente al proyecto en Vercel — no hace falta agregarlas manualmente en Settings.
 
 ---
 
-## 3. Configurar Apps Script para agregar ítems
+## 2. Variables de entorno en `.env.local`
 
-El formulario del panel escribe filas en el Sheet via un Google Apps Script.
-
-### Paso a paso (5 minutos)
-
-1. Abrir el Google Sheet
-2. Menú → **Extensiones** → **Apps Script**
-3. Borrar todo el código que hay y pegar esto:
-
-```javascript
-function doPost(e) {
-  try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName('carta');
-    var data = JSON.parse(e.postData.contents);
-
-    // ── EDITAR ítem existente ──────────────────────────────
-    if (data.action === 'update') {
-      var lastRow = sheet.getLastRow();
-      if (lastRow < 2) throw new Error('Sheet vacío');
-
-      var dataRange = sheet.getRange(2, 1, lastRow - 1, 10).getValues();
-      var rowIndex = -1;
-
-      for (var i = 0; i < dataRange.length; i++) {
-        // Buscar por id (col H = índice 7) si existe, sino por nombre (col C = índice 2)
-        if (data.id && dataRange[i][7] === data.id) { rowIndex = i + 2; break; }
-        if (!data.id && dataRange[i][2] === data.nombre) { rowIndex = i + 2; break; }
-      }
-
-      if (rowIndex === -1) throw new Error('Ítem no encontrado: ' + data.nombre);
-
-      sheet.getRange(rowIndex, 1, 1, 10).setValues([[
-        data.categoria      || '',
-        data.subcategoria   || '',
-        data.nombre         || '',
-        data.descripcion    || '',
-        data.precio         || 0,
-        data.precio_alternativo || '',
-        data.imagen_url     || '',
-        data.id             || '',
-        data.activo !== false ? 'TRUE' : 'FALSE',
-        data.orden          || 0
-      ]]);
-
-      return ContentService
-        .createTextOutput(JSON.stringify({ success: true }))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
-
-    // ── AGREGAR ítem nuevo ────────────────────────────────
-    var id = Utilities.getUuid();
-    var orden = sheet.getLastRow();
-
-    sheet.appendRow([
-      data.categoria      || '',
-      data.subcategoria   || '',
-      data.nombre         || '',
-      data.descripcion    || '',
-      data.precio         || 0,
-      data.precio_alternativo || '',
-      data.imagen_url     || '',
-      id,
-      data.activo !== false ? 'TRUE' : 'FALSE',
-      orden
-    ]);
-
-    return ContentService
-      .createTextOutput(JSON.stringify({ success: true, id: id }))
-      .setMimeType(ContentService.MimeType.JSON);
-
-  } catch(err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ success: false, error: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
+```env
+ADMIN_PASSWORD=cubic2024
+KV_REST_API_URL=https://YOUR_KV.upstash.io
+KV_REST_API_TOKEN=YOUR_TOKEN
+KV_REST_API_READ_ONLY_TOKEN=YOUR_READ_ONLY_TOKEN
 ```
-
-> ⚠ **Si ya tenías el script anterior**, reemplazá todo el código con este nuevo y volvé a **Implementar → Nueva implementación** (no editar la existente). Copiá la nueva URL y actualizá `APPS_SCRIPT_URL` en Vercel.
-
-4. Guardar (Ctrl+S) → nombre del proyecto: `cubic-admin`
-5. Click **"Implementar"** → **"Nueva implementación"**
-6. Tipo: **"Aplicación web"**
-7. Ejecutar como: **"Yo"**
-8. Quién tiene acceso: **"Cualquier persona"** (anonymous)
-9. Click **"Implementar"** → Autorizar → Copiar la URL que aparece
-
-La URL tiene este formato:
-```
-https://script.google.com/macros/s/AKfycb.../exec
-```
-
-10. Pegar esa URL en Vercel → Environment Variables:
-
-```
-APPS_SCRIPT_URL = https://script.google.com/macros/s/TU_SCRIPT_ID/exec
-```
-
-11. Redeploy en Vercel
 
 ---
 
-## Variables de entorno en Vercel
+## 3. Cargar la carta inicial
 
-| Variable | Valor |
+1. Deployar en Vercel (o correr localmente con las variables configuradas)
+2. Ir a `tu-dominio/admin` → ingresar con la contraseña
+3. Click **🌱 Datos iniciales** → confirmar
+4. Se cargan todos los ítems de la carta en KV (≈140 ítems)
+
+La carta pública en `/` ya mostrará los datos inmediatamente.
+
+---
+
+## 4. Deploy en Vercel
+
+```bash
+git add .
+git commit -m "setup: migrar a Vercel KV"
+git push
+```
+
+Vercel detecta el push y deploya automáticamente. Las variables de KV ya están conectadas al proyecto desde el paso 1.
+
+---
+
+## 5. Uso del panel `/admin`
+
+| Acción | Cómo |
 |---|---|
-| `ADMIN_PASSWORD` | tu contraseña segura |
-| `NEXT_PUBLIC_SHEET_ID` | `1TC8UYlQR0wpF4cUQYyYYqs6bUQpZvjRCVAsfXR6PfZg` |
-| `APPS_SCRIPT_URL` | URL copiada del paso 9 |
+| Ver todos los ítems | Botón **☰ ÍTEMS** |
+| Agregar ítem nuevo | Botón **+ AGREGAR ÍTEM** |
+| Editar un ítem | Ícono **✎** en la fila |
+| Eliminar un ítem | Ícono **🗑** → confirmar con **Sí** |
+| Activar/desactivar | Editar → toggle "Visible en la carta" |
+| Subir imagen | En el formulario → tab **📁 Archivo** (comprime a JPEG 72%, máx 420px) |
+| Cargar carta desde cero | Botón **🌱 Datos iniciales** (⚠ reemplaza todo) |
 
 ---
 
-## Agregar imágenes
+## 6. Imágenes
 
-1. Subir foto a Google Drive
-2. Click derecho → Compartir → "Cualquier persona con el enlace puede ver"
-3. Click derecho → "Obtener enlace" → copiar el `FILE_ID` de la URL
-4. Construir: `https://drive.google.com/uc?export=view&id=FILE_ID`
-5. Pegar esa URL en el campo "URL de imagen" del formulario
+**Opción A — Subir desde el dispositivo** (recomendado para fotos del local):
+- En el formulario de ítem → tab **📁 Archivo**
+- Se comprime automáticamente y se guarda como base64 en KV
+
+**Opción B — URL externa** (Drive, Imgur, Cloudinary):
+- Tab **🔗 URL** → pegar la URL pública
+- Para Google Drive: `https://drive.google.com/uc?export=view&id=FILE_ID`
 
 ---
 
-## Uso del panel
+## 7. Límites del plan gratuito de Vercel KV
 
-- Ir a `tu-dominio.vercel.app/admin`
-- Ingresar la contraseña
-- **Columna izquierda**: el Sheet embebido (editá celdas directo, requiere estar logueado en Google)
-- **Columna derecha**: formulario para agregar ítems nuevos rápidamente
-- Para editar un ítem existente: hacerlo directo en el Sheet embebido o abrirlo en nueva pestaña
+| Recurso | Límite gratuito |
+|---|---|
+| Almacenamiento | 256 MB |
+| Requests/mes | 30.000 |
+| Tamaño por valor | hasta 100 MB |
+
+Con ~140 ítems y fotos base64 de ~30KB c/u → ≈4MB total. Muy por debajo del límite.
