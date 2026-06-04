@@ -68,6 +68,11 @@ export async function getMenu(): Promise<MenuItem[]> {
       const precioRaw = getCell(row, 'precio');
       const precio = precioRaw ? parseFloat(precioRaw) : 0;
 
+      // Respetar columna 'activo' si existe (panel admin); si no existe, mostrar todo
+      const activoRaw = getCell(row, 'activo');
+      const activo = activoRaw === '' || activoRaw.toUpperCase() !== 'FALSE';
+      if (!activo) continue;
+
       items.push({
         categoria,
         subcategoria: getCell(row, 'subcategoria'),
