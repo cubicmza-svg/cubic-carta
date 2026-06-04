@@ -152,27 +152,21 @@ export async function seedDatabase(
     // 2. Limpiar datos actuales
     await sql`TRUNCATE TABLE menu_items RESTART IDENTITY`;
 
-    // 3. Insertar en lotes de 20 para no saturar la conexión
-    const CHUNK = 20;
-    for (let i = 0; i < items.length; i += CHUNK) {
-      const chunk = items.slice(i, i + CHUNK);
-      // postgres.js soporta INSERT con array de objetos
-      await sql`
-        INSERT INTO menu_items
-          (categoria, subcategoria, nombre, descripcion, precio,
-           precio_alternativo, imagen_url, activo, orden)
-        SELECT
-          unnest(${chunk.map((r) => r.categoria)}::text[]),
-          unnest(${chunk.map((r) => r.subcategoria)}::text[]),
-          unnest(${chunk.map((r) => r.nombre)}::text[]),
-          unnest(${chunk.map((r) => r.descripcion)}::text[]),
-          unnest(${chunk.map((r) => r.precio)}::int[]),
-          unnest(${chunk.map((r) => r.precio_alternativo)}::text[]),
-          unnest(${chunk.map((r) => r.imagen_url)}::text[]),
-          unnest(${chunk.map((r) => r.activo)}::bool[]),
-          unnest(${chunk.map((r) => r.orden)}::int[])
-      `;
-    }
+    // 3. Bulk insert con el helper nativo de postgres.js
+    //    sql(rows) genera: VALUES ($1,$2,...),($n,$n+1,...) sin casteos manuales
+    const rows = items.map((item) => ({
+      categoria:          item.categoria,
+      subcategoria:       item.subcategoria,
+      nombre:             item.nombre,
+      descripcion:        item.descripcion,
+      precio:             item.precio,
+      precio_alternativo: item.precio_alternativo,
+      imagen_url:         item.imagen_url,
+      activo:             item.activo,
+      orden:              item.orden,
+    }));
+
+    await sql`INSERT INTO menu_items ${sql(rows)}`;
 
     return items.length;
   } finally {
