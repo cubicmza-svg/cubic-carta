@@ -15,7 +15,7 @@ export interface MenuGroup {
   };
 }
 
-const SHEET_ID = 'TU_SHEET_ID'; // Reemplazar con el ID real del Google Sheet
+const SHEET_ID = '1TC8UYlQR0wpF4cUQYyYYqs6bUQpZvjRCVAsfXR6PfZg';
 const SHEET_NAME = 'carta';
 
 export async function getMenu(): Promise<MenuItem[]> {
