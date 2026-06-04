@@ -1,18 +1,20 @@
-import { getAllItems } from './kv';
+import { getAllItems } from './db';
 import type { MenuItem, MenuGroup } from './types';
 
-// Re-exportar los tipos para que los componentes existentes no cambien su import
 export type { MenuItem, MenuGroup };
 
 export async function getMenu(): Promise<MenuItem[]> {
-  const items = await getAllItems();
-  // Solo mostrar ítems activos en la carta pública
-  return items.filter((i) => i.activo);
+  try {
+    const items = await getAllItems();
+    return items.filter((i) => i.activo);
+  } catch (err) {
+    console.error('[getMenu] Error al leer de PostgreSQL:', err);
+    return [];
+  }
 }
 
 export function groupByCategoria(items: MenuItem[]): MenuGroup[] {
   const map = new Map<string, MenuGroup>();
-
   for (const item of items) {
     if (!map.has(item.categoria)) {
       map.set(item.categoria, { categoria: item.categoria, subcategorias: {} });
@@ -22,6 +24,5 @@ export function groupByCategoria(items: MenuItem[]): MenuGroup[] {
     if (!group.subcategorias[sub]) group.subcategorias[sub] = [];
     group.subcategorias[sub].push(item);
   }
-
   return Array.from(map.values());
 }

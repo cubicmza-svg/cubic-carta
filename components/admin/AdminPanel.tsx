@@ -242,9 +242,9 @@ function ItemForm({
 function ItemsTable({ items, onEdit, onDelete, deletingId, onConfirmDelete, onCancelDelete }: {
   items: MenuItem[];
   onEdit: (item: MenuItem) => void;
-  onDelete: (id: string) => void;
-  deletingId: string | null;
-  onConfirmDelete: (id: string) => void;
+  onDelete: (id: number) => void;
+  deletingId: number | null;
+  onConfirmDelete: (id: number) => void;
   onCancelDelete: () => void;
 }) {
   const fmtPrice = (p: number) => p ? `$${p.toLocaleString('es-AR')}` : '—';
@@ -339,7 +339,7 @@ export default function AdminPanel() {
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [toast, setToast] = useState('');
   const [seeding, setSeeding] = useState(false);
 
@@ -389,7 +389,7 @@ export default function AdminPanel() {
     showToast('✓ Cambios guardados');
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: number) {
     const res = await fetch(`/api/admin/items/${id}`, { method: 'DELETE' });
     if (!res.ok) { const d = await res.json(); showToast(`✗ ${d.error}`); return; }
     setItems((prev) => prev.filter((i) => i.id !== id));

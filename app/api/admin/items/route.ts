@@ -1,8 +1,7 @@
 import { isAuthenticated } from '@/lib/adminAuth';
-import { getAllItems, addItem } from '@/lib/kv';
+import { getAllItems, addItem } from '@/lib/db';
 import type { MenuItem } from '@/lib/types';
 
-// GET — listar todos los ítems (admin)
 export async function GET() {
   if (!isAuthenticated()) {
     return Response.json({ error: 'No autorizado' }, { status: 401 });
@@ -11,12 +10,11 @@ export async function GET() {
     const items = await getAllItems();
     return Response.json(items);
   } catch (err) {
-    console.error(err);
-    return Response.json({ error: 'Error al obtener ítems' }, { status: 500 });
+    const msg = err instanceof Error ? err.message : 'Error al obtener ítems';
+    return Response.json({ error: msg }, { status: 500 });
   }
 }
 
-// POST — agregar ítem nuevo
 export async function POST(req: Request) {
   if (!isAuthenticated()) {
     return Response.json({ error: 'No autorizado' }, { status: 401 });
@@ -29,7 +27,6 @@ export async function POST(req: Request) {
     const item = await addItem(body);
     return Response.json(item, { status: 201 });
   } catch (err) {
-    console.error(err);
     const msg = err instanceof Error ? err.message : 'Error al crear ítem';
     return Response.json({ error: msg }, { status: 500 });
   }
