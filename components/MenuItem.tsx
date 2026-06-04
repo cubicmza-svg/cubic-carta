@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import type { MenuItem as MenuItemType } from '@/lib/getMenu';
 
 interface Props {
@@ -142,12 +141,11 @@ export default function MenuItem({ item }: Props) {
             className="w-24 h-24 flex-shrink-0 relative rounded-lg overflow-hidden cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-cubic-accent"
             aria-label={`Ver foto de ${item.nombre}`}
           >
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={item.imagen_url}
               alt={item.nombre}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              unoptimized
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
             {/* Hint de zoom al hover */}
             <span
