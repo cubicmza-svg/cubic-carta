@@ -28,7 +28,7 @@ export default async function CartaPage() {
               Carta no disponible en este momento
             </p>
             <p className="font-dm text-cubic-muted mt-2 text-sm">
-              Configurá el Google Sheet para ver la carta completa.
+              Ingresá al panel /admin y cargá los datos iniciales.
             </p>
           </div>
         ) : (
