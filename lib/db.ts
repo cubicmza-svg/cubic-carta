@@ -2,12 +2,11 @@ import postgres from 'postgres';
 import type { MenuItem } from './types';
 
 // ─── Conexión ─────────────────────────────────────────────────────────────────
-// La variable se llama ALMACENAMIENTO_URL (custom, no DATABASE_URL)
 function getClient() {
-  const url = process.env.ALMACENAMIENTO_URL;
+  const url = process.env.DATABASE_URL;
   if (!url) {
     throw new Error(
-      'ALMACENAMIENTO_URL no configurada. ' +
+      'DATABASE_URL no configurada. ' +
       'Agregala en las variables de entorno de Vercel o en .env.local'
     );
   }
