@@ -1,5 +1,10 @@
-import { redirect } from 'next/navigation';
+import { isAuthenticated } from '@/lib/adminAuth';
+import LoginForm from '@/components/admin/LoginForm';
+import AdminPanel from '@/components/admin/AdminPanel';
 
-export default function AdminRoot() {
-  redirect('/admin/dashboard');
+export const dynamic = 'force-dynamic';
+
+export default function AdminPage() {
+  const auth = isAuthenticated();
+  return auth ? <AdminPanel /> : <LoginForm />;
 }

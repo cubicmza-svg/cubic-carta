@@ -1,161 +1,127 @@
 # Setup del Panel de Admin — CUBIC Café & Bar
 
-## 1. Configurar Google Service Account
-
-### Paso a paso
-
-1. Ir a [console.cloud.google.com](https://console.cloud.google.com)
-2. Crear un proyecto nuevo (ej: "cubic-carta")
-3. Menú lateral → **APIs y servicios** → **Biblioteca**
-4. Buscar **"Google Sheets API"** → Habilitar
-5. Menú lateral → **IAM y administración** → **Cuentas de servicio**
-6. Click **"Crear cuenta de servicio"**
-   - Nombre: `cubic-admin`
-   - Click "Crear y continuar" → "Listo"
-7. Click en la cuenta creada → pestaña **"Claves"** → **"Agregar clave"** → JSON
-8. Se descarga un archivo `.json` con las credenciales
-
-### Dar acceso al Sheet
-
-9. Abrir el archivo JSON descargado, copiar el valor de `client_email`
-   (algo como `cubic-admin@cubic-carta.iam.gserviceaccount.com`)
-10. En tu Google Sheet → Compartir → Pegar ese email → Rol: **Editor**
-
-### Configurar la variable de entorno
-
-11. Abrir el archivo JSON descargado
-12. Copiar TODO el contenido y **convertirlo en una sola línea** (sin saltos de línea)
-    - En el JSON, el `private_key` tiene `\n` que deben quedar como `\n` (escaped), no como saltos reales
-13. Pegar en `.env.local`:
-
-```
-GOOGLE_SERVICE_ACCOUNT_KEY={"type":"service_account","project_id":"cubic-carta",...}
-```
-
-> **Tip para Vercel**: En Settings → Environment Variables, pegás el JSON tal cual (multi-línea está OK en Vercel).
+El panel vive en `/admin`. Solo necesitás configurar 3 cosas:
 
 ---
 
-## 2. Configurar Cloudinary
+## 1. Contraseña de acceso
 
-1. Crear cuenta gratuita en [cloudinary.com](https://cloudinary.com)
-2. Dashboard → copiar:
-   - **Cloud Name**
-   - **API Key**
-   - **API Secret**
-3. Pegar en `.env.local`:
+En Vercel → Settings → Environment Variables, agregar:
 
-```env
-CLOUDINARY_CLOUD_NAME=tu_cloud_name
-CLOUDINARY_API_KEY=123456789012345
-CLOUDINARY_API_SECRET=abcdefghijklmnop
+```
+ADMIN_PASSWORD = cubic2024
 ```
 
+> Cambiar por una contraseña segura antes de deployar.
+
 ---
 
-## 3. Preparar el Google Sheet
+## 2. Mostrar el Sheet en el panel
 
-### Hoja `carta` — agregar columnas nuevas
+La variable `NEXT_PUBLIC_SHEET_ID` ya está configurada con el ID de tu Sheet.
+Verificar que en `.env.local` y en Vercel diga:
 
-La hoja `carta` ya existe. Agregar estas 3 columnas al final:
-
-| Columna H | Columna I | Columna J |
-|-----------|-----------|-----------|
-| `id`      | `activo`  | `orden`   |
-
-Para los ítems existentes:
-- Columna `activo`: poner `TRUE` en todas las filas
-- Columna `orden`: poner 1, 2, 3... en orden dentro de cada subcategoría
-- Columna `id`: dejar vacío por ahora (el panel admin los asigna automáticamente)
-
-### Hoja `usuarios` — crear nueva pestaña
-
-1. En el Google Sheet → click `+` para agregar hoja nueva
-2. Renombrarla como **`usuarios`** (exactamente así)
-3. Fila 1 (encabezados):
-
-| A    | B       | C               | D       | E    | F       |
-|------|---------|-----------------|---------|------|---------|
-| `id` | `email` | `password_hash` | `nombre`| `rol`| `activo`|
-
-4. Agregar el primer usuario (fila 2). Para generar el hash de la contraseña, correr en terminal:
-
-```bash
-node -e "const b=require('bcryptjs'); b.hash('cubic2024',10).then(h=>console.log(h))"
+```
+NEXT_PUBLIC_SHEET_ID = 1TC8UYlQR0wpF4cUQYyYYqs6bUQpZvjRCVAsfXR6PfZg
 ```
 
-Copiar el hash resultante (empieza con `$2b$10$...`) y pegarlo en la columna `password_hash`.
+El panel abre el Sheet embebido. Para **editar**, el dueño del Sheet necesita estar
+logueado en su cuenta de Google en ese navegador.
 
-Fila 2 completa:
+---
+
+## 3. Configurar Apps Script para agregar ítems
+
+El formulario del panel escribe filas en el Sheet via un Google Apps Script.
+
+### Paso a paso (5 minutos)
+
+1. Abrir el Google Sheet
+2. Menú → **Extensiones** → **Apps Script**
+3. Borrar todo el código que hay y pegar esto:
+
+```javascript
+function doPost(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName('carta');
+    var data = JSON.parse(e.postData.contents);
+
+    var id = Utilities.getUuid();
+    var lastRow = sheet.getLastRow();
+    var orden = lastRow; // orden = número de fila, ajustable
+
+    sheet.appendRow([
+      data.categoria      || '',
+      data.subcategoria   || '',
+      data.nombre         || '',
+      data.descripcion    || '',
+      data.precio         || 0,
+      data.precio_alternativo || '',
+      data.imagen_url     || '',
+      id,
+      data.activo !== false ? 'TRUE' : 'FALSE',
+      orden
+    ]);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: true, id: id }))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: false, error: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
 ```
-1 | admin@cubic.com | $2b$10$... | Admin CUBIC | superadmin | TRUE
+
+4. Guardar (Ctrl+S) → nombre del proyecto: `cubic-admin`
+5. Click **"Implementar"** → **"Nueva implementación"**
+6. Tipo: **"Aplicación web"**
+7. Ejecutar como: **"Yo"**
+8. Quién tiene acceso: **"Cualquier persona"** (anonymous)
+9. Click **"Implementar"** → Autorizar → Copiar la URL que aparece
+
+La URL tiene este formato:
+```
+https://script.google.com/macros/s/AKfycb.../exec
 ```
 
-> ⚠ **Importante**: Cambiar la contraseña después del primer login.
+10. Pegar esa URL en Vercel → Environment Variables:
 
----
-
-## 4. Variables de entorno completas
-
-Archivo `.env.local` (desarrollo):
-
-```env
-# NextAuth
-NEXTAUTH_SECRET=cambiar_por_string_random_largo
-NEXTAUTH_URL=http://localhost:3000
-
-# Google Sheets
-GOOGLE_SERVICE_ACCOUNT_KEY={"type":"service_account",...}
-GOOGLE_SHEET_ID=1TC8UYlQR0wpF4cUQYyYYqs6bUQpZvjRCVAsfXR6PfZg
-
-# Cloudinary
-CLOUDINARY_CLOUD_NAME=tu_cloud
-CLOUDINARY_API_KEY=tu_key
-CLOUDINARY_API_SECRET=tu_secret
+```
+APPS_SCRIPT_URL = https://script.google.com/macros/s/TU_SCRIPT_ID/exec
 ```
 
----
-
-## 5. Deploy en Vercel
-
-1. En [vercel.com](https://vercel.com) → tu proyecto `cubic-carta` → **Settings** → **Environment Variables**
-2. Agregar cada variable del `.env.local`
-   - Para `NEXTAUTH_URL`: usar la URL real del deploy (ej: `https://cubic-carta.vercel.app`)
-   - Para `NEXTAUTH_SECRET`: generar con `openssl rand -base64 32`
-3. **Redeploy** el proyecto para que tome las nuevas variables
+11. Redeploy en Vercel
 
 ---
 
-## 6. Primer acceso al panel
+## Variables de entorno en Vercel
 
-1. Ir a `tu-dominio.vercel.app/admin`
-2. Login con `admin@cubic.com` / `cubic2024`
-3. Ir a **Usuarios** → cambiar la contraseña
-
----
-
-## 7. Uso del panel
-
-### Agregar un ítem nuevo
-1. Admin → Carta → **+ Agregar ítem**
-2. Completar categoría, nombre, precio
-3. Subir foto (drag & drop o URL)
-4. Click **Agregar ítem** → aparece en la carta pública en ≤5 minutos
-
-### Ocultar un plato agotado
-- En la lista de la carta → toggle del ítem a **OFF**
-- El plato desaparece de la carta pública inmediatamente (próxima revalidación)
-
-### Agregar imágenes desde el panel
-- El panel permite subir fotos directo (hasta 5 MB, JPG/PNG/WebP)
-- Se suben automáticamente a Cloudinary
-- La URL se guarda en el Google Sheet
+| Variable | Valor |
+|---|---|
+| `ADMIN_PASSWORD` | tu contraseña segura |
+| `NEXT_PUBLIC_SHEET_ID` | `1TC8UYlQR0wpF4cUQYyYYqs6bUQpZvjRCVAsfXR6PfZg` |
+| `APPS_SCRIPT_URL` | URL copiada del paso 9 |
 
 ---
 
-## Roles
+## Agregar imágenes
 
-| Rol         | Dashboard | Carta | Usuarios |
-|-------------|-----------|-------|----------|
-| `admin`     | ✓         | ✓     | ✗        |
-| `superadmin`| ✓         | ✓     | ✓        |
+1. Subir foto a Google Drive
+2. Click derecho → Compartir → "Cualquier persona con el enlace puede ver"
+3. Click derecho → "Obtener enlace" → copiar el `FILE_ID` de la URL
+4. Construir: `https://drive.google.com/uc?export=view&id=FILE_ID`
+5. Pegar esa URL en el campo "URL de imagen" del formulario
+
+---
+
+## Uso del panel
+
+- Ir a `tu-dominio.vercel.app/admin`
+- Ingresar la contraseña
+- **Columna izquierda**: el Sheet embebido (editá celdas directo, requiere estar logueado en Google)
+- **Columna derecha**: formulario para agregar ítems nuevos rápidamente
+- Para editar un ítem existente: hacerlo directo en el Sheet embebido o abrirlo en nueva pestaña
