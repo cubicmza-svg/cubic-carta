@@ -17,6 +17,29 @@ export default async function CartaPage() {
         <Logo />
       </header>
 
+      {/* Banner promocional */}
+      <div className="relative w-full h-[200px] md:h-[380px] overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/banner.jpg"
+          alt="CUBIC Café & Bar — Subí tu foto etiquetándonos y obtené un 5% off"
+          className="w-full h-full object-cover object-center"
+        />
+        {/* Overlay oscuro sutil para que el botón resalte */}
+        <div className="absolute inset-0 bg-black/30" />
+        {/* Botón centrado */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <a
+            href="https://www.instagram.com/cubic.mza/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-8 py-3 rounded-full bg-[#4ADE80] text-black font-dm font-bold text-sm md:text-base tracking-wide hover:bg-green-400 active:scale-95 transition-all duration-200 shadow-lg"
+          >
+            SEGUINOS EN INSTAGRAM
+          </a>
+        </div>
+      </div>
+
       {/* Nav sticky de categorías */}
       <CategoryNav categorias={categorias} />
 
