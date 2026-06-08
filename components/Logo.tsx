@@ -3,7 +3,7 @@ export default function Logo() {
     <div className="flex items-center justify-center py-6">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/logo cubic cafe bar.png"
+        src="/logo-cubic.png"
         alt="CUBIC Café & Bar"
         className="h-20 md:h-28 w-auto object-contain"
       />
