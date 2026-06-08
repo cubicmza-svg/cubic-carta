@@ -18,13 +18,12 @@ export default async function CartaPage() {
       </header>
 
       {/* Banner promocional */}
-      <div className="relative w-full overflow-hidden" style={{ aspectRatio: '1920 / 400' }}>
+      <div className="relative w-full">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/banner.jpg"
           alt="CUBIC Café & Bar — Subí tu foto etiquetándonos y obtené un 5% off"
-          className="w-full h-full object-cover"
-          style={{ objectPosition: 'center center' }}
+          className="w-full h-auto block"
         />
         {/* Overlay oscuro semitransparente */}
         <div className="absolute inset-0 bg-black/50" />
