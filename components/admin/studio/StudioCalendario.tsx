@@ -34,7 +34,14 @@ const CAMPANA_COLORS = [
   'bg-sky-500/25 border-sky-500/50 text-sky-200',
 ];
 
-function toDate(iso: string) { return new Date(iso + 'T12:00:00'); }
+// Normaliza cualquier formato de fecha a "YYYY-MM-DD" sin depender del separador T
+function toDateStr(raw: string | null | undefined): string {
+  if (!raw) return '';
+  const s = String(raw);
+  // Toma los primeros 10 caracteres: cubre "2026-07-17", "2026-07-17T...", "2026-07-17 ..."
+  return s.substring(0, 10);
+}
+function toDate(raw: string) { return new Date(toDateStr(raw) + 'T12:00:00'); }
 function isoFromYMD(y: number, m: number, d: number) {
   return `${y}-${String(m + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 }
@@ -130,7 +137,7 @@ export default function StudioCalendario() {
   };
   const openEditCamp = (c: Campana) => {
     setCampForm({
-      nombre: c.nombre, fecha_inicio: c.fecha_inicio.split('T')[0], fecha_fin: c.fecha_fin.split('T')[0],
+      nombre: c.nombre, fecha_inicio: toDateStr(c.fecha_inicio), fecha_fin: toDateStr(c.fecha_fin),
       idea: c.idea, eje: c.eje, productos: JSON.parse(c.productos || '[]'), tipo: c.tipo,
     });
     setProdInput(''); setCampModal(c);
@@ -177,8 +184,8 @@ export default function StudioCalendario() {
 
   // Campañas que tocan este mes
   const campanasMes = campanas.filter((c) => {
-    const start = toDate(c.fecha_inicio.split('T')[0]);
-    const end   = toDate(c.fecha_fin.split('T')[0]);
+    const start = toDate(c.fecha_inicio);
+    const end   = toDate(c.fecha_fin);
     const mStart = new Date(year, month, 1);
     const mEnd   = new Date(year, month + 1, 0);
     return start <= mEnd && end >= mStart;
@@ -188,8 +195,8 @@ export default function StudioCalendario() {
   function dayCampanas(d: number) {
     const iso = isoFromYMD(year, month, d);
     return campanasMes.filter((c) => {
-      const di = c.fecha_inicio.split('T')[0];
-      const df = c.fecha_fin.split('T')[0];
+      const di = toDateStr(c.fecha_inicio);
+      const df = toDateStr(c.fecha_fin);
       return iso >= di && iso <= df;
     });
   }
@@ -225,7 +232,7 @@ export default function StudioCalendario() {
               <span>🎯</span>
               <span>{c.nombre}</span>
               <span className="opacity-60 font-normal">
-                {c.fecha_inicio.split('T')[0].split('-').slice(1).reverse().join('/')} → {c.fecha_fin.split('T')[0].split('-').slice(1).reverse().join('/')}
+                {toDateStr(c.fecha_inicio).split('-').slice(1).reverse().join('/')} → {toDateStr(c.fecha_fin).split('-').slice(1).reverse().join('/')}
               </span>
             </button>
           ))}
