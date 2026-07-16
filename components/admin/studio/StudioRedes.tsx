@@ -14,6 +14,8 @@ interface Post {
   formato: Formato;
   estado: EstadoPost;
   fecha_prog: string | null;
+  fechas_prog: string; // JSON array string
+  link_drive: string;
   pilar: string;
   creado_el: string;
 }
@@ -28,14 +30,25 @@ const ESTADO_COLOR: Record<EstadoPost, string> = {
   publicado:  'bg-green-500/15 text-green-300 border-green-500/30',
 };
 const ESTADO_LABEL: Record<EstadoPost, string> = {
-  idea: 'Idea', en_proceso: 'En proceso', listo: 'Listo para publicar', publicado: 'Publicado',
+  idea: 'Idea', en_proceso: 'En proceso', listo: 'Listo', publicado: 'Publicado',
 };
 const PILARES = ['Ambiente', 'Carta', 'Detrás de escena', 'Eventos', 'UGC', 'Promos', 'Otro'];
 
 const EMPTY = {
   titulo: '', caption: '', plataforma: 'instagram' as Plataforma,
-  formato: 'feed' as Formato, estado: 'idea' as EstadoPost, fecha_prog: '', pilar: PILARES[0],
+  formato: 'feed' as Formato, estado: 'idea' as EstadoPost,
+  fechas_prog: [] as string[], link_drive: '', pilar: PILARES[0],
 };
+
+function parseFechas(raw: string): string[] {
+  try { return JSON.parse(raw) || []; } catch { return []; }
+}
+
+function formatDateAR(iso: string) {
+  const [y, m, d] = iso.split('-');
+  const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return `${parseInt(d)} ${months[parseInt(m)-1]}`;
+}
 
 export default function StudioRedes() {
   const [posts, setPosts]       = useState<Post[]>([]);
@@ -45,6 +58,7 @@ export default function StudioRedes() {
   const [editId, setEditId]     = useState<number | null>(null);
   const [filtro, setFiltro]     = useState<EstadoPost | 'todos'>('todos');
   const [saving, setSaving]     = useState(false);
+  const [dateInput, setDateInput] = useState('');
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -56,13 +70,33 @@ export default function StudioRedes() {
 
   useEffect(() => { fetchPosts(); }, [fetchPosts]);
 
-  const resetForm = () => { setForm({ ...EMPTY }); setEditId(null); setShowForm(false); };
+  const resetForm = () => { setForm({ ...EMPTY }); setEditId(null); setShowForm(false); setDateInput(''); };
+
+  const addFecha = () => {
+    if (!dateInput || form.fechas_prog.includes(dateInput)) return;
+    setForm({ ...form, fechas_prog: [...form.fechas_prog, dateInput].sort() });
+    setDateInput('');
+  };
+
+  const removeFecha = (d: string) => {
+    setForm({ ...form, fechas_prog: form.fechas_prog.filter((f) => f !== d) });
+  };
 
   const savePost = async () => {
     if (!form.titulo.trim() || saving) return;
     setSaving(true);
     try {
-      const body = { ...form, titulo: form.titulo.trim(), fecha_prog: form.fecha_prog || null };
+      const body = {
+        titulo:       form.titulo.trim(),
+        caption:      form.caption,
+        plataforma:   form.plataforma,
+        formato:      form.formato,
+        estado:       form.estado,
+        fecha_prog:   form.fechas_prog[0] || null,
+        fechas_prog:  JSON.stringify(form.fechas_prog),
+        link_drive:   form.link_drive.trim(),
+        pilar:        form.pilar,
+      };
       if (editId !== null) {
         await fetch(`/api/admin/studio/redes/${editId}`, {
           method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
@@ -79,13 +113,18 @@ export default function StudioRedes() {
 
   const openEdit = (post: Post) => {
     setForm({
-      titulo: post.titulo, caption: post.caption, plataforma: post.plataforma,
-      formato: post.formato, estado: post.estado,
-      fecha_prog: post.fecha_prog ? post.fecha_prog.split('T')[0] : '',
-      pilar: post.pilar,
+      titulo:      post.titulo,
+      caption:     post.caption,
+      plataforma:  post.plataforma,
+      formato:     post.formato,
+      estado:      post.estado,
+      fechas_prog: parseFechas(post.fechas_prog),
+      link_drive:  post.link_drive || '',
+      pilar:       post.pilar,
     });
     setEditId(post.id);
     setShowForm(true);
+    setDateInput('');
   };
 
   const deletePost = async (id: number) => {
@@ -103,14 +142,15 @@ export default function StudioRedes() {
 
   const filtered = filtro === 'todos' ? posts : posts.filter((p) => p.estado === filtro);
   const stats = {
-    total: posts.length,
+    total:     posts.length,
     publicado: posts.filter((p) => p.estado === 'publicado').length,
-    listo: posts.filter((p) => p.estado === 'listo').length,
-    proceso: posts.filter((p) => p.estado === 'en_proceso').length,
+    listo:     posts.filter((p) => p.estado === 'listo').length,
+    proceso:   posts.filter((p) => p.estado === 'en_proceso').length,
   };
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <h2 className="font-bebas text-2xl tracking-widest text-white">PLANIFICACIÓN DE REDES</h2>
@@ -147,28 +187,68 @@ export default function StudioRedes() {
         ))}
       </div>
 
-      {/* Form modal */}
+      {/* Modal de formulario */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ backgroundColor: 'rgba(10,8,18,0.88)', backdropFilter: 'blur(6px)' }}
           onClick={resetForm}>
-          <div className="bg-cubic-card border border-cubic-border rounded-2xl p-6 w-full max-w-md flex flex-col gap-4 max-h-[90vh] overflow-y-auto"
+          <div className="bg-cubic-card border border-cubic-border rounded-2xl p-6 w-full max-w-lg flex flex-col gap-4 max-h-[92vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}>
             <h3 className="font-bebas text-xl tracking-widest text-white">
               {editId !== null ? 'Editar publicación' : 'Nueva publicación'}
             </h3>
+
+            {/* Título */}
             <div className="flex flex-col gap-1">
               <label className="font-dm text-[10px] text-cubic-muted uppercase tracking-widest">Título / tema</label>
               <input type="text" value={form.titulo} autoFocus onChange={(e) => setForm({ ...form, titulo: e.target.value })}
                 placeholder="Ej: Post happy hour viernes"
                 className="bg-cubic-bg border border-cubic-border rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-cubic-accent placeholder:text-cubic-muted" />
             </div>
+
+            {/* Caption */}
             <div className="flex flex-col gap-1">
               <label className="font-dm text-[10px] text-cubic-muted uppercase tracking-widest">Caption / texto</label>
               <textarea value={form.caption} rows={3} onChange={(e) => setForm({ ...form, caption: e.target.value })}
                 placeholder="Texto del post, hashtags…"
                 className="bg-cubic-bg border border-cubic-border rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-cubic-accent placeholder:text-cubic-muted resize-none" />
             </div>
+
+            {/* Link Drive */}
+            <div className="flex flex-col gap-1">
+              <label className="font-dm text-[10px] text-cubic-muted uppercase tracking-widest">Link a Drive / archivo</label>
+              <input type="url" value={form.link_drive} onChange={(e) => setForm({ ...form, link_drive: e.target.value })}
+                placeholder="https://drive.google.com/…"
+                className="bg-cubic-bg border border-cubic-border rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-cubic-accent placeholder:text-cubic-muted" />
+            </div>
+
+            {/* Fechas múltiples */}
+            <div className="flex flex-col gap-2">
+              <label className="font-dm text-[10px] text-cubic-muted uppercase tracking-widest">
+                Fechas de publicación <span className="text-cubic-muted normal-case">(podés agregar varias)</span>
+              </label>
+              <div className="flex gap-2">
+                <input type="date" value={dateInput} onChange={(e) => setDateInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && addFecha()}
+                  className="flex-1 bg-cubic-bg border border-cubic-border rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-cubic-accent" />
+                <button onClick={addFecha}
+                  className="px-4 py-2 rounded-lg bg-cubic-accent text-black font-dm text-sm font-bold hover:bg-green-400 transition-colors flex-shrink-0">
+                  +
+                </button>
+              </div>
+              {form.fechas_prog.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {form.fechas_prog.map((d) => (
+                    <span key={d} className="flex items-center gap-1 bg-cubic-accent/10 border border-cubic-accent/30 text-cubic-accent rounded-full px-3 py-1 text-xs font-dm">
+                      📅 {formatDateAR(d)}
+                      <button onClick={() => removeFecha(d)} className="ml-1 text-cubic-muted hover:text-pink-400 transition-colors font-bold leading-none">×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Plataforma + Formato */}
             <div className="grid grid-cols-2 gap-3">
               {[
                 { label: 'Plataforma', el: (
@@ -190,15 +270,19 @@ export default function StudioRedes() {
                     <option value="otro">Otro</option>
                   </select>
                 )},
-                { label: 'Pilar', el: (
+                { label: 'Pilar de contenido', el: (
                   <select value={form.pilar} onChange={(e) => setForm({ ...form, pilar: e.target.value })}
                     className="bg-cubic-bg border border-cubic-border rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-cubic-accent w-full">
                     {PILARES.map((p) => <option key={p} value={p}>{p}</option>)}
                   </select>
                 )},
-                { label: 'Fecha programada', el: (
-                  <input type="date" value={form.fecha_prog} onChange={(e) => setForm({ ...form, fecha_prog: e.target.value })}
-                    className="bg-cubic-bg border border-cubic-border rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-cubic-accent w-full" />
+                { label: 'Estado inicial', el: (
+                  <select value={form.estado} onChange={(e) => setForm({ ...form, estado: e.target.value as EstadoPost })}
+                    className="bg-cubic-bg border border-cubic-border rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-cubic-accent w-full">
+                    {(Object.entries(ESTADO_LABEL) as [EstadoPost, string][]).map(([v, l]) => (
+                      <option key={v} value={v}>{l}</option>
+                    ))}
+                  </select>
                 )},
               ].map(({ label, el }) => (
                 <div key={label} className="flex flex-col gap-1">
@@ -207,6 +291,7 @@ export default function StudioRedes() {
                 </div>
               ))}
             </div>
+
             <div className="flex gap-2 justify-end mt-1">
               {editId !== null && (
                 <button onClick={() => deletePost(editId)}
@@ -227,7 +312,7 @@ export default function StudioRedes() {
         </div>
       )}
 
-      {/* Posts */}
+      {/* Lista de posts */}
       {!loading && filtered.length === 0 ? (
         <div className="text-center py-20">
           <p className="font-bebas text-2xl text-cubic-muted tracking-widest">Sin publicaciones</p>
@@ -235,35 +320,54 @@ export default function StudioRedes() {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {filtered.map((post) => (
-            <div key={post.id} className="bg-cubic-card border border-cubic-border rounded-xl p-4 flex gap-4 hover:border-cubic-border/80 transition-all">
-              <div className="text-2xl flex-shrink-0 pt-0.5">{PLATAFORMA_ICON[post.plataforma]}</div>
-              <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                <div className="flex items-start gap-2 justify-between">
-                  <h3 className="font-dm font-semibold text-white text-sm leading-snug">{post.titulo}</h3>
-                  <select value={post.estado} onChange={(e) => setEstado(post.id, e.target.value as EstadoPost)}
-                    className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 outline-none cursor-pointer bg-transparent flex-shrink-0 ${ESTADO_COLOR[post.estado]}`}>
-                    {(Object.entries(ESTADO_LABEL) as [EstadoPost, string][]).map(([v, l]) => (
-                      <option key={v} value={v}>{l}</option>
-                    ))}
-                  </select>
-                </div>
-                {post.caption && <p className="font-dm text-xs text-cubic-muted leading-relaxed line-clamp-2">{post.caption}</p>}
-                <div className="flex items-center gap-3 flex-wrap">
-                  <span className="font-dm text-[10px] text-cubic-muted border border-cubic-border rounded-full px-2 py-0.5 capitalize">{post.formato}</span>
-                  <span className="font-dm text-[10px] text-cubic-muted border border-cubic-border rounded-full px-2 py-0.5">{post.pilar}</span>
-                  {post.fecha_prog && (
-                    <span className="font-dm text-[10px] text-cubic-accent">
-                      📅 {new Date(post.fecha_prog + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
-                    </span>
+          {filtered.map((post) => {
+            const fechas = parseFechas(post.fechas_prog);
+            return (
+              <div key={post.id} className="bg-cubic-card border border-cubic-border rounded-xl p-4 flex gap-4 hover:border-cubic-border/80 transition-all">
+                <div className="text-2xl flex-shrink-0 pt-0.5">{PLATAFORMA_ICON[post.plataforma]}</div>
+                <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                  <div className="flex items-start gap-2 justify-between">
+                    <h3 className="font-dm font-semibold text-white text-sm leading-snug">{post.titulo}</h3>
+                    <select value={post.estado} onChange={(e) => setEstado(post.id, e.target.value as EstadoPost)}
+                      className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 outline-none cursor-pointer bg-transparent flex-shrink-0 ${ESTADO_COLOR[post.estado]}`}>
+                      {(Object.entries(ESTADO_LABEL) as [EstadoPost, string][]).map(([v, l]) => (
+                        <option key={v} value={v}>{l}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {post.caption && (
+                    <p className="font-dm text-xs text-cubic-muted leading-relaxed line-clamp-2">{post.caption}</p>
                   )}
-                  <button onClick={() => openEdit(post)} className="font-dm text-[10px] text-cubic-muted hover:text-white transition-colors ml-auto">
-                    ✏️ Editar
-                  </button>
+
+                  {/* Fechas */}
+                  {fechas.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {fechas.map((d) => (
+                        <span key={d} className="font-dm text-[10px] text-cubic-accent bg-cubic-accent/10 border border-cubic-accent/20 rounded-full px-2 py-0.5">
+                          📅 {formatDateAR(d)}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="font-dm text-[10px] text-cubic-muted border border-cubic-border rounded-full px-2 py-0.5 capitalize">{post.formato}</span>
+                    <span className="font-dm text-[10px] text-cubic-muted border border-cubic-border rounded-full px-2 py-0.5">{post.pilar}</span>
+                    {post.link_drive && (
+                      <a href={post.link_drive} target="_blank" rel="noopener noreferrer"
+                        className="font-dm text-[10px] text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1">
+                        🔗 Ver en Drive
+                      </a>
+                    )}
+                    <button onClick={() => openEdit(post)} className="font-dm text-[10px] text-cubic-muted hover:text-white transition-colors ml-auto">
+                      ✏️ Editar
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

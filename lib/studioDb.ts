@@ -34,15 +34,34 @@ export async function ensureStudioTables() {
     `;
     await sql`
       CREATE TABLE IF NOT EXISTS studio_redes (
-        id          SERIAL PRIMARY KEY,
-        titulo      TEXT    NOT NULL DEFAULT '',
-        caption     TEXT    NOT NULL DEFAULT '',
-        plataforma  TEXT    NOT NULL DEFAULT 'instagram',
-        formato     TEXT    NOT NULL DEFAULT 'feed',
-        estado      TEXT    NOT NULL DEFAULT 'idea',
-        fecha_prog  DATE,
-        pilar       TEXT    NOT NULL DEFAULT '',
-        creado_el   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        id           SERIAL PRIMARY KEY,
+        titulo       TEXT    NOT NULL DEFAULT '',
+        caption      TEXT    NOT NULL DEFAULT '',
+        plataforma   TEXT    NOT NULL DEFAULT 'instagram',
+        formato      TEXT    NOT NULL DEFAULT 'feed',
+        estado       TEXT    NOT NULL DEFAULT 'idea',
+        fecha_prog   DATE,
+        fechas_prog  TEXT    NOT NULL DEFAULT '[]',
+        link_drive   TEXT    NOT NULL DEFAULT '',
+        pilar        TEXT    NOT NULL DEFAULT '',
+        creado_el    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    // Agregar columnas nuevas si la tabla ya existe (migration segura)
+    await sql`ALTER TABLE studio_redes ADD COLUMN IF NOT EXISTS fechas_prog TEXT NOT NULL DEFAULT '[]'`;
+    await sql`ALTER TABLE studio_redes ADD COLUMN IF NOT EXISTS link_drive  TEXT NOT NULL DEFAULT ''`;
+
+    await sql`
+      CREATE TABLE IF NOT EXISTS studio_campanas (
+        id           SERIAL PRIMARY KEY,
+        nombre       TEXT    NOT NULL DEFAULT '',
+        fecha_inicio DATE    NOT NULL,
+        fecha_fin    DATE    NOT NULL,
+        idea         TEXT    NOT NULL DEFAULT '',
+        eje          TEXT    NOT NULL DEFAULT '',
+        productos    TEXT    NOT NULL DEFAULT '[]',
+        tipo         TEXT    NOT NULL DEFAULT 'campaign',
+        creado_el    TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
   } finally {
@@ -74,6 +93,38 @@ export async function updateEvento(id: number, data: { nombre: string; tipo: str
     const [row] = await sql`UPDATE studio_eventos SET nombre=${data.nombre}, tipo=${data.tipo} WHERE id=${id} RETURNING *`;
     return row;
   } finally { await sql.end(); }
+}
+
+// ── CAMPAÑAS ──────────────────────────────────────────────────────────────────
+export async function getCampanas() {
+  const sql = getClient();
+  try { return await sql`SELECT * FROM studio_campanas ORDER BY fecha_inicio ASC`; }
+  finally { await sql.end(); }
+}
+export async function addCampana(data: {
+  nombre: string; fecha_inicio: string; fecha_fin: string;
+  idea: string; eje: string; productos: string; tipo: string;
+}) {
+  const sql = getClient();
+  try {
+    const [row] = await sql`INSERT INTO studio_campanas ${sql(data)} RETURNING *`;
+    return row;
+  } finally { await sql.end(); }
+}
+export async function updateCampana(id: number, data: Partial<{
+  nombre: string; fecha_inicio: string; fecha_fin: string;
+  idea: string; eje: string; productos: string; tipo: string;
+}>) {
+  const sql = getClient();
+  try {
+    const [row] = await sql`UPDATE studio_campanas SET ${sql(data)} WHERE id=${id} RETURNING *`;
+    return row;
+  } finally { await sql.end(); }
+}
+export async function deleteCampana(id: number) {
+  const sql = getClient();
+  try { await sql`DELETE FROM studio_campanas WHERE id = ${id}`; }
+  finally { await sql.end(); }
 }
 
 // ── DISEÑO ────────────────────────────────────────────────────────────────────
@@ -108,7 +159,11 @@ export async function getRedes() {
   try { return await sql`SELECT * FROM studio_redes ORDER BY creado_el DESC`; }
   finally { await sql.end(); }
 }
-export async function addRedes(data: { titulo: string; caption: string; plataforma: string; formato: string; estado: string; fecha_prog: string | null; pilar: string }) {
+export async function addRedes(data: {
+  titulo: string; caption: string; plataforma: string; formato: string;
+  estado: string; fecha_prog: string | null; fechas_prog: string;
+  link_drive: string; pilar: string;
+}) {
   const sql = getClient();
   try {
     const row_data = { ...data, fecha_prog: data.fecha_prog || null };
@@ -116,7 +171,11 @@ export async function addRedes(data: { titulo: string; caption: string; platafor
     return row;
   } finally { await sql.end(); }
 }
-export async function updateRedes(id: number, data: Partial<{ titulo: string; caption: string; plataforma: string; formato: string; estado: string; fecha_prog: string | null; pilar: string }>) {
+export async function updateRedes(id: number, data: Partial<{
+  titulo: string; caption: string; plataforma: string; formato: string;
+  estado: string; fecha_prog: string | null; fechas_prog: string;
+  link_drive: string; pilar: string;
+}>) {
   const sql = getClient();
   try {
     const [row] = await sql`UPDATE studio_redes SET ${sql(data)} WHERE id=${id} RETURNING *`;
