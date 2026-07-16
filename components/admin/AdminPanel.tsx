@@ -459,6 +459,10 @@ export default function AdminPanel() {
             <span className="hidden sm:inline font-dm text-xs text-[#9B97A8]">
               {totalActivos}/{items.length} activos
             </span>
+            <a href="/admin"
+              className="px-3 py-2 rounded-lg font-dm text-xs text-[#9B97A8] hover:text-white transition-colors">
+              ← Admin
+            </a>
             <button onClick={handleLogout}
               className="px-3 py-2 rounded-lg font-dm text-xs text-[#9B97A8] hover:text-red-400 transition-colors">
               Salir
