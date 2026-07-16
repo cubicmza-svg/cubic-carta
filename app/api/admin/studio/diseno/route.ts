@@ -1,8 +1,9 @@
 import { isAuthenticated } from '@/lib/adminAuth';
-import { getDiseno, addDiseno } from '@/lib/studioDb';
+import { ensureStudioTables, getDiseno, addDiseno } from '@/lib/studioDb';
 
 export async function GET() {
   if (!isAuthenticated()) return Response.json({ error: 'No autorizado' }, { status: 401 });
+  await ensureStudioTables();
   const rows = await getDiseno();
   return Response.json(rows);
 }

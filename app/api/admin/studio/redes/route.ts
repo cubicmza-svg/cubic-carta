@@ -1,8 +1,9 @@
 import { isAuthenticated } from '@/lib/adminAuth';
-import { getRedes, addRedes } from '@/lib/studioDb';
+import { ensureStudioTables, getRedes, addRedes } from '@/lib/studioDb';
 
 export async function GET() {
   if (!isAuthenticated()) return Response.json({ error: 'No autorizado' }, { status: 401 });
+  await ensureStudioTables();
   const rows = await getRedes();
   return Response.json(rows);
 }
