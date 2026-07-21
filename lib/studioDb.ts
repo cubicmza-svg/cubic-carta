@@ -47,9 +47,10 @@ export async function ensureStudioTables() {
         creado_el    TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
-    // Agregar columnas nuevas si la tabla ya existe (migration segura)
+    // Migraciones seguras
     await sql`ALTER TABLE studio_redes ADD COLUMN IF NOT EXISTS fechas_prog TEXT NOT NULL DEFAULT '[]'`;
     await sql`ALTER TABLE studio_redes ADD COLUMN IF NOT EXISTS link_drive  TEXT NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE studio_diseno ADD COLUMN IF NOT EXISTS archivos TEXT NOT NULL DEFAULT '[]'`;
 
     await sql`
       CREATE TABLE IF NOT EXISTS studio_campanas (
@@ -140,7 +141,7 @@ export async function addDiseno(data: { nombre: string; descripcion: string }) {
     return row;
   } finally { await sql.end(); }
 }
-export async function updateDiseno(id: number, data: Partial<{ nombre: string; descripcion: string; status: string; archivo: string; archivo_nombre: string; archivo_tipo: string }>) {
+export async function updateDiseno(id: number, data: Partial<{ nombre: string; descripcion: string; status: string; archivo: string; archivo_nombre: string; archivo_tipo: string; archivos: string }>) {
   const sql = getClient();
   try {
     const [row] = await sql`UPDATE studio_diseno SET ${sql(data)} WHERE id=${id} RETURNING *`;

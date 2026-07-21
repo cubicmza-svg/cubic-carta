@@ -5,15 +5,23 @@ import { uploadDiseno } from '@/lib/supabaseBrowser';
 
 type Status = 'pendiente' | 'en_proceso' | 'entregado';
 
+interface Archivo {
+  url: string;
+  nombre: string;
+  tipo: string;
+}
+
 interface DisenoCard {
   id: number;
   nombre: string;
   descripcion: string;
   status: Status;
-  archivo: string;
-  archivo_nombre: string;
-  archivo_tipo: string;
+  archivos: string; // JSON array de Archivo[]
   creado_el: string;
+}
+
+function parseArchivos(raw: string | null | undefined): Archivo[] {
+  try { return JSON.parse(raw || '[]') || []; } catch { return []; }
 }
 
 const STATUS_LABEL: Record<Status, string> = {
@@ -93,19 +101,16 @@ export default function StudioDiseno() {
     setCards((prev) => prev.map((c) => c.id === id ? { ...c, status } : c));
   };
 
-  const handleFileUpload = async (id: number, file: File) => {
-    setUploadingId(id);
+  const handleFileUpload = async (card: DisenoCard, file: File) => {
+    setUploadingId(card.id);
     try {
       const publicUrl = await uploadDiseno(file);
-      await fetch(`/api/admin/studio/diseno/${id}`, {
+      const current = parseArchivos(card.archivos);
+      const updated = [...current, { url: publicUrl, nombre: file.name, tipo: file.type }];
+      await fetch(`/api/admin/studio/diseno/${card.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          archivo: publicUrl,
-          archivo_nombre: file.name,
-          archivo_tipo: file.type,
-          status: 'entregado',
-        }),
+        body: JSON.stringify({ archivos: JSON.stringify(updated), status: 'entregado' }),
       });
       await fetchCards();
     } catch (err) {
@@ -115,14 +120,15 @@ export default function StudioDiseno() {
     }
   };
 
-  const downloadArchivo = (card: DisenoCard) => {
-    if (!card.archivo) return;
-    const a = document.createElement('a');
-    a.href = card.archivo;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    a.download = card.archivo_nombre || card.nombre;
-    a.click();
+  const removeArchivo = async (card: DisenoCard, idx: number) => {
+    const current = parseArchivos(card.archivos);
+    const updated = current.filter((_, i) => i !== idx);
+    await fetch(`/api/admin/studio/diseno/${card.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ archivos: JSON.stringify(updated) }),
+    });
+    await fetchCards();
   };
 
   return (
@@ -188,60 +194,67 @@ export default function StudioDiseno() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {cards.map((card) => (
-            <div key={card.id} className="bg-cubic-card border border-cubic-border rounded-xl p-5 flex flex-col gap-3 hover:border-cubic-border/80 transition-all">
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="font-dm font-semibold text-white text-sm leading-snug flex-1">{card.nombre}</h3>
-                <select value={card.status} onChange={(e) => setStatus(card.id, e.target.value as Status)}
-                  className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 outline-none cursor-pointer bg-transparent ${STATUS_COLOR[card.status]}`}>
-                  {(Object.entries(STATUS_LABEL) as [Status, string][]).map(([v, l]) => (
-                    <option key={v} value={v}>{l}</option>
-                  ))}
-                </select>
-              </div>
+          {cards.map((card) => {
+            const archivos = parseArchivos(card.archivos);
+            return (
+              <div key={card.id} className="bg-cubic-card border border-cubic-border rounded-xl p-5 flex flex-col gap-3 hover:border-cubic-border/80 transition-all">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-dm font-semibold text-white text-sm leading-snug flex-1">{card.nombre}</h3>
+                  <select value={card.status} onChange={(e) => setStatus(card.id, e.target.value as Status)}
+                    className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 outline-none cursor-pointer bg-transparent ${STATUS_COLOR[card.status]}`}>
+                    {(Object.entries(STATUS_LABEL) as [Status, string][]).map(([v, l]) => (
+                      <option key={v} value={v}>{l}</option>
+                    ))}
+                  </select>
+                </div>
 
-              {card.descripcion && (
-                <p className="font-dm text-xs text-cubic-muted leading-relaxed flex-1">{card.descripcion}</p>
-              )}
+                {card.descripcion && (
+                  <p className="font-dm text-xs text-cubic-muted leading-relaxed flex-1">{card.descripcion}</p>
+                )}
 
-              <div className="border-t border-cubic-border pt-3 flex flex-col gap-2">
-                {card.archivo ? (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <span className="text-cubic-accent text-base">{card.archivo_tipo?.includes('pdf') ? '📄' : '🖼️'}</span>
-                      <span className="font-dm text-xs text-cubic-muted flex-1 truncate">{card.archivo_nombre}</span>
-                      <button onClick={() => downloadArchivo(card)}
-                        className="font-dm text-xs font-semibold text-cubic-accent hover:text-green-300 transition-colors">
-                        ↓ Descargar
+                {/* Archivos */}
+                <div className="border-t border-cubic-border pt-3 flex flex-col gap-2">
+                  {archivos.map((a, idx) => (
+                    <div key={idx} className="flex items-center gap-2 bg-cubic-bg rounded-lg px-2 py-1.5">
+                      <span className="text-sm shrink-0">{a.tipo?.includes('pdf') ? '📄' : '🖼️'}</span>
+                      <span className="font-dm text-xs text-cubic-muted flex-1 truncate">{a.nombre}</span>
+                      <a href={a.url} target="_blank" rel="noopener noreferrer"
+                        className="font-dm text-xs font-semibold text-cubic-accent hover:text-green-300 transition-colors shrink-0">
+                        ↓
+                      </a>
+                      <button onClick={() => removeArchivo(card, idx)}
+                        className="font-dm text-xs text-cubic-muted hover:text-pink-400 transition-colors shrink-0 ml-1">
+                        ✕
                       </button>
                     </div>
-                    <label className="flex items-center gap-1 cursor-pointer text-[10px] font-dm text-cubic-muted hover:text-white transition-colors">
-                      <input type="file" accept="image/*,.pdf" className="hidden"
-                        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(card.id, f); }} />
-                      ↻ Reemplazar archivo
-                    </label>
-                  </>
-                ) : (
-                  <label className={`flex items-center gap-2 cursor-pointer text-xs font-dm text-cubic-muted hover:text-white transition-colors ${uploadingId === card.id ? 'opacity-50' : ''}`}>
-                    <input type="file" accept="image/*,.pdf" className="hidden" disabled={uploadingId === card.id}
-                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(card.id, f); }} />
-                    <span className="text-base">📎</span>
-                    {uploadingId === card.id ? 'Subiendo…' : 'Subir archivo (imagen o PDF)'}
-                  </label>
-                )}
-              </div>
+                  ))}
 
-              <div className="flex items-center justify-between">
-                <span className="font-dm text-[10px] text-cubic-muted">
-                  {new Date(card.creado_el).toLocaleDateString('es-AR')}
-                </span>
-                <button onClick={() => openEdit(card)}
-                  className="font-dm text-[10px] text-cubic-muted hover:text-white transition-colors">
-                  ✏️ Editar
-                </button>
+                  {/* Botón agregar archivo */}
+                  <label className={`flex items-center gap-2 cursor-pointer text-xs font-dm text-cubic-muted hover:text-white transition-colors mt-1 ${uploadingId === card.id ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <input type="file" accept="image/*,.pdf,.zip,.ai,.psd,.eps" className="hidden" multiple
+                      disabled={uploadingId === card.id}
+                      onChange={async (e) => {
+                        const files = Array.from(e.target.files || []);
+                        for (const f of files) await handleFileUpload(card, f);
+                        e.target.value = '';
+                      }} />
+                    <span className="text-base">📎</span>
+                    {uploadingId === card.id ? 'Subiendo…' : archivos.length > 0 ? '+ Agregar archivo' : 'Subir archivo'}
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="font-dm text-[10px] text-cubic-muted">
+                    {new Date(card.creado_el).toLocaleDateString('es-AR')}
+                  </span>
+                  <button onClick={() => openEdit(card)}
+                    className="font-dm text-[10px] text-cubic-muted hover:text-white transition-colors">
+                    ✏️ Editar
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
