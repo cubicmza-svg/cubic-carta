@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-export const BUCKET = 'cubic-diseno';
+export const BUCKET = 'cubic diseno';
 
 const supabase = createClient(
   'https://xjkzilnnagwgeejlnnto.supabase.co',
