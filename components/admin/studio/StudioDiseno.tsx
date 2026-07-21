@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { uploadDiseno } from '@/lib/supabaseBrowser';
 
 type Status = 'pendiente' | 'en_proceso' | 'entregado';
 
@@ -92,31 +93,34 @@ export default function StudioDiseno() {
     setCards((prev) => prev.map((c) => c.id === id ? { ...c, status } : c));
   };
 
-  const handleFileUpload = (id: number, file: File) => {
+  const handleFileUpload = async (id: number, file: File) => {
     setUploadingId(id);
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const dataUrl = e.target?.result as string;
+    try {
+      const publicUrl = await uploadDiseno(file);
       await fetch(`/api/admin/studio/diseno/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          archivo: dataUrl,
+          archivo: publicUrl,
           archivo_nombre: file.name,
           archivo_tipo: file.type,
           status: 'entregado',
         }),
       });
       await fetchCards();
+    } catch (err) {
+      alert(`Error al subir el archivo: ${(err as Error).message}`);
+    } finally {
       setUploadingId(null);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const downloadArchivo = (card: DisenoCard) => {
     if (!card.archivo) return;
     const a = document.createElement('a');
     a.href = card.archivo;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
     a.download = card.archivo_nombre || card.nombre;
     a.click();
   };
