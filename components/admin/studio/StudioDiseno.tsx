@@ -235,7 +235,12 @@ export default function StudioDiseno() {
                       disabled={uploadingId === card.id}
                       onChange={async (e) => {
                         const files = Array.from(e.target.files || []);
-                        for (const f of files) await handleFileUpload(card, f);
+                        const tooBig = files.filter(f => f.size > 50 * 1024 * 1024);
+                        if (tooBig.length) {
+                          alert(`Estos archivos superan el límite de 50MB:\n${tooBig.map(f => `• ${f.name} (${(f.size/1024/1024).toFixed(1)}MB)`).join('\n')}\n\nComprimilos antes de subir.`);
+                        }
+                        const ok = files.filter(f => f.size <= 50 * 1024 * 1024);
+                        for (const f of ok) await handleFileUpload(card, f);
                         e.target.value = '';
                       }} />
                     <span className="text-base">📎</span>
