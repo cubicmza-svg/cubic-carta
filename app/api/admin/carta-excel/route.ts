@@ -3,61 +3,70 @@ import { getAllItems, updateItem, addItem } from '@/lib/db';
 import ExcelJS from 'exceljs';
 import * as XLSX from 'xlsx';
 
-// Colores CUBIC
-const COLOR_BG      = '1A1721'; // fondo oscuro
-const COLOR_HEADER  = '4ADE80'; // verde acento
-const COLOR_CAT: Record<string, string> = {
-  'BRUNCH':               'FFF3E0',
-  'PROMOS':               'E8F5E9',
-  'CAFETERIA E INFUSIONES': 'E3F2FD',
-  'BEBIDAS':              'FCE4EC',
-  'COCTELERIA':           'F3E5F5',
-  'MINUTAS':              'E0F7FA',
-  'POSTRES':              'FFF9C4',
-};
-const COLOR_DEFAULT = 'F5F5F5';
+// ARGB = FF + hex RGB (FF = totalmente opaco)
+const HDR_BG   = 'FF4ADE80'; // verde CUBIC
+const HDR_FG   = 'FF1A1721'; // oscuro
+const GOOD_FG  = 'FF166534'; // verde texto
+const BAD_FG   = 'FF991B1B'; // rojo texto
+const BODY_FG  = 'FF1A1721';
 
-function catColor(cat: string) {
-  return COLOR_CAT[cat?.toUpperCase()] ?? COLOR_DEFAULT;
+// Color de fondo por categoría (filas pares)
+const CAT_COLORS: Record<string, string> = {
+  'BRUNCH':                 'FFFFF8EE',
+  'PROMOS':                 'FFEDFFF3',
+  'CAFETERIA E INFUSIONES': 'FFE8F3FF',
+  'BEBIDAS':                'FFFFF0F4',
+  'COCTELERIA':             'FFF8F0FF',
+  'MINUTAS':                'FFE8FFFC',
+  'POSTRES':                'FFFFFCE8',
+};
+const CAT_DEFAULT = 'FFF9F9F9';
+
+// Versión levemente más oscura para filas impares
+function darken(argb: string): string {
+  const hex = argb.slice(2); // quita FF
+  const r = Math.max(0, parseInt(hex.slice(0, 2), 16) - 10).toString(16).padStart(2, '0');
+  const g = Math.max(0, parseInt(hex.slice(2, 4), 16) - 10).toString(16).padStart(2, '0');
+  const b = Math.max(0, parseInt(hex.slice(4, 6), 16) - 10).toString(16).padStart(2, '0');
+  return `FF${r}${g}${b}`;
 }
 
-// GET — descarga el Excel con estilo
+// GET — descarga Excel con estilos
 export async function GET() {
   if (!isAuthenticated()) return new Response('No autorizado', { status: 401 });
 
   const items = await getAllItems();
   const wb = new ExcelJS.Workbook();
   wb.creator = 'CUBIC Café & Bar';
-  const ws = wb.addWorksheet('Carta', { views: [{ state: 'frozen', ySplit: 1 }] });
 
-  // Columnas
-  ws.columns = [
-    { key: 'id',          header: 'ID',                 width: 6 },
-    { key: 'categoria',   header: 'Categoría',          width: 22 },
-    { key: 'subcat',      header: 'Subcategoría',       width: 20 },
-    { key: 'nombre',      header: 'Nombre',             width: 28 },
-    { key: 'descripcion', header: 'Descripción',        width: 45 },
-    { key: 'precio',      header: 'Precio',             width: 12 },
-    { key: 'precio_alt',  header: 'Precio alternativo', width: 22 },
-    { key: 'activo',      header: 'Activo',             width: 9 },
-    { key: 'orden',       header: 'Orden',              width: 8 },
-  ];
-
-  // Header row estilo
-  const headerRow = ws.getRow(1);
-  headerRow.height = 22;
-  ws.columns.forEach((col, i) => {
-    const cell = headerRow.getCell(i + 1);
-    cell.value = col.header;
-    cell.font        = { bold: true, color: { argb: COLOR_BG }, size: 11, name: 'Calibri' };
-    cell.fill        = { type: 'pattern', pattern: 'solid', fgColor: { argb: COLOR_HEADER } };
-    cell.alignment   = { vertical: 'middle', horizontal: 'center', wrapText: false };
-    cell.border = {
-      bottom: { style: 'medium', color: { argb: '22C55E' } },
-    };
+  const ws = wb.addWorksheet('Carta', {
+    views: [{ state: 'frozen', ySplit: 1 }],
   });
 
-  // Filas de datos
+  ws.columns = [
+    { key: 'id',          header: 'ID',                  width: 6  },
+    { key: 'categoria',   header: 'Categoría',           width: 24 },
+    { key: 'subcat',      header: 'Subcategoría',        width: 20 },
+    { key: 'nombre',      header: 'Nombre',              width: 28 },
+    { key: 'descripcion', header: 'Descripción',         width: 46 },
+    { key: 'precio',      header: 'Precio',              width: 12 },
+    { key: 'precio_alt',  header: 'Precio alternativo',  width: 24 },
+    { key: 'activo',      header: 'Activo',              width: 9  },
+    { key: 'orden',       header: 'Orden',               width: 8  },
+  ];
+
+  // ── Header ──
+  const hRow = ws.getRow(1);
+  hRow.height = 24;
+  for (let c = 1; c <= 9; c++) {
+    const cell = hRow.getCell(c);
+    cell.font      = { bold: true, name: 'Calibri', size: 11, color: { argb: HDR_FG } };
+    cell.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: HDR_BG } };
+    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    cell.border    = { bottom: { style: 'medium', color: { argb: 'FF22C55E' } } };
+  }
+
+  // ── Filas ──
   items.forEach((it, idx) => {
     const row = ws.addRow({
       id:          it.id,
@@ -72,56 +81,47 @@ export async function GET() {
     });
     row.height = 18;
 
-    const bg = catColor(it.categoria);
-    const isEven = idx % 2 === 0;
-    const rowBg = isEven ? bg : lighten(bg);
+    const base = CAT_COLORS[it.categoria?.toUpperCase()] ?? CAT_DEFAULT;
+    const bg   = idx % 2 === 0 ? base : darken(base);
 
-    row.eachCell((cell, colNum) => {
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowBg } };
-      cell.font = { name: 'Calibri', size: 10, color: { argb: '1A1721' } };
-      cell.alignment = { vertical: 'middle', wrapText: colNum === 5 };
-      cell.border = {
-        bottom: { style: 'thin', color: { argb: 'DDDDDD' } },
-      };
-      // Precio en negrita
-      if (colNum === 6) {
-        cell.font = { ...cell.font, bold: true };
-        cell.numFmt = '#,##0';
+    row.eachCell((cell, col) => {
+      cell.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+      cell.font      = { name: 'Calibri', size: 10, color: { argb: BODY_FG } };
+      cell.alignment = { vertical: 'middle', wrapText: col === 5 };
+      cell.border    = { bottom: { style: 'thin', color: { argb: 'FFDDDDDD' } } };
+
+      if (col === 1) cell.alignment = { ...cell.alignment, horizontal: 'center' };
+
+      if (col === 6) {
+        cell.font      = { ...cell.font, bold: true };
+        cell.numFmt    = '#,##0';
         cell.alignment = { ...cell.alignment, horizontal: 'right' };
       }
-      // Activo centrado
-      if (colNum === 8) {
+
+      if (col === 8) {
         cell.alignment = { ...cell.alignment, horizontal: 'center' };
-        if (it.activo) cell.font = { ...cell.font, color: { argb: '166534' }, bold: true };
-        else           cell.font = { ...cell.font, color: { argb: '991B1B' } };
+        cell.font      = it.activo
+          ? { ...cell.font, bold: true, color: { argb: GOOD_FG } }
+          : { ...cell.font, color: { argb: BAD_FG } };
       }
-      // ID centrado
-      if (colNum === 1) cell.alignment = { ...cell.alignment, horizontal: 'center' };
+
+      if (col === 9) cell.alignment = { ...cell.alignment, horizontal: 'center' };
     });
   });
 
-  // Autofilter en header
   ws.autoFilter = { from: 'A1', to: 'I1' };
 
   const buf = await wb.xlsx.writeBuffer();
 
   return new Response(buf as ArrayBuffer, {
     headers: {
-      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Type':        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': 'attachment; filename="carta-cubic.xlsx"',
     },
   });
 }
 
-// Aclara levemente un color hex para filas alternas
-function lighten(hex: string): string {
-  const r = Math.min(255, parseInt(hex.slice(0, 2), 16) + 12).toString(16).padStart(2, '0');
-  const g = Math.min(255, parseInt(hex.slice(2, 4), 16) + 12).toString(16).padStart(2, '0');
-  const b = Math.min(255, parseInt(hex.slice(4, 6), 16) + 12).toString(16).padStart(2, '0');
-  return `${r}${g}${b}`;
-}
-
-// POST — recibe el Excel modificado, actualiza sin tocar imágenes
+// POST — importa Excel modificado, actualiza sin tocar imágenes
 export async function POST(req: Request) {
   if (!isAuthenticated()) return Response.json({ error: 'No autorizado' }, { status: 401 });
 
@@ -142,14 +142,14 @@ export async function POST(req: Request) {
 
   for (const row of rows) {
     const id           = row['ID'] != null ? Number(row['ID']) : null;
-    const nombre       = String(row['Nombre']            ?? '').trim();
-    const categoria    = String(row['Categoría']         ?? '').trim();
-    const subcategoria = String(row['Subcategoría']      ?? '').trim();
-    const descripcion  = String(row['Descripción']       ?? '').trim();
-    const precio       = Number(row['Precio']            ?? 0);
+    const nombre       = String(row['Nombre']             ?? '').trim();
+    const categoria    = String(row['Categoría']          ?? '').trim();
+    const subcategoria = String(row['Subcategoría']       ?? '').trim();
+    const descripcion  = String(row['Descripción']        ?? '').trim();
+    const precio       = Number(row['Precio']             ?? 0);
     const precioAlt    = String(row['Precio alternativo'] ?? '').trim();
     const activo       = String(row['Activo'] ?? 'SI').toUpperCase() !== 'NO';
-    const orden        = Number(row['Orden']             ?? 0);
+    const orden        = Number(row['Orden']              ?? 0);
 
     if (!nombre) continue;
 
