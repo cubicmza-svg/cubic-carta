@@ -342,6 +342,7 @@ export default function AdminPanel() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [toast, setToast] = useState('');
   const [seeding, setSeeding] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   // ── Fetch de ítems desde KV ──────────────────────────────────────────────
   const fetchItems = useCallback(async () => {
@@ -355,6 +356,27 @@ export default function AdminPanel() {
   }, []);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
+
+  function handleExcel() {
+    window.location.href = '/api/admin/carta-excel';
+  }
+
+  async function handleImportExcel(file: File) {
+    setImporting(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/admin/carta-excel', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al importar');
+      await fetchItems();
+      showToast(`✅ ${data.updated} actualizados, ${data.created} nuevos`);
+    } catch (err) {
+      showToast(`❌ ${(err as Error).message}`);
+    } finally {
+      setImporting(false);
+    }
+  }
 
   function showToast(msg: string) {
     setToast(msg);
@@ -443,6 +465,21 @@ export default function AdminPanel() {
           >
             + AGREGAR ÍTEM
           </button>
+
+          {/* Excel export/import */}
+          <button
+            onClick={handleExcel}
+            title="Descargar carta como Excel"
+            className="px-4 py-2 rounded-lg border border-[#2D2840] font-dm text-xs text-[#9B97A8] hover:border-green-500/50 hover:text-green-400 transition-all">
+            ↓ Excel
+          </button>
+
+          <label title="Subir Excel modificado para actualizar precios"
+            className={`px-4 py-2 rounded-lg border border-[#2D2840] font-dm text-xs cursor-pointer transition-all ${importing ? 'opacity-50 pointer-events-none text-[#9B97A8]' : 'text-[#9B97A8] hover:border-amber-500/50 hover:text-amber-400'}`}>
+            <input type="file" accept=".xlsx,.xls" className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) { handleImportExcel(f); e.target.value = ''; } }} />
+            {importing ? '⏳ Importando…' : '↑ Importar Excel'}
+          </label>
 
           {/* Seed (solo si está vacío o para reset) */}
           <button
