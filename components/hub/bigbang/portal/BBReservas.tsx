@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-interface Servicio { id: number; nombre: string; precio: number; }
+interface Servicio { id: number; nombre: string; precio: number; activo: boolean; }
 interface Reserva {
   id: number; cliente: string; telefono: string;
   fecha_evento: string; hora_inicio: string; hora_fin: string;
