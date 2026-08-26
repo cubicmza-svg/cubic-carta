@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import BBDiseno from './BBDiseno';
 import BBRedes from './BBRedes';
+import BBSpaceBackground from '../BBSpaceBackground';
 
 type Tab = 'diseno' | 'redes';
 
@@ -16,7 +17,8 @@ export default function BBMarketing() {
   const [tab, setTab] = useState<Tab>('redes');
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#ffffff' }}>
+    <div className="relative min-h-screen flex flex-col" style={{ background: '#ffffff' }}>
+      <BBSpaceBackground />
 
       {/* Arco iris top */}
       <div className="h-2 w-full"

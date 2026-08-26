@@ -6,6 +6,7 @@ import BBServicios from './BBServicios';
 import BBAgenda from './BBAgenda';
 import BBReservas from './BBReservas';
 import BBPresupuestos from './BBPresupuestos';
+import BBSpaceBackground from '../BBSpaceBackground';
 
 type Tab = 'agenda' | 'reservas' | 'presupuestos' | 'servicios';
 
@@ -20,7 +21,8 @@ export default function BigBangPortal() {
   const [tab, setTab] = useState<Tab>('agenda');
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#ffffff' }}>
+    <div className="relative min-h-screen flex flex-col" style={{ background: '#ffffff' }}>
+      <BBSpaceBackground />
 
       {/* Arco iris top */}
       <div className="h-2 w-full"

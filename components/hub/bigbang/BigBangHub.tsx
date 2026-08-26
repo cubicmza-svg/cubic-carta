@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import BBSpaceBackground from './BBSpaceBackground';
 
 const SECTIONS = [
   {
@@ -49,7 +50,8 @@ const SECTIONS = [
 
 export default function BigBangHub() {
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#ffffff' }}>
+    <div className="relative min-h-screen flex flex-col" style={{ background: '#ffffff' }}>
+      <BBSpaceBackground />
 
       {/* Arco iris top — más grueso */}
       <div className="h-2 w-full"
