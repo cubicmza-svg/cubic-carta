@@ -1,0 +1,267 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { uploadDiseno } from '@/lib/supabaseBrowser';
+
+type Status = 'pendiente' | 'en_proceso' | 'entregado';
+
+interface Archivo {
+  url: string;
+  nombre: string;
+  tipo: string;
+}
+
+interface DisenoCard {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  status: Status;
+  archivos: string; // JSON array de Archivo[]
+  creado_el: string;
+}
+
+function parseArchivos(raw: string | null | undefined): Archivo[] {
+  try { return JSON.parse(raw || '[]') || []; } catch { return []; }
+}
+
+const STATUS_LABEL: Record<Status, string> = {
+  pendiente:  'Pendiente',
+  en_proceso: 'En proceso',
+  entregado:  'Entregado',
+};
+const STATUS_COLOR: Record<Status, string> = {
+  pendiente:  'bg-orange-500/15 text-orange-300 border-orange-500/30',
+  en_proceso: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
+  entregado:  'bg-green-500/15 text-green-300 border-green-500/30',
+};
+
+export default function StudioDiseno() {
+  const [cards, setCards]       = useState<DisenoCard[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [nombre, setNombre]     = useState('');
+  const [desc, setDesc]         = useState('');
+  const [editId, setEditId]     = useState<number | null>(null);
+  const [uploadingId, setUploadingId] = useState<number | null>(null);
+  const [saving, setSaving]     = useState(false);
+
+  const fetchCards = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/bigbang/marketing/diseno');
+      if (res.ok) setCards(await res.json());
+    } finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { fetchCards(); }, [fetchCards]);
+
+  const resetForm = () => { setNombre(''); setDesc(''); setEditId(null); setShowForm(false); };
+
+  const saveCard = async () => {
+    if (!nombre.trim() || saving) return;
+    setSaving(true);
+    try {
+      if (editId !== null) {
+        await fetch(`/api/bigbang/marketing/diseno/${editId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre: nombre.trim(), descripcion: desc.trim() }),
+        });
+      } else {
+        await fetch('/api/bigbang/marketing/diseno', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre: nombre.trim(), descripcion: desc.trim() }),
+        });
+      }
+      await fetchCards();
+      resetForm();
+    } finally { setSaving(false); }
+  };
+
+  const openEdit = (card: DisenoCard) => {
+    setNombre(card.nombre);
+    setDesc(card.descripcion);
+    setEditId(card.id);
+    setShowForm(true);
+  };
+
+  const deleteCard = async (id: number) => {
+    await fetch(`/api/bigbang/marketing/diseno/${id}`, { method: 'DELETE' });
+    await fetchCards();
+    resetForm();
+  };
+
+  const setStatus = async (id: number, status: Status) => {
+    await fetch(`/api/bigbang/marketing/diseno/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    setCards((prev) => prev.map((c) => c.id === id ? { ...c, status } : c));
+  };
+
+  const handleFileUpload = async (card: DisenoCard, file: File) => {
+    setUploadingId(card.id);
+    try {
+      const publicUrl = await uploadDiseno(file);
+      const current = parseArchivos(card.archivos);
+      const updated = [...current, { url: publicUrl, nombre: file.name, tipo: file.type }];
+      await fetch(`/api/bigbang/marketing/diseno/${card.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ archivos: JSON.stringify(updated), status: 'entregado' }),
+      });
+      await fetchCards();
+    } catch (err) {
+      alert(`Error al subir el archivo: ${(err as Error).message}`);
+    } finally {
+      setUploadingId(null);
+    }
+  };
+
+  const removeArchivo = async (card: DisenoCard, idx: number) => {
+    const current = parseArchivos(card.archivos);
+    const updated = current.filter((_, i) => i !== idx);
+    await fetch(`/api/bigbang/marketing/diseno/${card.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ archivos: JSON.stringify(updated) }),
+    });
+    await fetchCards();
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto px-6 py-8">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <h2 className="font-bebas text-2xl tracking-widest text-white">PEDIDOS DE DISEÑO</h2>
+          {loading && <span className="font-dm text-xs text-white/40">Cargando…</span>}
+        </div>
+        <button onClick={() => { resetForm(); setShowForm(true); }}
+          className="font-dm text-sm font-semibold px-4 py-2 rounded-lg bg-orange-500 text-black hover:bg-orange-400 transition-colors">
+          + Nuevo pedido
+        </button>
+      </div>
+
+      {/* Form modal */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(10,8,18,0.88)', backdropFilter: 'blur(6px)' }}
+          onClick={resetForm}>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 w-full max-w-md flex flex-col gap-4"
+            onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-bebas text-xl tracking-widest text-white">
+              {editId !== null ? 'Editar pedido' : 'Nuevo pedido de diseño'}
+            </h3>
+            <div className="flex flex-col gap-1">
+              <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Nombre</label>
+              <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} autoFocus
+                placeholder="Ej: Cartel A3 Happy Hour"
+                className="bg-white/5 border border-white/10 rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 placeholder:text-white/40" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Descripción</label>
+              <textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={3}
+                placeholder="Medidas, colores, texto que debe incluir, formato de entrega…"
+                className="bg-white/5 border border-white/10 rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 placeholder:text-white/40 resize-none" />
+            </div>
+            <div className="flex gap-2 justify-end mt-1">
+              {editId !== null && (
+                <button onClick={() => deleteCard(editId)}
+                  className="font-dm text-sm px-4 py-2 rounded-lg border border-pink-500/30 text-pink-400 bg-pink-500/10 hover:bg-pink-500/20 transition-colors mr-auto">
+                  Eliminar
+                </button>
+              )}
+              <button onClick={resetForm}
+                className="font-dm text-sm px-4 py-2 rounded-lg border border-white/10 text-white/40 hover:text-white transition-colors">
+                Cancelar
+              </button>
+              <button onClick={saveCard} disabled={saving}
+                className="font-dm text-sm font-semibold px-5 py-2 rounded-lg bg-orange-500 text-black hover:bg-orange-400 transition-colors disabled:opacity-50">
+                {saving ? 'Guardando…' : 'Guardar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cards */}
+      {!loading && cards.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="font-bebas text-2xl text-white/40 tracking-widest">Sin pedidos todavía</p>
+          <p className="font-dm text-sm text-white/40 mt-2">Creá el primer pedido de diseño.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {cards.map((card) => {
+            const archivos = parseArchivos(card.archivos);
+            return (
+              <div key={card.id} className="bg-white/5 border border-white/10 rounded-xl p-5 flex flex-col gap-3 hover:border-white/10/80 transition-all">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-dm font-semibold text-white text-sm leading-snug flex-1">{card.nombre}</h3>
+                  <select value={card.status} onChange={(e) => setStatus(card.id, e.target.value as Status)}
+                    className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 outline-none cursor-pointer bg-transparent ${STATUS_COLOR[card.status]}`}>
+                    {(Object.entries(STATUS_LABEL) as [Status, string][]).map(([v, l]) => (
+                      <option key={v} value={v}>{l}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {card.descripcion && (
+                  <p className="font-dm text-xs text-white/40 leading-relaxed flex-1">{card.descripcion}</p>
+                )}
+
+                {/* Archivos */}
+                <div className="border-t border-white/10 pt-3 flex flex-col gap-2">
+                  {archivos.map((a, idx) => (
+                    <div key={idx} className="flex items-center gap-2 bg-white/5 rounded-lg px-2 py-1.5">
+                      <span className="text-sm shrink-0">{a.tipo?.includes('pdf') ? '📄' : '🖼️'}</span>
+                      <span className="font-dm text-xs text-white/40 flex-1 truncate">{a.nombre}</span>
+                      <a href={a.url} target="_blank" rel="noopener noreferrer"
+                        className="font-dm text-xs font-semibold text-orange-500 hover:text-green-300 transition-colors shrink-0">
+                        ↓
+                      </a>
+                      <button onClick={() => removeArchivo(card, idx)}
+                        className="font-dm text-xs text-white/40 hover:text-pink-400 transition-colors shrink-0 ml-1">
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Botón agregar archivo */}
+                  <label className={`flex items-center gap-2 cursor-pointer text-xs font-dm text-white/40 hover:text-white transition-colors mt-1 ${uploadingId === card.id ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <input type="file" accept="image/*,.pdf,.zip,.ai,.psd,.eps" className="hidden" multiple
+                      disabled={uploadingId === card.id}
+                      onChange={async (e) => {
+                        const files = Array.from(e.target.files || []);
+                        const tooBig = files.filter(f => f.size > 50 * 1024 * 1024);
+                        if (tooBig.length) {
+                          alert(`Estos archivos superan el límite de 50MB:\n${tooBig.map(f => `• ${f.name} (${(f.size/1024/1024).toFixed(1)}MB)`).join('\n')}\n\nComprimilos antes de subir.`);
+                        }
+                        const ok = files.filter(f => f.size <= 50 * 1024 * 1024);
+                        for (const f of ok) await handleFileUpload(card, f);
+                        e.target.value = '';
+                      }} />
+                    <span className="text-base">📎</span>
+                    {uploadingId === card.id ? 'Subiendo…' : archivos.length > 0 ? '+ Agregar archivo' : 'Subir archivo'}
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="font-dm text-[10px] text-white/40">
+                    {new Date(card.creado_el).toLocaleDateString('es-AR')}
+                  </span>
+                  <button onClick={() => openEdit(card)}
+                    className="font-dm text-[10px] text-white/40 hover:text-white transition-colors">
+                    ✏️ Editar
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

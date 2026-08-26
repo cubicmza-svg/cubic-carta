@@ -60,9 +60,85 @@ export async function ensureBigBangTables() {
         creado_el     TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS bb_diseno (
+        id              SERIAL PRIMARY KEY,
+        nombre          TEXT    NOT NULL DEFAULT '',
+        descripcion     TEXT    NOT NULL DEFAULT '',
+        status          TEXT    NOT NULL DEFAULT 'pendiente',
+        archivos        TEXT    NOT NULL DEFAULT '[]',
+        creado_el       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS bb_redes (
+        id           SERIAL PRIMARY KEY,
+        titulo       TEXT    NOT NULL DEFAULT '',
+        caption      TEXT    NOT NULL DEFAULT '',
+        plataforma   TEXT    NOT NULL DEFAULT 'instagram',
+        formato      TEXT    NOT NULL DEFAULT 'feed',
+        estado       TEXT    NOT NULL DEFAULT 'idea',
+        fechas_prog  TEXT    NOT NULL DEFAULT '[]',
+        link_drive   TEXT    NOT NULL DEFAULT '',
+        pilar        TEXT    NOT NULL DEFAULT '',
+        creado_el    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
   } finally {
     await sql.end();
   }
+}
+
+// ── MARKETING: DISEÑO ────────────────────────────────────────────────────────
+export async function getBBDiseno() {
+  const sql = getClient();
+  try { return await sql`SELECT * FROM bb_diseno ORDER BY creado_el DESC`; }
+  finally { await sql.end(); }
+}
+export async function addBBDiseno(data: { nombre: string; descripcion: string }) {
+  const sql = getClient();
+  try {
+    const [row] = await sql`INSERT INTO bb_diseno (nombre, descripcion) VALUES (${data.nombre}, ${data.descripcion}) RETURNING *`;
+    return row;
+  } finally { await sql.end(); }
+}
+export async function updateBBDiseno(id: number, data: Partial<{ nombre: string; descripcion: string; status: string; archivos: string }>) {
+  const sql = getClient();
+  try {
+    const [row] = await sql`UPDATE bb_diseno SET ${sql(data)} WHERE id=${id} RETURNING *`;
+    return row;
+  } finally { await sql.end(); }
+}
+export async function deleteBBDiseno(id: number) {
+  const sql = getClient();
+  try { await sql`DELETE FROM bb_diseno WHERE id=${id}`; }
+  finally { await sql.end(); }
+}
+
+// ── MARKETING: REDES ─────────────────────────────────────────────────────────
+export async function getBBRedes() {
+  const sql = getClient();
+  try { return await sql`SELECT * FROM bb_redes ORDER BY creado_el DESC`; }
+  finally { await sql.end(); }
+}
+export async function addBBRedes(data: Record<string, unknown>) {
+  const sql = getClient();
+  try {
+    const [row] = await sql`INSERT INTO bb_redes ${sql(data)} RETURNING *`;
+    return row;
+  } finally { await sql.end(); }
+}
+export async function updateBBRedes(id: number, data: Record<string, unknown>) {
+  const sql = getClient();
+  try {
+    const [row] = await sql`UPDATE bb_redes SET ${sql(data)} WHERE id=${id} RETURNING *`;
+    return row;
+  } finally { await sql.end(); }
+}
+export async function deleteBBRedes(id: number) {
+  const sql = getClient();
+  try { await sql`DELETE FROM bb_redes WHERE id=${id}`; }
+  finally { await sql.end(); }
 }
 
 // ── SERVICIOS ─────────────────────────────────────────────────────────────────
