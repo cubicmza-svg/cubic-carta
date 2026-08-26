@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 
@@ -111,7 +111,7 @@ export default function BBPresupuestos() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="font-bebas text-2xl tracking-widest text-white">📋 PRESUPUESTOS</h2>
+        <h2 className="font-bebas text-2xl tracking-widest text-gray-800">📋 PRESUPUESTOS</h2>
         <button onClick={() => { reset(); setShowForm(true); }}
           className="font-dm text-sm font-semibold px-4 py-2 rounded-lg text-black"
           style={{ background: '#f97316' }}>
@@ -127,7 +127,7 @@ export default function BBPresupuestos() {
           <div className="w-full max-w-xl rounded-2xl p-6 flex flex-col gap-4 overflow-y-auto max-h-[92vh]"
             style={{ background: '#0d1a30', border: '1px solid rgba(249,115,22,0.2)' }}
             onClick={e => e.stopPropagation()}>
-            <h3 className="font-bebas text-xl tracking-widest text-white">Nuevo presupuesto</h3>
+            <h3 className="font-bebas text-xl tracking-widest text-gray-800">Nuevo presupuesto</h3>
 
             <div className="grid grid-cols-2 gap-3">
               {[
@@ -137,23 +137,23 @@ export default function BBPresupuestos() {
                 { label: 'Fecha (opcional)', key: 'fecha_evento', type: 'date', span: 2 },
               ].map(f => (
                 <div key={f.key} className={`flex flex-col gap-1 ${f.span === 2 ? 'col-span-2' : ''}`}>
-                  <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">{f.label}</label>
+                  <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">{f.label}</label>
                   <input type={f.type || 'text'} value={(form as Record<string,unknown>)[f.key] as string}
                     onChange={e => set(f.key, e.target.value)} placeholder={f.ph} autoFocus={f.key === 'cliente'}
-                    className="px-3 py-2 rounded-lg font-dm text-sm text-white placeholder-white/20 outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
+                    className="px-3 py-2 rounded-lg font-dm text-sm text-gray-800 placeholder-white/20 outline-none"
+                    style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
                 </div>
               ))}
 
               <div className="col-span-2 flex flex-col gap-1">
-                <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Paquete base</label>
+                <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Paquete base</label>
                 <select value={form.servicio_id} onChange={e => {
                   const s = servicios.find(x => x.id === parseInt(e.target.value)) || null;
                   set('servicio_id', e.target.value);
                   setSelectedService(s);
                 }}
-                  className="px-3 py-2 rounded-lg font-dm text-sm text-white outline-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  className="px-3 py-2 rounded-lg font-dm text-sm text-gray-800 outline-none"
+                  style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)' }}>
                   <option value="">Sin paquete fijo</option>
                   {servicios.map(s => <option key={s.id} value={s.id}>{s.nombre} — ${s.precio.toLocaleString('es-AR')}</option>)}
                 </select>
@@ -168,39 +168,39 @@ export default function BBPresupuestos() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Chicos</label>
+                <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Chicos</label>
                 <input type="number" value={form.cant_chicos} onChange={e => set('cant_chicos', e.target.value)}
-                  className="px-3 py-2 rounded-lg font-dm text-sm text-white outline-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  className="px-3 py-2 rounded-lg font-dm text-sm text-gray-800 outline-none"
+                  style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)' }} />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Adultos</label>
+                <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Adultos</label>
                 <input type="number" value={form.cant_adultos} onChange={e => set('cant_adultos', e.target.value)}
-                  className="px-3 py-2 rounded-lg font-dm text-sm text-white outline-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  className="px-3 py-2 rounded-lg font-dm text-sm text-gray-800 outline-none"
+                  style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)' }} />
               </div>
 
               {/* Adicionales */}
               <div className="col-span-2 flex flex-col gap-2">
-                <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Adicionales</label>
+                <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Adicionales</label>
                 <div className="flex gap-2">
                   <input value={extraDesc} onChange={e => setExtraDesc(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addExtra(); } }}
-                    placeholder="Descripción" className="flex-1 px-3 py-2 rounded-lg font-dm text-sm text-white placeholder-white/20 outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                    placeholder="Descripción" className="flex-1 px-3 py-2 rounded-lg font-dm text-sm text-gray-800 placeholder-white/20 outline-none"
+                    style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)' }} />
                   <input type="number" value={extraPrecio} onChange={e => setExtraPrecio(e.target.value)}
-                    placeholder="$" className="w-24 px-3 py-2 rounded-lg font-dm text-sm text-white placeholder-white/20 outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                    placeholder="$" className="w-24 px-3 py-2 rounded-lg font-dm text-sm text-gray-800 placeholder-white/20 outline-none"
+                    style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)' }} />
                   <button onClick={addExtra} type="button"
                     className="px-3 py-2 rounded-lg font-dm text-sm font-semibold text-black"
                     style={{ background: '#f97316' }}>+</button>
                 </div>
                 {extras.map((e, i) => (
                   <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
-                    style={{ background: 'rgba(255,255,255,0.03)' }}>
-                    <span className="font-dm text-xs text-white flex-1">{e.desc}</span>
+                    style={{ background: '#ffffff' }}>
+                    <span className="font-dm text-xs text-gray-800 flex-1">{e.desc}</span>
                     <span className="font-dm text-xs" style={{ color: '#fb923c' }}>${e.precio.toLocaleString('es-AR')}</span>
-                    <button onClick={() => setExtras(extras.filter((_, j) => j !== i))} className="text-white/30 hover:text-red-400 ml-1">✕</button>
+                    <button onClick={() => setExtras(extras.filter((_, j) => j !== i))} className="text-gray-400 hover:text-red-400 ml-1">✕</button>
                   </div>
                 ))}
               </div>
@@ -208,21 +208,21 @@ export default function BBPresupuestos() {
               {/* Total */}
               <div className="col-span-2 flex items-center justify-between px-4 py-3 rounded-xl"
                 style={{ background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.2)' }}>
-                <span className="font-dm text-sm text-white/60">Total presupuestado</span>
+                <span className="font-dm text-sm text-gray-600">Total presupuestado</span>
                 <span className="font-bebas text-2xl" style={{ color: '#f97316' }}>${total.toLocaleString('es-AR')}</span>
               </div>
 
               <div className="col-span-2 flex flex-col gap-1">
-                <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Notas</label>
+                <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Notas</label>
                 <textarea value={form.notas} onChange={e => set('notas', e.target.value)} rows={2}
                   placeholder="Observaciones adicionales…"
-                  className="px-3 py-2 rounded-lg font-dm text-sm text-white placeholder-white/20 outline-none resize-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  className="px-3 py-2 rounded-lg font-dm text-sm text-gray-800 placeholder-white/20 outline-none resize-none"
+                  style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)' }} />
               </div>
             </div>
 
             <div className="flex gap-2 justify-end mt-2">
-              <button onClick={reset} className="font-dm text-sm px-4 py-2 rounded-lg text-white/40 hover:text-white transition-colors">Cancelar</button>
+              <button onClick={reset} className="font-dm text-sm px-4 py-2 rounded-lg text-gray-400 hover:text-gray-800 transition-colors">Cancelar</button>
               <button onClick={save} disabled={saving}
                 className="font-dm text-sm font-semibold px-5 py-2 rounded-lg text-black disabled:opacity-50"
                 style={{ background: '#f97316' }}>
@@ -236,7 +236,7 @@ export default function BBPresupuestos() {
       {/* Lista */}
       {!loading && presups.length === 0 ? (
         <div className="text-center py-20">
-          <p className="font-bebas text-2xl text-white/20 tracking-widest">Sin presupuestos todavía</p>
+          <p className="font-bebas text-2xl text-gray-300 tracking-widest">Sin presupuestos todavía</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
@@ -244,29 +244,29 @@ export default function BBPresupuestos() {
             const items: ItemExtra[] = JSON.parse(p.items || '[]');
             return (
               <div key={p.id} className="rounded-2xl p-5"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                style={{ background: '#ffffff', border: '1px solid rgba(255,255,255,0.07)' }}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-dm font-semibold text-white">{p.cliente}</h3>
+                      <h3 className="font-dm font-semibold text-gray-800">{p.cliente}</h3>
                       <span className="font-dm text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full"
                         style={{ background: `${ESTADO_COL[p.estado]}22`, color: ESTADO_COL[p.estado] }}>
                         {p.estado}
                       </span>
                     </div>
-                    <p className="font-dm text-xs text-white/40">{p.telefono} · {p.tipo_evento}</p>
-                    {p.fecha_evento && <p className="font-dm text-xs text-white/40">📅 {new Date(p.fecha_evento).toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })}</p>}
+                    <p className="font-dm text-xs text-gray-400">{p.telefono} · {p.tipo_evento}</p>
+                    {p.fecha_evento && <p className="font-dm text-xs text-gray-400">📅 {new Date(p.fecha_evento).toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })}</p>}
                     {p.servicio_nombre && <p className="font-dm text-xs mt-0.5" style={{ color: '#fb923c' }}>📦 {p.servicio_nombre}</p>}
                     {items.length > 0 && items.map((it, i) => (
-                      <p key={i} className="font-dm text-xs text-white/40">+ {it.desc}: ${it.precio.toLocaleString('es-AR')}</p>
+                      <p key={i} className="font-dm text-xs text-gray-400">+ {it.desc}: ${it.precio.toLocaleString('es-AR')}</p>
                     ))}
-                    {p.notas && <p className="font-dm text-xs text-white/30 mt-1">💬 {p.notas}</p>}
+                    {p.notas && <p className="font-dm text-xs text-gray-400 mt-1">💬 {p.notas}</p>}
                   </div>
                   <div className="flex flex-col items-end gap-2">
                     <p className="font-bebas text-2xl" style={{ color: '#f97316' }}>${p.total.toLocaleString('es-AR')}</p>
                     <select value={p.estado} onChange={e => updateEstado(p.id, e.target.value)}
                       className="font-dm text-[10px] px-2 py-1 rounded-lg outline-none"
-                      style={{ background: 'rgba(255,255,255,0.05)', color: ESTADO_COL[p.estado], border: '1px solid rgba(255,255,255,0.1)' }}>
+                      style={{ background: '#f3f4f6', color: ESTADO_COL[p.estado], border: '1px solid rgba(255,255,255,0.1)' }}>
                       {ESTADOS_PRES.map(e => <option key={e} value={e}>{e}</option>)}
                     </select>
                     <a href={`https://wa.me/${p.telefono.replace(/\D/g,'')}?text=${whatsappText(p)}`}
@@ -275,7 +275,7 @@ export default function BBPresupuestos() {
                       style={{ background: 'rgba(37,211,102,0.12)', color: '#25d366' }}>
                       📲 Enviar por WA
                     </a>
-                    <button onClick={() => del(p.id)} className="font-dm text-[10px] text-white/20 hover:text-red-400 transition-colors">Eliminar</button>
+                    <button onClick={() => del(p.id)} className="font-dm text-[10px] text-gray-300 hover:text-red-400 transition-colors">Eliminar</button>
                   </div>
                 </div>
               </div>
@@ -286,3 +286,4 @@ export default function BBPresupuestos() {
     </div>
   );
 }
+

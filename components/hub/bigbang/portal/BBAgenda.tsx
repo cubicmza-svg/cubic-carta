@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 
@@ -51,23 +51,23 @@ export default function BBAgenda() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="font-bebas text-2xl tracking-widest text-white">📅 AGENDA</h2>
-        {loading && <span className="font-dm text-xs text-white/30">Cargando…</span>}
+        <h2 className="font-bebas text-2xl tracking-widest text-gray-800">📅 AGENDA</h2>
+        {loading && <span className="font-dm text-xs text-gray-400">Cargando…</span>}
       </div>
 
       {/* Navegación mes */}
       <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} className="font-dm text-sm text-white/50 hover:text-white px-3 py-1 rounded-lg transition-colors"
-          style={{ background: 'rgba(255,255,255,0.05)' }}>← Ant</button>
-        <h3 className="font-bebas text-2xl text-white tracking-widest">{MESES[month]} {year}</h3>
-        <button onClick={nextMonth} className="font-dm text-sm text-white/50 hover:text-white px-3 py-1 rounded-lg transition-colors"
-          style={{ background: 'rgba(255,255,255,0.05)' }}>Sig →</button>
+        <button onClick={prevMonth} className="font-dm text-sm text-gray-500 hover:text-gray-800 px-3 py-1 rounded-lg transition-colors"
+          style={{ background: '#f3f4f6' }}>← Ant</button>
+        <h3 className="font-bebas text-2xl text-gray-800 tracking-widest">{MESES[month]} {year}</h3>
+        <button onClick={nextMonth} className="font-dm text-sm text-gray-500 hover:text-gray-800 px-3 py-1 rounded-lg transition-colors"
+          style={{ background: '#f3f4f6' }}>Sig →</button>
       </div>
 
       {/* Días de semana */}
       <div className="grid grid-cols-7 mb-2">
         {DIAS.map(d => (
-          <div key={d} className="font-dm text-[10px] text-white/30 uppercase tracking-widest text-center py-1">{d}</div>
+          <div key={d} className="font-dm text-[10px] text-gray-400 uppercase tracking-widest text-center py-1">{d}</div>
         ))}
       </div>
 
@@ -85,7 +85,7 @@ export default function BBAgenda() {
             <button key={d} onClick={() => setSelected(isSel ? null : iso)}
               className="relative flex flex-col items-center rounded-xl p-1.5 transition-all min-h-[52px]"
               style={{
-                background: isSel ? 'rgba(249,115,22,0.15)' : rs.length > 0 ? 'rgba(255,255,255,0.04)' : 'transparent',
+                background: isSel ? 'rgba(249,115,22,0.15)' : rs.length > 0 ? '#f9fafb' : 'transparent',
                 border: isToday ? '1px solid rgba(249,115,22,0.5)' : isSel ? '1px solid rgba(249,115,22,0.4)' : '1px solid transparent',
               }}>
               <span className="font-dm text-xs font-semibold"
@@ -98,7 +98,7 @@ export default function BBAgenda() {
                     <div key={r.id} className="w-1.5 h-1.5 rounded-full"
                       style={{ background: ESTADO_COLOR[r.estado] || '#9ca3af' }} />
                   ))}
-                  {rs.length > 3 && <span className="font-dm text-[8px] text-white/40">+{rs.length-3}</span>}
+                  {rs.length > 3 && <span className="font-dm text-[8px] text-gray-400">+{rs.length-3}</span>}
                 </div>
               )}
             </button>
@@ -109,25 +109,25 @@ export default function BBAgenda() {
       {/* Panel del día seleccionado */}
       {selected && (
         <div className="mt-6 rounded-2xl p-5"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(249,115,22,0.2)' }}>
-          <h4 className="font-bebas text-lg text-white tracking-widest mb-3">
+          style={{ background: '#ffffff', border: '1px solid rgba(249,115,22,0.2)' }}>
+          <h4 className="font-bebas text-lg text-gray-800 tracking-widest mb-3">
             {new Date(selected + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}
           </h4>
           {selectedReservas.length === 0 ? (
-            <p className="font-dm text-sm text-white/30">Sin reservas este día.</p>
+            <p className="font-dm text-sm text-gray-400">Sin reservas este día.</p>
           ) : (
             <div className="flex flex-col gap-3">
               {selectedReservas.map(r => (
                 <div key={r.id} className="flex items-start justify-between gap-3 pb-3"
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  style={{ borderBottom: '1px solid #e5e7eb' }}>
                   <div className="flex flex-col gap-0.5">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full" style={{ background: ESTADO_COLOR[r.estado] || '#9ca3af' }} />
-                      <p className="font-dm font-semibold text-sm text-white">{r.cliente}</p>
-                      <span className="font-dm text-[10px] text-white/40">{r.tipo_evento}</span>
+                      <p className="font-dm font-semibold text-sm text-gray-800">{r.cliente}</p>
+                      <span className="font-dm text-[10px] text-gray-400">{r.tipo_evento}</span>
                     </div>
                     {(r.hora_inicio || r.hora_fin) && (
-                      <p className="font-dm text-xs text-white/40 ml-4">
+                      <p className="font-dm text-xs text-gray-400 ml-4">
                         {r.hora_inicio}{r.hora_fin ? ' → ' + r.hora_fin : ''}
                       </p>
                     )}
@@ -148,18 +148,18 @@ export default function BBAgenda() {
 
       {/* Próximas reservas */}
       <div className="mt-8">
-        <h3 className="font-bebas text-lg tracking-widest text-white/50 mb-3">PRÓXIMAS FECHAS</h3>
+        <h3 className="font-bebas text-lg tracking-widest text-gray-500 mb-3">PRÓXIMAS FECHAS</h3>
         <div className="flex flex-col gap-2">
           {reservas
             .filter(r => String(r.fecha_evento).substring(0,10) >= today.toISOString().substring(0,10) && r.estado !== 'cancelada')
             .slice(0, 5)
             .map(r => (
               <div key={r.id} className="flex items-center gap-3 px-4 py-3 rounded-xl"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                style={{ background: '#ffffff', border: '1px solid #e5e7eb' }}>
                 <div className="w-2 h-2 rounded-full shrink-0" style={{ background: ESTADO_COLOR[r.estado] }} />
                 <div className="flex-1">
-                  <p className="font-dm text-sm font-semibold text-white">{r.cliente}</p>
-                  <p className="font-dm text-xs text-white/40">
+                  <p className="font-dm text-sm font-semibold text-gray-800">{r.cliente}</p>
+                  <p className="font-dm text-xs text-gray-400">
                     {new Date(r.fecha_evento).toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short' })}
                     {r.hora_inicio ? ` · ${r.hora_inicio}` : ''}
                   </p>
@@ -168,10 +168,11 @@ export default function BBAgenda() {
               </div>
             ))}
           {reservas.filter(r => String(r.fecha_evento).substring(0,10) >= today.toISOString().substring(0,10) && r.estado !== 'cancelada').length === 0 && (
-            <p className="font-dm text-sm text-white/20">Sin reservas próximas.</p>
+            <p className="font-dm text-sm text-gray-300">Sin reservas próximas.</p>
           )}
         </div>
       </div>
     </div>
   );
 }
+

@@ -11,11 +11,11 @@ const SECTIONS = [
     href: '/hub/bigbang/web',
     emoji: '🌐',
     tags: ['Inicio', 'Servicios', 'Galería', 'Contacto'],
-    color: '#38bdf8',     // celeste
-    tagBg: 'rgba(56,189,248,0.12)',
-    tagText: '#7dd3fc',
-    border: 'rgba(56,189,248,0.2)',
-    glow: 'rgba(56,189,248,0.15)',
+    bg: '#eff6ff',
+    border: '#bfdbfe',
+    accent: '#3b82f6',
+    tagBg: '#dbeafe',
+    tagText: '#1d4ed8',
   },
   {
     id: 'portal',
@@ -25,11 +25,11 @@ const SECTIONS = [
     href: '/hub/bigbang/portal',
     emoji: '🚀',
     tags: ['Reservas', 'Eventos', 'Presupuestos', 'Clientes'],
-    color: '#f97316',     // naranja
-    tagBg: 'rgba(249,115,22,0.12)',
-    tagText: '#fb923c',
-    border: 'rgba(249,115,22,0.2)',
-    glow: 'rgba(249,115,22,0.15)',
+    bg: '#fff7ed',
+    border: '#fed7aa',
+    accent: '#f97316',
+    tagBg: '#ffedd5',
+    tagText: '#c2410c',
   },
   {
     id: 'marketing',
@@ -39,120 +39,96 @@ const SECTIONS = [
     href: '/hub/bigbang/marketing',
     emoji: '🎯',
     tags: ['Calendario', 'Diseño', 'Redes', 'Campañas'],
-    color: '#a855f7',     // violeta
-    tagBg: 'rgba(168,85,247,0.12)',
-    tagText: '#c084fc',
-    border: 'rgba(168,85,247,0.2)',
-    glow: 'rgba(168,85,247,0.15)',
+    bg: '#faf5ff',
+    border: '#e9d5ff',
+    accent: '#a855f7',
+    tagBg: '#f3e8ff',
+    tagText: '#7e22ce',
   },
 ];
 
 export default function BigBangHub() {
   return (
-    <div className="min-h-screen flex flex-col"
-      style={{ background: 'linear-gradient(160deg, #020818 0%, #050d24 60%, #030a1a 100%)' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: '#ffffff' }}>
 
-      {/* Estrellas decorativas */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div key={i} className="absolute rounded-full bg-white"
-            style={{
-              width: Math.random() > 0.7 ? '2px' : '1px',
-              height: Math.random() > 0.7 ? '2px' : '1px',
-              top: `${(i * 37 + 11) % 100}%`,
-              left: `${(i * 53 + 7) % 100}%`,
-              opacity: 0.2 + (i % 5) * 0.1,
-            }} />
-        ))}
-        <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] rounded-full opacity-[0.06]"
-          style={{ background: 'radial-gradient(circle, #f97316, transparent)', filter: 'blur(80px)' }} />
-        <div className="absolute bottom-1/4 left-1/4 w-[300px] h-[300px] rounded-full opacity-[0.05]"
-          style={{ background: 'radial-gradient(circle, #38bdf8, transparent)', filter: 'blur(80px)' }} />
-      </div>
+      {/* Arco iris top — más grueso */}
+      <div className="h-2 w-full"
+        style={{ background: 'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #8b5cf6, #ec4899)' }} />
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-8 py-5"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <header className="flex items-center justify-between px-8 py-5"
+        style={{ borderBottom: '1px solid #f0f0f0' }}>
         <div className="flex items-center gap-3">
           <Link href="/hub"
-            className="font-dm text-xs uppercase tracking-widest text-white/30 hover:text-white/70 transition-colors">
+            className="font-dm text-xs uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors">
             ← Hub
           </Link>
-          <span className="text-white/10">|</span>
+          <span className="text-gray-200">|</span>
           <span className="text-2xl">🚀</span>
           <div>
-            <span className="font-bebas text-xl tracking-widest text-white">BIG BANG</span>
-            <span className="font-dm text-[10px] text-white/30 ml-2 uppercase tracking-widest">Eventos en el Espacio</span>
+            <span className="font-bebas text-xl tracking-widest text-gray-800">BIG BANG</span>
+            <span className="font-dm text-[10px] text-gray-400 ml-2 uppercase tracking-widest">Eventos</span>
           </div>
         </div>
         <form action="/api/admin/logout" method="POST">
           <button type="submit"
-            className="font-dm text-xs uppercase tracking-widest text-white/30 hover:text-white transition-colors">
+            className="font-dm text-xs uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors">
             Salir
           </button>
         </form>
       </header>
 
-      {/* Arco iris decorativo */}
-      <div className="relative z-10 h-1 w-full"
-        style={{ background: 'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #8b5cf6, #ec4899)' }} />
-
       {/* Main */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-12">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         <div className="w-full max-w-4xl">
 
           {/* Título */}
           <div className="text-center mb-12">
-            <p className="font-dm text-xs uppercase tracking-[0.3em] mb-3"
-              style={{ color: 'rgba(255,255,255,0.3)' }}>
+            <p className="font-dm text-xs uppercase tracking-[0.3em] text-gray-400 mb-3">
               Seleccioná una sección
             </p>
-            <h1 className="font-bebas text-5xl md:text-6xl text-white tracking-widest">
+            <h1 className="font-bebas text-5xl md:text-6xl text-gray-800 tracking-widest">
               ¿QUÉ VAMOS A GESTIONAR?
             </h1>
-            <div className="mx-auto mt-4 h-px w-24"
-              style={{ background: 'linear-gradient(90deg, transparent, rgba(249,115,22,0.5), transparent)' }} />
+            {/* Mini arcoíris decorativo */}
+            <div className="mx-auto mt-4 h-1 w-24 rounded-full"
+              style={{ background: 'linear-gradient(90deg, #f97316, #eab308, #22c55e, #3b82f6, #a855f7)' }} />
           </div>
 
           {/* Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {SECTIONS.map((sec) => (
               <Link key={sec.id} href={sec.href}
-                className="group relative flex flex-col gap-5 p-7 rounded-3xl transition-all duration-300"
+                className="group flex flex-col gap-5 p-7 rounded-3xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                 style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${sec.border}`,
+                  background: sec.bg,
+                  border: `2px solid ${sec.border}`,
                 }}>
 
-                {/* Glow hover */}
-                <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  style={{ boxShadow: `0 0 40px ${sec.glow}, inset 0 0 30px ${sec.glow}` }} />
-
                 {/* Ícono */}
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
-                  style={{ background: `${sec.color}18`, border: `1px solid ${sec.color}30` }}>
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl bg-white shadow-sm">
                   {sec.emoji}
                 </div>
 
                 {/* Título */}
                 <div>
-                  <h2 className="font-bebas text-3xl tracking-widest text-white" style={{ lineHeight: 1 }}>
+                  <h2 className="font-bebas text-3xl tracking-widest text-gray-800" style={{ lineHeight: 1 }}>
                     {sec.titulo}
                   </h2>
-                  <p className="font-dm text-xs mt-1 uppercase tracking-widest" style={{ color: sec.color }}>
+                  <p className="font-dm text-xs mt-1 uppercase tracking-widest font-semibold" style={{ color: sec.accent }}>
                     {sec.subtitulo}
                   </p>
                 </div>
 
                 {/* Descripción */}
-                <p className="font-dm text-sm leading-relaxed text-white/50">
+                <p className="font-dm text-sm leading-relaxed text-gray-500">
                   {sec.descripcion}
                 </p>
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mt-auto">
                   {sec.tags.map((t) => (
-                    <span key={t} className="font-dm text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full"
+                    <span key={t} className="font-dm text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full font-medium"
                       style={{ background: sec.tagBg, color: sec.tagText }}>
                       {t}
                     </span>
@@ -160,7 +136,8 @@ export default function BigBangHub() {
                 </div>
 
                 {/* Arrow */}
-                <div className="font-dm text-xs uppercase tracking-widest text-white/20 flex items-center gap-1">
+                <div className="font-dm text-xs uppercase tracking-widest flex items-center gap-1 font-semibold"
+                  style={{ color: sec.accent }}>
                   <span className="group-hover:translate-x-1 transition-transform duration-300 inline-block">→</span>
                   <span>Entrar</span>
                 </div>

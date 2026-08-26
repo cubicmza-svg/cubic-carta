@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { uploadDiseno } from '@/lib/supabaseBrowser';
@@ -135,8 +135,8 @@ export default function StudioDiseno() {
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <h2 className="font-bebas text-2xl tracking-widest text-white">PEDIDOS DE DISEÑO</h2>
-          {loading && <span className="font-dm text-xs text-white/40">Cargando…</span>}
+          <h2 className="font-bebas text-2xl tracking-widest text-gray-800">PEDIDOS DE DISEÑO</h2>
+          {loading && <span className="font-dm text-xs text-gray-400">Cargando…</span>}
         </div>
         <button onClick={() => { resetForm(); setShowForm(true); }}
           className="font-dm text-sm font-semibold px-4 py-2 rounded-lg bg-orange-500 text-black hover:bg-orange-400 transition-colors">
@@ -151,20 +151,20 @@ export default function StudioDiseno() {
           onClick={resetForm}>
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 w-full max-w-md flex flex-col gap-4"
             onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-bebas text-xl tracking-widest text-white">
+            <h3 className="font-bebas text-xl tracking-widest text-gray-800">
               {editId !== null ? 'Editar pedido' : 'Nuevo pedido de diseño'}
             </h3>
             <div className="flex flex-col gap-1">
-              <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Nombre</label>
+              <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Nombre</label>
               <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} autoFocus
                 placeholder="Ej: Cartel A3 Happy Hour"
-                className="bg-white/5 border border-white/10 rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 placeholder:text-white/40" />
+                className="bg-white/5 border border-white/10 rounded-lg text-gray-800 font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 placeholder:text-gray-400" />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Descripción</label>
+              <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Descripción</label>
               <textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={3}
                 placeholder="Medidas, colores, texto que debe incluir, formato de entrega…"
-                className="bg-white/5 border border-white/10 rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 placeholder:text-white/40 resize-none" />
+                className="bg-white/5 border border-white/10 rounded-lg text-gray-800 font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 placeholder:text-gray-400 resize-none" />
             </div>
             <div className="flex gap-2 justify-end mt-1">
               {editId !== null && (
@@ -174,7 +174,7 @@ export default function StudioDiseno() {
                 </button>
               )}
               <button onClick={resetForm}
-                className="font-dm text-sm px-4 py-2 rounded-lg border border-white/10 text-white/40 hover:text-white transition-colors">
+                className="font-dm text-sm px-4 py-2 rounded-lg border border-white/10 text-gray-400 hover:text-gray-800 transition-colors">
                 Cancelar
               </button>
               <button onClick={saveCard} disabled={saving}
@@ -189,8 +189,8 @@ export default function StudioDiseno() {
       {/* Cards */}
       {!loading && cards.length === 0 ? (
         <div className="text-center py-20">
-          <p className="font-bebas text-2xl text-white/40 tracking-widest">Sin pedidos todavía</p>
-          <p className="font-dm text-sm text-white/40 mt-2">Creá el primer pedido de diseño.</p>
+          <p className="font-bebas text-2xl text-gray-400 tracking-widest">Sin pedidos todavía</p>
+          <p className="font-dm text-sm text-gray-400 mt-2">Creá el primer pedido de diseño.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -199,7 +199,7 @@ export default function StudioDiseno() {
             return (
               <div key={card.id} className="bg-white/5 border border-white/10 rounded-xl p-5 flex flex-col gap-3 hover:border-white/10/80 transition-all">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-dm font-semibold text-white text-sm leading-snug flex-1">{card.nombre}</h3>
+                  <h3 className="font-dm font-semibold text-gray-800 text-sm leading-snug flex-1">{card.nombre}</h3>
                   <select value={card.status} onChange={(e) => setStatus(card.id, e.target.value as Status)}
                     className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 outline-none cursor-pointer bg-transparent ${STATUS_COLOR[card.status]}`}>
                     {(Object.entries(STATUS_LABEL) as [Status, string][]).map(([v, l]) => (
@@ -209,7 +209,7 @@ export default function StudioDiseno() {
                 </div>
 
                 {card.descripcion && (
-                  <p className="font-dm text-xs text-white/40 leading-relaxed flex-1">{card.descripcion}</p>
+                  <p className="font-dm text-xs text-gray-400 leading-relaxed flex-1">{card.descripcion}</p>
                 )}
 
                 {/* Archivos */}
@@ -217,20 +217,20 @@ export default function StudioDiseno() {
                   {archivos.map((a, idx) => (
                     <div key={idx} className="flex items-center gap-2 bg-white/5 rounded-lg px-2 py-1.5">
                       <span className="text-sm shrink-0">{a.tipo?.includes('pdf') ? '📄' : '🖼️'}</span>
-                      <span className="font-dm text-xs text-white/40 flex-1 truncate">{a.nombre}</span>
+                      <span className="font-dm text-xs text-gray-400 flex-1 truncate">{a.nombre}</span>
                       <a href={a.url} target="_blank" rel="noopener noreferrer"
                         className="font-dm text-xs font-semibold text-orange-500 hover:text-green-300 transition-colors shrink-0">
                         ↓
                       </a>
                       <button onClick={() => removeArchivo(card, idx)}
-                        className="font-dm text-xs text-white/40 hover:text-pink-400 transition-colors shrink-0 ml-1">
+                        className="font-dm text-xs text-gray-400 hover:text-pink-400 transition-colors shrink-0 ml-1">
                         ✕
                       </button>
                     </div>
                   ))}
 
                   {/* Botón agregar archivo */}
-                  <label className={`flex items-center gap-2 cursor-pointer text-xs font-dm text-white/40 hover:text-white transition-colors mt-1 ${uploadingId === card.id ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <label className={`flex items-center gap-2 cursor-pointer text-xs font-dm text-gray-400 hover:text-gray-800 transition-colors mt-1 ${uploadingId === card.id ? 'opacity-50 pointer-events-none' : ''}`}>
                     <input type="file" accept="image/*,.pdf,.zip,.ai,.psd,.eps" className="hidden" multiple
                       disabled={uploadingId === card.id}
                       onChange={async (e) => {
@@ -249,11 +249,11 @@ export default function StudioDiseno() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="font-dm text-[10px] text-white/40">
+                  <span className="font-dm text-[10px] text-gray-400">
                     {new Date(card.creado_el).toLocaleDateString('es-AR')}
                   </span>
                   <button onClick={() => openEdit(card)}
-                    className="font-dm text-[10px] text-white/40 hover:text-white transition-colors">
+                    className="font-dm text-[10px] text-gray-400 hover:text-gray-800 transition-colors">
                     ✏️ Editar
                   </button>
                 </div>
@@ -265,3 +265,4 @@ export default function StudioDiseno() {
     </div>
   );
 }
+

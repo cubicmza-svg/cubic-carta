@@ -13,9 +13,11 @@ const BRANDS = [
     gradient: 'linear-gradient(135deg, #1a2e1a 0%, #0d1f0d 100%)',
     accentColor: '#4ADE80',
     borderColor: 'rgba(74,222,128,0.25)',
-    hoverBorder: 'rgba(74,222,128,0.6)',
     tagBg: 'rgba(74,222,128,0.12)',
     tagText: '#4ADE80',
+    textColor: 'rgba(255,255,255,0.5)',
+    nameColor: '#ffffff',
+    arrowColor: 'rgba(255,255,255,0.25)',
     sections: ['Carta digital', 'Orden & Redes', 'Excel precios'],
   },
   {
@@ -25,12 +27,14 @@ const BRANDS = [
     descripcion: 'Gestión del salón, eventos infantiles, app interactiva y contenido.',
     href: '/hub/bigbang',
     emoji: '🚀',
-    gradient: 'linear-gradient(160deg, #020818 0%, #050d24 60%, #080318 100%)',
+    gradient: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 50%, #fdf4ff 100%)',
     accentColor: '#f97316',
-    borderColor: 'rgba(249,115,22,0.2)',
-    hoverBorder: 'rgba(249,115,22,0.5)',
-    tagBg: 'rgba(249,115,22,0.12)',
-    tagText: '#fb923c',
+    borderColor: 'rgba(249,115,22,0.3)',
+    tagBg: '#ffedd5',
+    tagText: '#c2410c',
+    textColor: '#6b7280',
+    nameColor: '#1f2937',
+    arrowColor: '#f97316',
     sections: ['Eventos', 'App web', 'Contenido', 'Redes'],
   },
   {
@@ -40,12 +44,14 @@ const BRANDS = [
     descripcion: 'Presupuestos, portfolio de trabajos, contenido y redes para Tamara.',
     href: '/hub/glowup',
     emoji: '🎀',
-    gradient: 'linear-gradient(160deg, #1f0d1a 0%, #2a1020 60%, #1a0d1f 100%)',
-    accentColor: '#f472b6',
-    borderColor: 'rgba(244,114,182,0.2)',
-    hoverBorder: 'rgba(244,114,182,0.5)',
-    tagBg: 'rgba(244,114,182,0.12)',
-    tagText: '#f9a8d4',
+    gradient: 'linear-gradient(135deg, #fdf2f8 0%, #f5f3ff 50%, #fce7f3 100%)',
+    accentColor: '#ec4899',
+    borderColor: 'rgba(236,72,153,0.25)',
+    tagBg: '#fce7f3',
+    tagText: '#be185d',
+    textColor: '#6b7280',
+    nameColor: '#1f2937',
+    arrowColor: '#ec4899',
     sections: ['Portfolio', 'Presupuestos', 'Contenido', 'Redes'],
   },
 ];
@@ -100,46 +106,41 @@ export default function HubLanding() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {BRANDS.map((brand) => (
               <Link key={brand.id} href={brand.href}
-                className="group relative flex flex-col gap-5 p-7 rounded-3xl transition-all duration-300 cursor-pointer"
+                className="group relative flex flex-col gap-5 p-7 rounded-3xl transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-2xl"
                 style={{
                   background: brand.gradient,
-                  border: `1px solid ${brand.borderColor}`,
+                  border: `2px solid ${brand.borderColor}`,
                 }}>
 
-                {/* Hover glow */}
-                <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  style={{ boxShadow: `0 0 40px ${brand.accentColor}22, inset 0 0 40px ${brand.accentColor}08` }} />
-
-                {/* Arco iris Big Bang */}
+                {/* Arco iris Big Bang — franja top */}
                 {brand.id === 'bigbang' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1.5 rounded-b-3xl overflow-hidden">
-                    <div className="h-full w-full" style={{ background: 'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #8b5cf6)' }} />
+                  <div className="absolute top-0 left-0 right-0 h-1.5 rounded-t-3xl overflow-hidden">
+                    <div className="h-full w-full" style={{ background: 'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #8b5cf6, #ec4899)' }} />
                   </div>
                 )}
 
-                {/* Brillo pastel Glow Up */}
+                {/* Brillo pastel Glow Up — esquina */}
                 {brand.id === 'glowup' && (
-                  <div className="absolute top-0 right-0 w-32 h-32 rounded-tr-3xl overflow-hidden opacity-20 pointer-events-none"
-                    style={{ background: 'radial-gradient(circle at top right, #f9a8d4, #c4b5fd, transparent)' }} />
+                  <div className="absolute top-0 right-0 w-32 h-32 rounded-tr-3xl overflow-hidden opacity-30 pointer-events-none"
+                    style={{ background: 'radial-gradient(circle at top right, #fbcfe8, #ddd6fe, transparent)' }} />
                 )}
 
-                {/* Emoji + accent line */}
+                {/* Emoji */}
                 <div className="flex items-start justify-between">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
-                    style={{ background: `${brand.accentColor}18`, border: `1px solid ${brand.accentColor}30` }}>
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl bg-white/70 shadow-sm">
                     {brand.emoji}
                   </div>
                   <div className="w-2 h-2 rounded-full mt-2"
-                    style={{ background: brand.accentColor, boxShadow: `0 0 8px ${brand.accentColor}` }} />
+                    style={{ background: brand.accentColor }} />
                 </div>
 
                 {/* Nombre y subtítulo */}
                 <div>
-                  <h2 className="font-bebas text-4xl tracking-widest text-white transition-colors duration-300"
-                    style={{ lineHeight: 1 }}>
+                  <h2 className="font-bebas text-4xl tracking-widest transition-colors duration-300"
+                    style={{ lineHeight: 1, color: brand.nameColor }}>
                     {brand.nombre}
                   </h2>
-                  <p className="font-dm text-xs mt-1 uppercase tracking-widest"
+                  <p className="font-dm text-xs mt-1 uppercase tracking-widest font-semibold"
                     style={{ color: brand.accentColor }}>
                     {brand.subtitulo}
                   </p>
@@ -147,14 +148,14 @@ export default function HubLanding() {
 
                 {/* Descripción */}
                 <p className="font-dm text-sm leading-relaxed"
-                  style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  style={{ color: brand.textColor }}>
                   {brand.descripcion}
                 </p>
 
                 {/* Tags de secciones */}
                 <div className="flex flex-wrap gap-2 mt-auto">
                   {brand.sections.map((s) => (
-                    <span key={s} className="font-dm text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full"
+                    <span key={s} className="font-dm text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full font-medium"
                       style={{ background: brand.tagBg, color: brand.tagText }}>
                       {s}
                     </span>
@@ -162,8 +163,8 @@ export default function HubLanding() {
                 </div>
 
                 {/* Flecha */}
-                <div className="flex items-center gap-1.5 font-dm text-xs uppercase tracking-widest transition-all duration-300"
-                  style={{ color: 'rgba(255,255,255,0.25)' }}>
+                <div className="flex items-center gap-1.5 font-dm text-xs uppercase tracking-widest font-semibold transition-all duration-300"
+                  style={{ color: brand.arrowColor }}>
                   <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
                   <span>Entrar</span>
                 </div>

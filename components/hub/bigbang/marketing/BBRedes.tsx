@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 
@@ -153,8 +153,8 @@ export default function StudioRedes() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <h2 className="font-bebas text-2xl tracking-widest text-white">PLANIFICACIÓN DE REDES</h2>
-          {loading && <span className="font-dm text-xs text-white/40">Cargando…</span>}
+          <h2 className="font-bebas text-2xl tracking-widest text-gray-800">PLANIFICACIÓN DE REDES</h2>
+          {loading && <span className="font-dm text-xs text-gray-400">Cargando…</span>}
         </div>
         <button onClick={() => { resetForm(); setShowForm(true); }}
           className="font-dm text-sm font-semibold px-4 py-2 rounded-lg bg-orange-500 text-black hover:bg-orange-400 transition-colors">
@@ -165,14 +165,14 @@ export default function StudioRedes() {
       {/* Stats */}
       <div className="grid grid-cols-4 gap-3 mb-6">
         {[
-          { label: 'Total',      value: stats.total,     color: 'text-white' },
+          { label: 'Total',      value: stats.total,     color: 'text-gray-800' },
           { label: 'Publicado',  value: stats.publicado, color: 'text-orange-400' },
           { label: 'Listo',      value: stats.listo,     color: 'text-orange-400' },
           { label: 'En proceso', value: stats.proceso,   color: 'text-violet-400' },
         ].map((s) => (
           <div key={s.label} className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
             <p className={`font-bebas text-3xl ${s.color}`}>{s.value}</p>
-            <p className="font-dm text-[10px] text-white/40 uppercase tracking-widest mt-1">{s.label}</p>
+            <p className="font-dm text-[10px] text-gray-400 uppercase tracking-widest mt-1">{s.label}</p>
           </div>
         ))}
       </div>
@@ -181,7 +181,7 @@ export default function StudioRedes() {
       <div className="flex gap-2 mb-5 flex-wrap">
         {(['todos', 'idea', 'en_proceso', 'listo', 'publicado'] as const).map((f) => (
           <button key={f} onClick={() => setFiltro(f)}
-            className={`font-dm text-xs px-3 py-1.5 rounded-full border transition-colors ${filtro === f ? 'border-orange-500 text-orange-500 bg-orange-500/10' : 'border-white/10 text-white/40 hover:text-white'}`}>
+            className={`font-dm text-xs px-3 py-1.5 rounded-full border transition-colors ${filtro === f ? 'border-orange-500 text-orange-500 bg-orange-500/10' : 'border-white/10 text-gray-400 hover:text-gray-800'}`}>
             {f === 'todos' ? 'Todos' : ESTADO_LABEL[f]}
           </button>
         ))}
@@ -194,43 +194,43 @@ export default function StudioRedes() {
           onClick={resetForm}>
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 w-full max-w-lg flex flex-col gap-4 max-h-[92vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-bebas text-xl tracking-widest text-white">
+            <h3 className="font-bebas text-xl tracking-widest text-gray-800">
               {editId !== null ? 'Editar publicación' : 'Nueva publicación'}
             </h3>
 
             {/* Título */}
             <div className="flex flex-col gap-1">
-              <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Título / tema</label>
+              <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Título / tema</label>
               <input type="text" value={form.titulo} autoFocus onChange={(e) => setForm({ ...form, titulo: e.target.value })}
                 placeholder="Ej: Post happy hour viernes"
-                className="bg-white/5 border border-white/10 rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 placeholder:text-white/40" />
+                className="bg-white/5 border border-white/10 rounded-lg text-gray-800 font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 placeholder:text-gray-400" />
             </div>
 
             {/* Caption */}
             <div className="flex flex-col gap-1">
-              <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Caption / texto</label>
+              <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Caption / texto</label>
               <textarea value={form.caption} rows={3} onChange={(e) => setForm({ ...form, caption: e.target.value })}
                 placeholder="Texto del post, hashtags…"
-                className="bg-white/5 border border-white/10 rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 placeholder:text-white/40 resize-none" />
+                className="bg-white/5 border border-white/10 rounded-lg text-gray-800 font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 placeholder:text-gray-400 resize-none" />
             </div>
 
             {/* Link Drive */}
             <div className="flex flex-col gap-1">
-              <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Link a Drive / archivo</label>
+              <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Link a Drive / archivo</label>
               <input type="url" value={form.link_drive} onChange={(e) => setForm({ ...form, link_drive: e.target.value })}
                 placeholder="https://drive.google.com/…"
-                className="bg-white/5 border border-white/10 rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 placeholder:text-white/40" />
+                className="bg-white/5 border border-white/10 rounded-lg text-gray-800 font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 placeholder:text-gray-400" />
             </div>
 
             {/* Fechas múltiples */}
             <div className="flex flex-col gap-2">
-              <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">
-                Fechas de publicación <span className="text-white/40 normal-case">(podés agregar varias)</span>
+              <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">
+                Fechas de publicación <span className="text-gray-400 normal-case">(podés agregar varias)</span>
               </label>
               <div className="flex gap-2">
                 <input type="date" value={dateInput} onChange={(e) => setDateInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && addFecha()}
-                  className="flex-1 bg-white/5 border border-white/10 rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-orange-500" />
+                  className="flex-1 bg-white/5 border border-white/10 rounded-lg text-gray-800 font-dm text-sm px-3 py-2 outline-none focus:border-orange-500" />
                 <button onClick={addFecha}
                   className="px-4 py-2 rounded-lg bg-orange-500 text-black font-dm text-sm font-bold hover:bg-orange-400 transition-colors flex-shrink-0">
                   +
@@ -241,7 +241,7 @@ export default function StudioRedes() {
                   {form.fechas_prog.map((d) => (
                     <span key={d} className="flex items-center gap-1 bg-orange-500/10 border border-orange-500/30 text-orange-500 rounded-full px-3 py-1 text-xs font-dm">
                       📅 {formatDateAR(d)}
-                      <button onClick={() => removeFecha(d)} className="ml-1 text-white/40 hover:text-pink-400 transition-colors font-bold leading-none">×</button>
+                      <button onClick={() => removeFecha(d)} className="ml-1 text-gray-400 hover:text-pink-400 transition-colors font-bold leading-none">×</button>
                     </span>
                   ))}
                 </div>
@@ -253,7 +253,7 @@ export default function StudioRedes() {
               {[
                 { label: 'Plataforma', el: (
                   <select value={form.plataforma} onChange={(e) => setForm({ ...form, plataforma: e.target.value as Plataforma })}
-                    className="bg-white/5 border border-white/10 rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 w-full">
+                    className="bg-white/5 border border-white/10 rounded-lg text-gray-800 font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 w-full">
                     <option value="instagram">Instagram</option>
                     <option value="tiktok">TikTok</option>
                     <option value="facebook">Facebook</option>
@@ -262,7 +262,7 @@ export default function StudioRedes() {
                 )},
                 { label: 'Formato', el: (
                   <select value={form.formato} onChange={(e) => setForm({ ...form, formato: e.target.value as Formato })}
-                    className="bg-white/5 border border-white/10 rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 w-full">
+                    className="bg-white/5 border border-white/10 rounded-lg text-gray-800 font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 w-full">
                     <option value="feed">Feed</option>
                     <option value="story">Story</option>
                     <option value="reel">Reel</option>
@@ -272,13 +272,13 @@ export default function StudioRedes() {
                 )},
                 { label: 'Pilar de contenido', el: (
                   <select value={form.pilar} onChange={(e) => setForm({ ...form, pilar: e.target.value })}
-                    className="bg-white/5 border border-white/10 rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 w-full">
+                    className="bg-white/5 border border-white/10 rounded-lg text-gray-800 font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 w-full">
                     {PILARES.map((p) => <option key={p} value={p}>{p}</option>)}
                   </select>
                 )},
                 { label: 'Estado inicial', el: (
                   <select value={form.estado} onChange={(e) => setForm({ ...form, estado: e.target.value as EstadoPost })}
-                    className="bg-white/5 border border-white/10 rounded-lg text-white font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 w-full">
+                    className="bg-white/5 border border-white/10 rounded-lg text-gray-800 font-dm text-sm px-3 py-2 outline-none focus:border-orange-500 w-full">
                     {(Object.entries(ESTADO_LABEL) as [EstadoPost, string][]).map(([v, l]) => (
                       <option key={v} value={v}>{l}</option>
                     ))}
@@ -286,7 +286,7 @@ export default function StudioRedes() {
                 )},
               ].map(({ label, el }) => (
                 <div key={label} className="flex flex-col gap-1">
-                  <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">{label}</label>
+                  <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">{label}</label>
                   {el}
                 </div>
               ))}
@@ -300,7 +300,7 @@ export default function StudioRedes() {
                 </button>
               )}
               <button onClick={resetForm}
-                className="font-dm text-sm px-4 py-2 rounded-lg border border-white/10 text-white/40 hover:text-white transition-colors">
+                className="font-dm text-sm px-4 py-2 rounded-lg border border-white/10 text-gray-400 hover:text-gray-800 transition-colors">
                 Cancelar
               </button>
               <button onClick={savePost} disabled={saving}
@@ -315,8 +315,8 @@ export default function StudioRedes() {
       {/* Lista de posts */}
       {!loading && filtered.length === 0 ? (
         <div className="text-center py-20">
-          <p className="font-bebas text-2xl text-white/40 tracking-widest">Sin publicaciones</p>
-          <p className="font-dm text-sm text-white/40 mt-2">Agregá la primera.</p>
+          <p className="font-bebas text-2xl text-gray-400 tracking-widest">Sin publicaciones</p>
+          <p className="font-dm text-sm text-gray-400 mt-2">Agregá la primera.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
@@ -327,7 +327,7 @@ export default function StudioRedes() {
                 <div className="text-2xl flex-shrink-0 pt-0.5">{PLATAFORMA_ICON[post.plataforma]}</div>
                 <div className="flex-1 min-w-0 flex flex-col gap-1.5">
                   <div className="flex items-start gap-2 justify-between">
-                    <h3 className="font-dm font-semibold text-white text-sm leading-snug">{post.titulo}</h3>
+                    <h3 className="font-dm font-semibold text-gray-800 text-sm leading-snug">{post.titulo}</h3>
                     <select value={post.estado} onChange={(e) => setEstado(post.id, e.target.value as EstadoPost)}
                       className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 outline-none cursor-pointer bg-transparent flex-shrink-0 ${ESTADO_COLOR[post.estado]}`}>
                       {(Object.entries(ESTADO_LABEL) as [EstadoPost, string][]).map(([v, l]) => (
@@ -337,7 +337,7 @@ export default function StudioRedes() {
                   </div>
 
                   {post.caption && (
-                    <p className="font-dm text-xs text-white/40 leading-relaxed line-clamp-2">{post.caption}</p>
+                    <p className="font-dm text-xs text-gray-400 leading-relaxed line-clamp-2">{post.caption}</p>
                   )}
 
                   {/* Fechas */}
@@ -352,15 +352,15 @@ export default function StudioRedes() {
                   )}
 
                   <div className="flex items-center gap-3 flex-wrap">
-                    <span className="font-dm text-[10px] text-white/40 border border-white/10 rounded-full px-2 py-0.5 capitalize">{post.formato}</span>
-                    <span className="font-dm text-[10px] text-white/40 border border-white/10 rounded-full px-2 py-0.5">{post.pilar}</span>
+                    <span className="font-dm text-[10px] text-gray-400 border border-white/10 rounded-full px-2 py-0.5 capitalize">{post.formato}</span>
+                    <span className="font-dm text-[10px] text-gray-400 border border-white/10 rounded-full px-2 py-0.5">{post.pilar}</span>
                     {post.link_drive && (
                       <a href={post.link_drive} target="_blank" rel="noopener noreferrer"
                         className="font-dm text-[10px] text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1">
                         🔗 Ver en Drive
                       </a>
                     )}
-                    <button onClick={() => openEdit(post)} className="font-dm text-[10px] text-white/40 hover:text-white transition-colors ml-auto">
+                    <button onClick={() => openEdit(post)} className="font-dm text-[10px] text-gray-400 hover:text-gray-800 transition-colors ml-auto">
                       ✏️ Editar
                     </button>
                   </div>
@@ -373,3 +373,4 @@ export default function StudioRedes() {
     </div>
   );
 }
+

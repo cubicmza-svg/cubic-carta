@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 
@@ -21,7 +21,7 @@ const ESTADO_STYLE: Record<string, string> = {
 };
 
 function estadoStyle(e: string) {
-  const [bg, color] = (ESTADO_STYLE[e] || 'rgba(255,255,255,0.06)|rgba(255,255,255,0.4)').split('|');
+  const [bg, color] = (ESTADO_STYLE[e] || '#e5e7eb|rgba(255,255,255,0.4)').split('|');
   return { background: bg, color };
 }
 
@@ -92,7 +92,7 @@ export default function BBReservas() {
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div className="flex items-center gap-3">
-          <h2 className="font-bebas text-2xl tracking-widest text-white">🎉 RESERVAS</h2>
+          <h2 className="font-bebas text-2xl tracking-widest text-gray-800">🎉 RESERVAS</h2>
           {pendienteSena > 0 && (
             <span className="font-dm text-xs px-2.5 py-1 rounded-full" style={{ background: 'rgba(234,179,8,0.15)', color: '#fbbf24' }}>
               {pendienteSena} sin seña
@@ -102,7 +102,7 @@ export default function BBReservas() {
         <div className="flex items-center gap-2">
           <select value={filtro} onChange={e => setFiltro(e.target.value)}
             className="font-dm text-xs px-3 py-2 rounded-lg outline-none"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}>
+            style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)', color: '#1f2937' }}>
             <option value="todos">Todos</option>
             {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
           </select>
@@ -122,7 +122,7 @@ export default function BBReservas() {
           <div className="w-full max-w-xl rounded-2xl p-6 flex flex-col gap-4 overflow-y-auto max-h-[90vh]"
             style={{ background: '#0d1a30', border: '1px solid rgba(249,115,22,0.2)' }}
             onClick={e => e.stopPropagation()}>
-            <h3 className="font-bebas text-xl tracking-widest text-white">
+            <h3 className="font-bebas text-xl tracking-widest text-gray-800">
               {editId ? 'Editar reserva' : 'Nueva reserva'}
             </h3>
 
@@ -133,42 +133,42 @@ export default function BBReservas() {
                 { label: 'Tipo de evento', key: 'tipo_evento', placeholder: 'cumpleaños' },
               ].map(f => (
                 <div key={f.key} className={`flex flex-col gap-1 ${f.span === 2 ? 'col-span-2' : ''}`}>
-                  <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">{f.label}</label>
+                  <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">{f.label}</label>
                   <input value={(form as Record<string,unknown>)[f.key] as string} onChange={e => set(f.key, e.target.value)}
                     placeholder={f.placeholder} autoFocus={f.key === 'cliente'}
-                    className="px-3 py-2 rounded-lg font-dm text-sm text-white placeholder-white/20 outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                    className="px-3 py-2 rounded-lg font-dm text-sm text-gray-800 placeholder-white/20 outline-none"
+                    style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)' }} />
                 </div>
               ))}
 
               <div className="flex flex-col gap-1">
-                <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Fecha</label>
+                <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Fecha</label>
                 <input type="date" value={form.fecha_evento} onChange={e => set('fecha_evento', e.target.value)}
-                  className="px-3 py-2 rounded-lg font-dm text-sm text-white outline-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
+                  className="px-3 py-2 rounded-lg font-dm text-sm text-gray-800 outline-none"
+                  style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Horario</label>
+                <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Horario</label>
                 <div className="flex gap-1">
                   <input type="time" value={form.hora_inicio} onChange={e => set('hora_inicio', e.target.value)}
-                    className="flex-1 px-2 py-2 rounded-lg font-dm text-xs text-white outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
-                  <span className="text-white/30 self-center">→</span>
+                    className="flex-1 px-2 py-2 rounded-lg font-dm text-xs text-gray-800 outline-none"
+                    style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
+                  <span className="text-gray-400 self-center">→</span>
                   <input type="time" value={form.hora_fin} onChange={e => set('hora_fin', e.target.value)}
-                    className="flex-1 px-2 py-2 rounded-lg font-dm text-xs text-white outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
+                    className="flex-1 px-2 py-2 rounded-lg font-dm text-xs text-gray-800 outline-none"
+                    style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)', colorScheme: 'dark' }} />
                 </div>
               </div>
 
               <div className="col-span-2 flex flex-col gap-1">
-                <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Paquete / Servicio</label>
+                <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Paquete / Servicio</label>
                 <select value={form.servicio_id} onChange={e => {
                   const s = servicios.find(x => x.id === parseInt(e.target.value));
                   set('servicio_id', e.target.value);
                   if (s) { set('servicio_nombre', s.nombre); set('total', String(s.precio)); }
                 }}
-                  className="px-3 py-2 rounded-lg font-dm text-sm text-white outline-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  className="px-3 py-2 rounded-lg font-dm text-sm text-gray-800 outline-none"
+                  style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)' }}>
                   <option value="">Sin paquete fijo</option>
                   {servicios.filter(s => s.activo !== false).map(s => (
                     <option key={s.id} value={s.id}>{s.nombre} — ${s.precio.toLocaleString('es-AR')}</option>
@@ -183,33 +183,33 @@ export default function BBReservas() {
                 { label: 'Seña ($)', key: 'sena', type: 'number' },
               ].map(f => (
                 <div key={f.key} className="flex flex-col gap-1">
-                  <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">{f.label}</label>
+                  <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">{f.label}</label>
                   <input type={f.type} value={(form as Record<string,unknown>)[f.key] as string} onChange={e => set(f.key, e.target.value)}
-                    className="px-3 py-2 rounded-lg font-dm text-sm text-white outline-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                    className="px-3 py-2 rounded-lg font-dm text-sm text-gray-800 outline-none"
+                    style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)' }} />
                 </div>
               ))}
 
               <div className="flex flex-col gap-1">
-                <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Estado</label>
+                <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Estado</label>
                 <select value={form.estado} onChange={e => set('estado', e.target.value)}
-                  className="px-3 py-2 rounded-lg font-dm text-sm text-white outline-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  className="px-3 py-2 rounded-lg font-dm text-sm text-gray-800 outline-none"
+                  style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)' }}>
                   {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
                 </select>
               </div>
               <div className="flex items-center gap-2 self-end pb-2">
                 <input type="checkbox" id="sena_pagada" checked={form.sena_pagada} onChange={e => set('sena_pagada', e.target.checked)}
                   className="w-4 h-4 accent-orange-400" />
-                <label htmlFor="sena_pagada" className="font-dm text-sm text-white/60 cursor-pointer">Seña cobrada</label>
+                <label htmlFor="sena_pagada" className="font-dm text-sm text-gray-600 cursor-pointer">Seña cobrada</label>
               </div>
 
               <div className="col-span-2 flex flex-col gap-1">
-                <label className="font-dm text-[10px] text-white/40 uppercase tracking-widest">Notas</label>
+                <label className="font-dm text-[10px] text-gray-400 uppercase tracking-widest">Notas</label>
                 <textarea value={form.notas} onChange={e => set('notas', e.target.value)} rows={2}
                   placeholder="Observaciones, pedidos especiales…"
-                  className="px-3 py-2 rounded-lg font-dm text-sm text-white placeholder-white/20 outline-none resize-none"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+                  className="px-3 py-2 rounded-lg font-dm text-sm text-gray-800 placeholder-white/20 outline-none resize-none"
+                  style={{ background: '#f3f4f6', border: '1px solid rgba(255,255,255,0.1)' }} />
               </div>
             </div>
 
@@ -221,7 +221,7 @@ export default function BBReservas() {
                   Eliminar
                 </button>
               )}
-              <button onClick={reset} className="font-dm text-sm px-4 py-2 rounded-lg text-white/40 hover:text-white transition-colors">Cancelar</button>
+              <button onClick={reset} className="font-dm text-sm px-4 py-2 rounded-lg text-gray-400 hover:text-gray-800 transition-colors">Cancelar</button>
               <button onClick={save} disabled={saving}
                 className="font-dm text-sm font-semibold px-5 py-2 rounded-lg text-black disabled:opacity-50"
                 style={{ background: '#f97316' }}>
@@ -235,29 +235,29 @@ export default function BBReservas() {
       {/* Lista */}
       {!loading && filtradas.length === 0 ? (
         <div className="text-center py-20">
-          <p className="font-bebas text-2xl text-white/20 tracking-widest">Sin reservas</p>
+          <p className="font-bebas text-2xl text-gray-300 tracking-widest">Sin reservas</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
           {filtradas.map(r => (
             <div key={r.id} className="rounded-2xl p-5"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              style={{ background: '#ffffff', border: '1px solid rgba(255,255,255,0.07)' }}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-dm font-semibold text-white">{r.cliente}</h3>
+                    <h3 className="font-dm font-semibold text-gray-800">{r.cliente}</h3>
                     <span className="font-dm text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full"
                       style={estadoStyle(r.estado)}>
                       {r.estado}
                     </span>
                   </div>
-                  <p className="font-dm text-xs text-white/40">{r.telefono} · {r.tipo_evento}</p>
-                  <p className="font-dm text-xs text-white/50">
+                  <p className="font-dm text-xs text-gray-400">{r.telefono} · {r.tipo_evento}</p>
+                  <p className="font-dm text-xs text-gray-500">
                     📅 {new Date(r.fecha_evento).toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short' })}
                     {r.hora_inicio && ` · ${r.hora_inicio}${r.hora_fin ? ' - ' + r.hora_fin : ''}`}
                   </p>
                   {r.servicio_nombre && <p className="font-dm text-xs" style={{ color: '#fb923c' }}>📦 {r.servicio_nombre}</p>}
-                  {r.notas && <p className="font-dm text-xs text-white/30 mt-1">💬 {r.notas}</p>}
+                  {r.notas && <p className="font-dm text-xs text-gray-400 mt-1">💬 {r.notas}</p>}
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <p className="font-bebas text-2xl" style={{ color: '#f97316' }}>
@@ -271,9 +271,9 @@ export default function BBReservas() {
                     {r.sena_pagada ? `✓ Seña $${r.sena.toLocaleString('es-AR')}` : `⚠ Seña $${r.sena.toLocaleString('es-AR')} pendiente`}
                   </button>
                   {r.cant_chicos > 0 && (
-                    <p className="font-dm text-[10px] text-white/30">{r.cant_chicos} chicos · {r.cant_adultos} adultos</p>
+                    <p className="font-dm text-[10px] text-gray-400">{r.cant_chicos} chicos · {r.cant_adultos} adultos</p>
                   )}
-                  <button onClick={() => openEdit(r)} className="font-dm text-[10px] text-white/30 hover:text-white transition-colors">✏️ Editar</button>
+                  <button onClick={() => openEdit(r)} className="font-dm text-[10px] text-gray-400 hover:text-gray-800 transition-colors">✏️ Editar</button>
                 </div>
               </div>
             </div>
@@ -283,3 +283,4 @@ export default function BBReservas() {
     </div>
   );
 }
+
