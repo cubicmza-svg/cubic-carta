@@ -28,7 +28,7 @@ export default function BigBangPortal() {
 
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4"
-        style={{ borderBottom: '1px solid #f0f0f0' }}>
+        style={{ borderBottom: '1px solid #f0f0f0', background: '#ffffff', position: 'relative', zIndex: 10 }}>
         <div className="flex items-center gap-3">
           <Link href="/hub/bigbang"
             className="font-dm text-xs uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors">
@@ -48,7 +48,7 @@ export default function BigBangPortal() {
 
       {/* Tabs */}
       <div className="flex gap-1 px-6 pt-4 pb-0"
-        style={{ borderBottom: '2px solid #f3f4f6' }}>
+        style={{ borderBottom: '2px solid #f3f4f6', background: '#ffffff', position: 'relative', zIndex: 10 }}>
         {TABS.map((t) => (
           <button key={t.id} onClick={() => setTab(t.id)}
             className="flex items-center gap-2 px-5 py-3 font-dm text-sm font-semibold transition-all rounded-t-xl"
