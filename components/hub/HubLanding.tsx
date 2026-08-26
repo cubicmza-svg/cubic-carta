@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 
 const BRANDS = [
@@ -73,10 +75,7 @@ export default function HubLanding() {
         </div>
         <form action="/api/admin/logout" method="POST">
           <button type="submit"
-            className="font-dm text-xs uppercase tracking-widest transition-colors"
-            style={{ color: 'rgba(255,255,255,0.3)' }}
-            onMouseOver={e => (e.currentTarget.style.color = 'white')}
-            onMouseOut={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}>
+            className="font-dm text-xs uppercase tracking-widest text-white/30 hover:text-white transition-colors">
             Salir
           </button>
         </form>
