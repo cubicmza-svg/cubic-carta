@@ -16,15 +16,15 @@ const ESTADO_COLOR: Record<string, string> = {
 };
 
 const FLOATERS = [
-  { emoji: '🚀', top: '8%',  left: '5%',  size: 28, dur: 8,  delay: 0   },
-  { emoji: '🪐', top: '15%', left: '88%', size: 36, dur: 12, delay: 2   },
-  { emoji: '⭐', top: '35%', left: '3%',  size: 16, dur: 6,  delay: 1   },
-  { emoji: '🌙', top: '60%', left: '92%', size: 22, dur: 10, delay: 3   },
-  { emoji: '👨‍🚀', top: '75%', left: '7%',  size: 30, dur: 14, delay: 1.5 },
-  { emoji: '✨', top: '20%', left: '50%', size: 14, dur: 5,  delay: 0.5 },
-  { emoji: '🌟', top: '50%', left: '80%', size: 18, dur: 7,  delay: 2.5 },
-  { emoji: '🛸', top: '85%', left: '60%', size: 26, dur: 11, delay: 0.8 },
-  { emoji: '💫', top: '40%', left: '96%', size: 14, dur: 6,  delay: 3.5 },
+  { emoji: '🚀', top: '8%',  left: '4%',  size: 48, dur: 8,  delay: 0   },
+  { emoji: '🪐', top: '12%', left: '87%', size: 56, dur: 12, delay: 2   },
+  { emoji: '⭐', top: '38%', left: '2%',  size: 32, dur: 6,  delay: 1   },
+  { emoji: '🌙', top: '58%', left: '91%', size: 40, dur: 10, delay: 3   },
+  { emoji: '👨‍🚀', top: '72%', left: '5%',  size: 52, dur: 14, delay: 1.5 },
+  { emoji: '✨', top: '22%', left: '48%', size: 28, dur: 5,  delay: 0.5 },
+  { emoji: '🌟', top: '48%', left: '79%', size: 36, dur: 7,  delay: 2.5 },
+  { emoji: '🛸', top: '82%', left: '58%', size: 44, dur: 11, delay: 0.8 },
+  { emoji: '💫', top: '30%', left: '94%', size: 28, dur: 6,  delay: 3.5 },
 ];
 
 export default function BBAgenda() {
@@ -87,7 +87,7 @@ export default function BBAgenda() {
             top: f.top,
             left: f.left,
             fontSize: f.size,
-            opacity: 0.10,
+            opacity: 0.22,
             animation: `bb-float ${f.dur}s ease-in-out ${f.delay}s infinite`,
           }}>
             {f.emoji}
