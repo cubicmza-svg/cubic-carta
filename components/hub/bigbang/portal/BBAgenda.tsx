@@ -64,7 +64,7 @@ export default function BBAgenda() {
   const selectedReservas = selected ? reservas.filter(r => String(r.fecha_evento).substring(0,10) === selected) : [];
 
   return (
-    <div className="relative min-h-screen overflow-hidden" style={{ background: '#ffffff' }}>
+    <div className="relative min-h-screen" style={{ background: '#ffffff' }}>
 
       {/* CSS animations */}
       <style>{`
@@ -80,7 +80,7 @@ export default function BBAgenda() {
       `}</style>
 
       {/* Floaters espaciales */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
         {FLOATERS.map((f, i) => (
           <div key={i} style={{
             position: 'absolute',
