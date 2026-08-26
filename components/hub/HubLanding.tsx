@@ -19,31 +19,31 @@ const BRANDS = [
   {
     id: 'bigbang',
     nombre: 'BIG BANG',
-    subtitulo: 'Pelotero & Eventos',
+    subtitulo: 'Eventos en el Espacio',
     descripcion: 'Gestión del salón, eventos infantiles, app interactiva y contenido.',
     href: '/hub/bigbang',
-    emoji: '🎈',
-    gradient: 'linear-gradient(135deg, #1e1a2e 0%, #120d1f 100%)',
-    accentColor: '#a855f7',
-    borderColor: 'rgba(168,85,247,0.25)',
-    hoverBorder: 'rgba(168,85,247,0.6)',
-    tagBg: 'rgba(168,85,247,0.12)',
-    tagText: '#a855f7',
+    emoji: '🚀',
+    gradient: 'linear-gradient(160deg, #020818 0%, #050d24 60%, #080318 100%)',
+    accentColor: '#f97316',
+    borderColor: 'rgba(249,115,22,0.2)',
+    hoverBorder: 'rgba(249,115,22,0.5)',
+    tagBg: 'rgba(249,115,22,0.12)',
+    tagText: '#fb923c',
     sections: ['Eventos', 'App web', 'Contenido', 'Redes'],
   },
   {
     id: 'glowup',
     nombre: 'GLOW UP',
-    subtitulo: 'Deco & Eventos',
+    subtitulo: 'Decoraciones Divertidas',
     descripcion: 'Presupuestos, portfolio de trabajos, contenido y redes para Tamara.',
     href: '/hub/glowup',
-    emoji: '✨',
-    gradient: 'linear-gradient(135deg, #2e1a20 0%, #1f0d12 100%)',
-    accentColor: '#ec4899',
-    borderColor: 'rgba(236,72,153,0.25)',
-    hoverBorder: 'rgba(236,72,153,0.6)',
-    tagBg: 'rgba(236,72,153,0.12)',
-    tagText: '#ec4899',
+    emoji: '🎀',
+    gradient: 'linear-gradient(160deg, #1f0d1a 0%, #2a1020 60%, #1a0d1f 100%)',
+    accentColor: '#f472b6',
+    borderColor: 'rgba(244,114,182,0.2)',
+    hoverBorder: 'rgba(244,114,182,0.5)',
+    tagBg: 'rgba(244,114,182,0.12)',
+    tagText: '#f9a8d4',
     sections: ['Portfolio', 'Presupuestos', 'Contenido', 'Redes'],
   },
 ];
@@ -55,12 +55,12 @@ export default function HubLanding() {
 
       {/* Fondo decorativo */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full opacity-[0.04]"
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full opacity-[0.05]"
           style={{ background: 'radial-gradient(circle, #4ADE80, transparent)', filter: 'blur(100px)' }} />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full opacity-[0.04]"
-          style={{ background: 'radial-gradient(circle, #a855f7, transparent)', filter: 'blur(100px)' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full opacity-[0.03]"
-          style={{ background: 'radial-gradient(ellipse, #ec4899, transparent)', filter: 'blur(120px)' }} />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full opacity-[0.05]"
+          style={{ background: 'radial-gradient(circle, #f97316, transparent)', filter: 'blur(100px)' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full opacity-[0.04]"
+          style={{ background: 'radial-gradient(ellipse, #f472b6, transparent)', filter: 'blur(120px)' }} />
       </div>
 
       {/* Header */}
@@ -110,6 +110,19 @@ export default function HubLanding() {
                 {/* Hover glow */}
                 <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                   style={{ boxShadow: `0 0 40px ${brand.accentColor}22, inset 0 0 40px ${brand.accentColor}08` }} />
+
+                {/* Arco iris Big Bang */}
+                {brand.id === 'bigbang' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1.5 rounded-b-3xl overflow-hidden">
+                    <div className="h-full w-full" style={{ background: 'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #8b5cf6)' }} />
+                  </div>
+                )}
+
+                {/* Brillo pastel Glow Up */}
+                {brand.id === 'glowup' && (
+                  <div className="absolute top-0 right-0 w-32 h-32 rounded-tr-3xl overflow-hidden opacity-20 pointer-events-none"
+                    style={{ background: 'radial-gradient(circle at top right, #f9a8d4, #c4b5fd, transparent)' }} />
+                )}
 
                 {/* Emoji + accent line */}
                 <div className="flex items-start justify-between">
