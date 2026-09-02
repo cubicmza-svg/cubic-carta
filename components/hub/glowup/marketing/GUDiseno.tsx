@@ -7,6 +7,21 @@ interface Diseno {
   estado: string; notas: string; created_at: string;
 }
 
+function SelectField({ label, val, opts, set, borderColor = '#ddd6fe' }: {
+  label: string; val: string; opts: string[]; set: (v: string) => void; borderColor?: string;
+}) {
+  return (
+    <div>
+      <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">{label}</label>
+      <select value={val} onChange={e => set(e.target.value)}
+        className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
+        style={{ borderColor }}>
+        {opts.map(o => <option key={o}>{o}</option>)}
+      </select>
+    </div>
+  );
+}
+
 const TIPOS = ['Post', 'Story', 'Reels', 'Flyer', 'Sticker', 'Logo', 'Otro'];
 const FORMATOS = ['1:1 (cuadrado)', '4:5 (vertical)', '9:16 (story)', 'A4', 'Libre'];
 const ESTADOS_D = ['pendiente', 'en proceso', 'revisión', 'entregado'];
@@ -78,17 +93,6 @@ export default function GUDiseno() {
     await load();
   }
 
-  const Select = ({ label, val, opts, set }: { label: string; val: string; opts: string[]; set: (v: string) => void }) => (
-    <div>
-      <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">{label}</label>
-      <select value={val} onChange={e => set(e.target.value)}
-        className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
-        style={{ borderColor: '#ddd6fe' }}>
-        {opts.map(o => <option key={o}>{o}</option>)}
-      </select>
-    </div>
-  );
-
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
       <div className="flex items-center justify-between mb-5">
@@ -112,9 +116,9 @@ export default function GUDiseno() {
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
                 style={{ borderColor: '#ddd6fe' }} placeholder="Nombre o "Glow Up Deco"" />
             </div>
-            <Select label="Tipo" val={tipo} opts={TIPOS} set={setTipo} />
-            <Select label="Formato" val={formato} opts={FORMATOS} set={setFormato} />
-            <Select label="Estado" val={estado} opts={ESTADOS_D} set={setEstado} />
+            <SelectField label="Tipo" val={tipo} opts={TIPOS} set={setTipo} />
+            <SelectField label="Formato" val={formato} opts={FORMATOS} set={setFormato} />
+            <SelectField label="Estado" val={estado} opts={ESTADOS_D} set={setEstado} />
             <div className="sm:col-span-2">
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Descripción / Brief</label>
               <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} rows={4}
