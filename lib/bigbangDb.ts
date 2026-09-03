@@ -84,6 +84,11 @@ export async function ensureBigBangTables() {
         creado_el    TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
+    // Columnas de revision (se agregan si no existen)
+    await sql`ALTER TABLE bb_redes ADD COLUMN IF NOT EXISTS revisado BOOLEAN NOT NULL DEFAULT FALSE`;
+    await sql`ALTER TABLE bb_redes ADD COLUMN IF NOT EXISTS feedback TEXT NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE bb_redes ADD COLUMN IF NOT EXISTS tipo_grabacion TEXT NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE bb_redes ADD COLUMN IF NOT EXISTS guion TEXT NOT NULL DEFAULT ''`;
   } finally {
     await sql.end();
   }

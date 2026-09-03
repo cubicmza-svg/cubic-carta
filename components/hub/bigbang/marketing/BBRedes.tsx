@@ -14,10 +14,14 @@ interface Post {
   formato: Formato;
   estado: EstadoPost;
   fecha_prog: string | null;
-  fechas_prog: string; // JSON array string
+  fechas_prog: string;
   link_drive: string;
   pilar: string;
   creado_el: string;
+  revisado: boolean;
+  feedback: string;
+  tipo_grabacion: string;
+  guion: string;
 }
 
 const PLATAFORMA_ICON: Record<Plataforma, string> = {
@@ -139,6 +143,25 @@ export default function StudioRedes() {
     });
     setPosts((prev) => prev.map((p) => p.id === id ? { ...p, estado } : p));
   };
+
+  const toggleRevisado = async (post: Post) => {
+    const revisado = !post.revisado;
+    await fetch(`/api/bigbang/marketing/redes/${post.id}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ revisado }),
+    });
+    setPosts((prev) => prev.map((p) => p.id === post.id ? { ...p, revisado } : p));
+  };
+
+  const saveFeedback = async (id: number, feedback: string) => {
+    await fetch(`/api/bigbang/marketing/redes/${id}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ feedback }),
+    });
+    setPosts((prev) => prev.map((p) => p.id === id ? { ...p, feedback } : p));
+  };
+
+  const [expandGuion, setExpandGuion] = useState<number | null>(null);
+  const [expandFeedback, setExpandFeedback] = useState<number | null>(null);
+  const [feedbackDraft, setFeedbackDraft] = useState<Record<number, string>>({});
 
   const filtered = filtro === 'todos' ? posts : posts.filter((p) => p.estado === filtro);
   const stats = {
@@ -354,16 +377,77 @@ export default function StudioRedes() {
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="font-dm text-[10px] text-gray-400 border border-white/10 rounded-full px-2 py-0.5 capitalize">{post.formato}</span>
                     <span className="font-dm text-[10px] text-gray-400 border border-white/10 rounded-full px-2 py-0.5">{post.pilar}</span>
+                    {post.tipo_grabacion && (
+                      <span className={`font-dm text-[10px] rounded-full px-2 py-0.5 border font-semibold ${post.tipo_grabacion === 'tami_obra' ? 'bg-amber-500/15 text-amber-400 border-amber-500/30' : post.tipo_grabacion === 'camara' ? 'bg-violet-500/15 text-violet-300 border-violet-500/30' : 'bg-sky-500/15 text-sky-300 border-sky-500/30'}`}>
+                        {post.tipo_grabacion === 'tami_obra' ? '🎬 Grabar en obra' : post.tipo_grabacion === 'camara' ? '🎙 Camara a cara' : '🎨 Diseno'}
+                      </span>
+                    )}
                     {post.link_drive && (
                       <a href={post.link_drive} target="_blank" rel="noopener noreferrer"
-                        className="font-dm text-[10px] text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1">
-                        🔗 Ver en Drive
+                        className="font-dm text-[10px] text-sky-400 hover:text-sky-300 transition-colors">
+                        🔗 Drive
                       </a>
                     )}
+                  </div>
+
+                  {/* Guion expandible */}
+                  {post.guion && (
+                    <div>
+                      <button onClick={() => setExpandGuion(expandGuion === post.id ? null : post.id)}
+                        className="font-dm text-[10px] text-orange-400 hover:text-orange-300 transition-colors">
+                        {expandGuion === post.id ? '▲ Ocultar guion' : '▼ Ver guion completo'}
+                      </button>
+                      {expandGuion === post.id && (
+                        <pre className="mt-2 font-dm text-[11px] text-gray-300 whitespace-pre-wrap leading-relaxed p-3 rounded-lg bg-white/5 border border-white/10 max-h-64 overflow-y-auto">
+                          {post.guion}
+                        </pre>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Revision */}
+                  <div className="flex items-center gap-3 pt-1 border-t border-white/5">
+                    <button onClick={() => toggleRevisado(post)}
+                      className={`font-dm text-[11px] font-semibold px-3 py-1 rounded-full border transition-all ${post.revisado ? 'bg-green-500/20 border-green-500/40 text-green-400' : 'bg-white/5 border-white/10 text-gray-400 hover:border-orange-500/40 hover:text-orange-400'}`}>
+                      {post.revisado ? '✓ Revisado' : 'Marcar revisado'}
+                    </button>
+                    <button onClick={() => {
+                      setExpandFeedback(expandFeedback === post.id ? null : post.id);
+                      if (!feedbackDraft[post.id]) setFeedbackDraft(d => ({ ...d, [post.id]: post.feedback || '' }));
+                    }}
+                      className="font-dm text-[11px] text-gray-400 hover:text-orange-400 transition-colors">
+                      {post.feedback ? '💬 Ver feedback' : '💬 Agregar cambios'}
+                    </button>
                     <button onClick={() => openEdit(post)} className="font-dm text-[10px] text-gray-400 hover:text-gray-800 transition-colors ml-auto">
                       ✏️ Editar
                     </button>
                   </div>
+                  {expandFeedback === post.id && (
+                    <div className="flex flex-col gap-2">
+                      <textarea
+                        value={feedbackDraft[post.id] ?? post.feedback ?? ''}
+                        onChange={e => setFeedbackDraft(d => ({ ...d, [post.id]: e.target.value }))}
+                        rows={3} placeholder="Escribi los cambios que queres hacer en este contenido..."
+                        className="w-full bg-white/5 border border-orange-500/30 rounded-lg text-gray-800 font-dm text-xs px-3 py-2 outline-none resize-none"
+                      />
+                      <div className="flex gap-2">
+                        <button onClick={() => { saveFeedback(post.id, feedbackDraft[post.id] ?? ''); setExpandFeedback(null); }}
+                          className="font-dm text-xs font-semibold px-3 py-1.5 rounded-lg bg-orange-500 text-black hover:bg-orange-400">
+                          Guardar feedback
+                        </button>
+                        <button onClick={() => setExpandFeedback(null)}
+                          className="font-dm text-xs text-gray-400 hover:text-gray-800 px-3 py-1.5">
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {!expandFeedback && post.feedback && (
+                    <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg px-3 py-2">
+                      <p className="font-dm text-[10px] text-orange-400 font-semibold uppercase tracking-wider mb-1">Cambios solicitados</p>
+                      <p className="font-dm text-xs text-orange-300 whitespace-pre-line">{post.feedback}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             );
