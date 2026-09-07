@@ -28,7 +28,7 @@ function Input({ label, val, onChange, type = 'text', ph = '' }: {
       <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">{label}</label>
       <input type={type} value={val} onChange={e => onChange(e.target.value)} placeholder={ph}
         className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
-        style={{ borderColor: '#fbcfe8' }} />
+        style={{ borderColor: '#fbcfe8', color: '#1f2937' }} />
     </div>
   );
 }
@@ -191,7 +191,7 @@ export default function GUPedidos() {
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Notas</label>
               <textarea value={form.notas} onChange={e => setF('notas', e.target.value as any)} rows={3}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none resize-none"
-                style={{ borderColor: '#fbcfe8' }} placeholder="Cualquier detalle importante..." />
+                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="Cualquier detalle importante..." />
             </div>
           </div>
           <div className="flex gap-3 mt-4">

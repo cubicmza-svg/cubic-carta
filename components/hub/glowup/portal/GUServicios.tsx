@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect, useCallback } from 'react';
 
 interface Servicio {
@@ -103,13 +103,13 @@ export default function GUServicios() {
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Nombre</label>
               <input value={nombre} onChange={e => setNombre(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
-                style={{ borderColor: '#fbcfe8' }} placeholder="Nombre del servicio" />
+                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="Nombre del servicio" />
             </div>
             <div>
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Descripción</label>
               <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none resize-none"
-                style={{ borderColor: '#fbcfe8' }} placeholder="Descripción del servicio para el catálogo..." />
+                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="Descripción del servicio para el catálogo..." />
             </div>
             <div>
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">
@@ -117,32 +117,32 @@ export default function GUServicios() {
               </label>
               <textarea value={incluyeRaw} onChange={e => setIncluyeRaw(e.target.value)} rows={5}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none resize-none"
-                style={{ borderColor: '#fbcfe8' }} placeholder="Mesas decorativas&#10;Alfombra&#10;Arco de globos..." />
+                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="Mesas decorativas&#10;Alfombra&#10;Arco de globos..." />
             </div>
             <div>
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Condiciones</label>
               <textarea value={condiciones} onChange={e => setCondiciones(e.target.value)} rows={4}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none resize-none"
-                style={{ borderColor: '#fbcfe8' }} placeholder="Seña, zona de trabajo, política de alquiler..." />
+                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="Seña, zona de trabajo, política de alquiler..." />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Precio desde $</label>
                 <input type="number" value={precioMin} onChange={e => setPrecioMin(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
-                  style={{ borderColor: '#fbcfe8' }} placeholder="100000" />
+                  style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="100000" />
               </div>
               <div>
                 <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Precio hasta $</label>
                 <input type="number" value={precioMax} onChange={e => setPrecioMax(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
-                  style={{ borderColor: '#fbcfe8' }} placeholder="300000" />
+                  style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="300000" />
               </div>
               <div>
                 <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Tiempo armado</label>
                 <input value={tiempo} onChange={e => setTiempo(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
-                  style={{ borderColor: '#fbcfe8' }} placeholder="2–3 horas" />
+                  style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="2–3 horas" />
               </div>
             </div>
             <div className="flex gap-3 mt-2">
@@ -236,3 +236,4 @@ export default function GUServicios() {
     </div>
   );
 }
+

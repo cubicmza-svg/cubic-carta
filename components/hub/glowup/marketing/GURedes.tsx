@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface Post {
@@ -400,14 +400,14 @@ export default function GURedes() {
               <input value={form.titulo} autoFocus onChange={e => setForm(f => ({ ...f, titulo: e.target.value }))}
                 placeholder="Story de fechas disponibles..."
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm outline-none"
-                style={{ borderColor: '#fbcfe8' }} />
+                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} />
             </div>
 
             <div>
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Caption / texto del post</label>
               <textarea value={form.caption} onChange={e => setForm(f => ({ ...f, caption: e.target.value }))} rows={3}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm outline-none resize-none"
-                style={{ borderColor: '#fbcfe8' }} placeholder="Texto completo con emojis..." />
+                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="Texto completo con emojis..." />
             </div>
 
             {/* Imagen */}
@@ -442,7 +442,7 @@ export default function GURedes() {
                     setDateInput('');
                   })()}
                   className="flex-1 px-3 py-2 rounded-xl border font-dm text-sm outline-none"
-                  style={{ borderColor: '#fbcfe8' }} />
+                  style={{ borderColor: '#fbcfe8', color: '#1f2937' }} />
                 <button onClick={() => {
                   if (!dateInput || form.fechas_prog.includes(dateInput)) return;
                   setForm(f => ({ ...f, fechas_prog: [...f.fechas_prog, dateInput].sort() }));
@@ -476,7 +476,7 @@ export default function GURedes() {
                   <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">{label}</label>
                   <select value={val} onChange={e => set(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border font-dm text-sm outline-none bg-white"
-                    style={{ borderColor: '#fbcfe8' }}>
+                    style={{ borderColor: '#fbcfe8', color: '#1f2937' }}>
                     {opts.map(o => <option key={o} value={o}>{o === 'tami_obra' ? 'Grabar en obra' : o === 'camara' ? 'Camara a cara' : ESTADO_LABEL[o] || o}</option>)}
                   </select>
                 </div>
@@ -487,14 +487,14 @@ export default function GURedes() {
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Guion / descripcion de slides</label>
               <textarea value={form.guion} onChange={e => setForm(f => ({ ...f, guion: e.target.value }))} rows={5}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm outline-none resize-none"
-                style={{ borderColor: '#fbcfe8' }} placeholder="DURACION: 30seg&#10;ESCENA 1: ..." />
+                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="DURACION: 30seg&#10;ESCENA 1: ..." />
             </div>
 
             <div>
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Link Drive (opcional)</label>
               <input value={form.link_drive} onChange={e => setForm(f => ({ ...f, link_drive: e.target.value }))}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm outline-none"
-                style={{ borderColor: '#fbcfe8' }} placeholder="https://drive.google.com/..." />
+                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="https://drive.google.com/..." />
             </div>
 
             <div className="flex gap-3">
@@ -631,3 +631,4 @@ function GUPostCard({ post, expandGuion, setExpandGuion, expandFeedback, setExpa
     </div>
   );
 }
+
