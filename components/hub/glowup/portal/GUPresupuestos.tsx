@@ -144,20 +144,20 @@ export default function GUPresupuestos() {
                 <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">{label}</label>
                 <input value={val} onChange={e => set(e.target.value)} placeholder={ph}
                   className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
-                  style={{ borderColor: '#fbcfe8', color: '#1f2937' }} />
+                  style={{ borderColor: '#fbcfe8', color: '#1f2937', WebkitTextFillColor: '#1f2937' }} />
               </div>
             ))}
             <div>
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Fecha del evento</label>
               <input type="date" value={fechaEvento} onChange={e => setFechaEvento(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
-                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} />
+                style={{ borderColor: '#fbcfe8', color: '#1f2937', WebkitTextFillColor: '#1f2937' }} />
             </div>
             <div>
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Servicio</label>
               <select value={servicioId || ''} onChange={e => onServicioChange(Number(e.target.value))}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
-                style={{ borderColor: '#fbcfe8', color: '#1f2937' }}>
+                style={{ borderColor: '#fbcfe8', color: '#1f2937', WebkitTextFillColor: '#1f2937' }}>
                 <option value="">Seleccionar...</option>
                 {servicios.map(s => <option key={s.id} value={s.id}>{s.nombre}</option>)}
               </select>
@@ -166,20 +166,20 @@ export default function GUPresupuestos() {
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Descripción del presupuesto</label>
               <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} rows={5}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none resize-none"
-                style={{ borderColor: '#fbcfe8', color: '#1f2937' }}
+                style={{ borderColor: '#fbcfe8', color: '#1f2937', WebkitTextFillColor: '#1f2937' }}
                 placeholder="Detallá qué incluye, colores, personalización, extras..." />
             </div>
             <div>
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Total $</label>
               <input type="number" value={total} onChange={e => setTotal(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
-                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="200000" />
+                style={{ borderColor: '#fbcfe8', color: '#1f2937', WebkitTextFillColor: '#1f2937' }} placeholder="200000" />
             </div>
             <div>
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Estado</label>
               <select value={estado} onChange={e => setEstado(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
-                style={{ borderColor: '#fbcfe8', color: '#1f2937' }}>
+                style={{ borderColor: '#fbcfe8', color: '#1f2937', WebkitTextFillColor: '#1f2937' }}>
                 {ESTADOS_P.map(e => <option key={e} value={e}>{e}</option>)}
               </select>
             </div>
@@ -187,7 +187,7 @@ export default function GUPresupuestos() {
               <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Notas internas</label>
               <textarea value={notas} onChange={e => setNotas(e.target.value)} rows={2}
                 className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none resize-none"
-                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} placeholder="Solo visible en el panel..." />
+                style={{ borderColor: '#fbcfe8', color: '#1f2937', WebkitTextFillColor: '#1f2937' }} placeholder="Solo visible en el panel..." />
             </div>
           </div>
           <div className="flex gap-3 mt-4">
@@ -284,4 +284,5 @@ export default function GUPresupuestos() {
     </div>
   );
 }
+
 
