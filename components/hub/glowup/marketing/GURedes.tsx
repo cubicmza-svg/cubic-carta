@@ -102,6 +102,7 @@ export default function GURedes() {
   const [expandFeedback, setExpandFeedback] = useState<number | null>(null);
   const [feedbackDraft, setFeedbackDraft]   = useState<Record<number, string>>({});
   const [uploadingImg, setUploadingImg]     = useState(false);
+  const [saveError, setSaveError]           = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -119,18 +120,29 @@ export default function GURedes() {
 
   async function save() {
     if (!form.titulo.trim() || saving) return;
-    setSaving(true);
-    const body = {
-      titulo: form.titulo, caption: form.caption, plataforma: form.plataforma,
-      formato: form.formato, estado: form.estado,
-      fechas_prog: JSON.stringify(form.fechas_prog),
-      link_drive: form.link_drive, pilar: form.pilar,
-      guion: form.guion, tipo_grabacion: form.tipo_grabacion,
-      imagen: form.imagen,
-    };
-    const url = editId !== null ? `/api/glowup/redes/${editId}` : '/api/glowup/redes';
-    await fetch(url, { method: editId !== null ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    await load(); resetForm(); setSaving(false);
+    setSaving(true); setSaveError('');
+    try {
+      const body = {
+        titulo: form.titulo, caption: form.caption, plataforma: form.plataforma,
+        formato: form.formato, estado: form.estado,
+        fechas_prog: JSON.stringify(form.fechas_prog),
+        link_drive: form.link_drive, pilar: form.pilar,
+        guion: form.guion, tipo_grabacion: form.tipo_grabacion,
+        imagen: form.imagen,
+      };
+      const url = editId !== null ? `/api/glowup/redes/${editId}` : '/api/glowup/redes';
+      const res = await fetch(url, { method: editId !== null ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        setSaveError(`Error ${res.status}: ${err.error || 'No se pudo guardar'}`);
+        return;
+      }
+      await load();
+      resetForm();
+      setView('lista');
+    } catch (e: unknown) {
+      setSaveError('Error de red: ' + (e instanceof Error ? e.message : 'desconocido'));
+    } finally { setSaving(false); }
   }
 
   function openEdit(p: Post) {
@@ -496,10 +508,13 @@ export default function GURedes() {
                 style={{ borderColor: '#fbcfe8', color: '#1f2937', WebkitTextFillColor: '#1f2937' }} placeholder="https://drive.google.com/..." />
             </div>
 
+            {saveError && (
+              <div className="font-dm text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2">{saveError}</div>
+            )}
             <div className="flex gap-3">
-              <button onClick={save} disabled={saving}
+              <button onClick={save} disabled={saving || !form.titulo.trim()}
                 className="font-dm text-sm font-semibold px-5 py-2 rounded-xl text-white"
-                style={{ background: GU, opacity: saving ? 0.6 : 1 }}>
+                style={{ background: GU, opacity: (saving || !form.titulo.trim()) ? 0.5 : 1 }}>
                 {saving ? 'Guardando...' : editId !== null ? 'Guardar' : 'Crear'}
               </button>
               {editId !== null && (

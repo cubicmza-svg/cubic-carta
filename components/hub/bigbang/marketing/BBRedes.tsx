@@ -111,6 +111,7 @@ export default function StudioRedes() {
   const [expandFeedback, setExpandFeedback] = useState<number | null>(null);
   const [feedbackDraft, setFeedbackDraft]   = useState<Record<number, string>>({});
   const [uploadingImg, setUploadingImg]     = useState(false);
+  const [saveError, setSaveError]           = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
   const fetchPosts = useCallback(async () => {
@@ -135,12 +136,12 @@ export default function StudioRedes() {
 
   const savePost = async () => {
     if (!form.titulo.trim() || saving) return;
-    setSaving(true);
+    setSaving(true); setSaveError('');
     try {
       const body = {
         titulo: form.titulo.trim(), caption: form.caption,
         plataforma: form.plataforma, formato: form.formato,
-        estado: form.estado, fecha_prog: form.fechas_prog[0] || null,
+        estado: form.estado,
         fechas_prog: JSON.stringify(form.fechas_prog),
         link_drive: form.link_drive.trim(), pilar: form.pilar,
         guion: form.guion, tipo_grabacion: form.tipo_grabacion,
@@ -148,9 +149,17 @@ export default function StudioRedes() {
       };
       const url = editId !== null ? `/api/bigbang/marketing/redes/${editId}` : '/api/bigbang/marketing/redes';
       const method = editId !== null ? 'PUT' : 'POST';
-      await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        setSaveError(`Error ${res.status}: ${err.error || 'No se pudo guardar'}`);
+        return;
+      }
       await fetchPosts();
       resetForm();
+      setView('lista');
+    } catch (e: unknown) {
+      setSaveError('Error de red: ' + (e instanceof Error ? e.message : 'desconocido'));
     } finally { setSaving(false); }
   };
 
@@ -528,11 +537,14 @@ export default function StudioRedes() {
               <button onClick={resetForm} className="font-dm text-sm px-4 py-2 rounded-lg border border-gray-200 text-gray-500 hover:text-gray-800">
                 Cancelar
               </button>
-              <button onClick={savePost} disabled={saving}
+              <button onClick={savePost} disabled={saving || !form.titulo.trim()}
                 className="font-dm text-sm font-semibold px-5 py-2 rounded-lg bg-orange-500 text-black hover:bg-orange-400 disabled:opacity-50">
                 {saving ? 'Guardando...' : 'Guardar'}
               </button>
             </div>
+            {saveError && (
+              <div className="font-dm text-sm text-red-600 bg-red-900/20 border border-red-500/30 rounded-lg px-4 py-2 mt-2">{saveError}</div>
+            )}
           </div>
         </div>
       )}
