@@ -94,6 +94,7 @@ export async function ensureGlowUpTables() {
     await sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS feedback TEXT NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS tipo_grabacion TEXT NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS guion TEXT NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS imagen TEXT NOT NULL DEFAULT ''`;
   } finally { await sql.end(); }
 }
 
