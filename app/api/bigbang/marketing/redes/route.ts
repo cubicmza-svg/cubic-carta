@@ -7,5 +7,6 @@ export async function GET() {
 }
 export async function POST(req: Request) {
   if (!isAuthenticated()) return Response.json({ error: 'No autorizado' }, { status: 401 });
+  await ensureBigBangTables();
   return Response.json(await addBBRedes(await req.json()), { status: 201 });
 }

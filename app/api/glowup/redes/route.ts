@@ -7,5 +7,6 @@ export async function GET() {
 }
 export async function POST(req: Request) {
   if (!isAuthenticated()) return Response.json({ error: 'No autorizado' }, { status: 401 });
+  await ensureGlowUpTables();
   return Response.json(await addGURedes(await req.json()), { status: 201 });
 }
