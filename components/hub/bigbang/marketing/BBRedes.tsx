@@ -403,7 +403,6 @@ export default function StudioRedes() {
               <PostCard key={post.id} post={post}
                 expandGuion={expandGuion} setExpandGuion={setExpandGuion}
                 expandFeedback={expandFeedback} setExpandFeedback={setExpandFeedback}
-                feedbackDraft={feedbackDraft} setFeedbackDraft={setFeedbackDraft}
                 onEdit={openEdit} onEstado={setEstado}
                 onRevisado={toggleRevisado} onFeedback={saveFeedback} />
             ))}
