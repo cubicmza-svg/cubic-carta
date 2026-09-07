@@ -349,7 +349,7 @@ export default function StudioRedes() {
                   <PostCard key={p.id} post={p}
                     expandGuion={expandGuion} setExpandGuion={setExpandGuion}
                     expandFeedback={expandFeedback} setExpandFeedback={setExpandFeedback}
-                    feedbackDraft={feedbackDraft} setFeedbackDraft={setFeedbackDraft}
+
                     onEdit={openEdit} onEstado={setEstado}
                     onRevisado={toggleRevisado} onFeedback={saveFeedback} />
                 ))}
@@ -541,12 +541,32 @@ export default function StudioRedes() {
   );
 }
 
+// ── BBFeedbackBox: estado local para evitar pérdida de foco en Android ────────
+function BBFeedbackBox({ initialValue, onSave, onCancel }: {
+  initialValue: string; onSave: (v: string) => void; onCancel: () => void;
+}) {
+  const [draft, setDraft] = useState(initialValue);
+  return (
+    <div className="mt-2 flex flex-col gap-2">
+      <textarea value={draft} rows={3} autoFocus
+        onChange={e => setDraft(e.target.value)}
+        placeholder="Escribi los cambios que queres hacer..."
+        className="w-full border border-orange-500/30 rounded-lg font-dm text-xs px-3 py-2 outline-none resize-none"
+        style={{ background: 'white', color: '#1f2937' }} />
+      <div className="flex gap-2">
+        <button onClick={() => onSave(draft)}
+          className="font-dm text-xs font-semibold px-3 py-1.5 rounded-lg bg-orange-500 text-black">Guardar</button>
+        <button onClick={onCancel} className="font-dm text-xs text-gray-400 px-3 py-1.5">Cancelar</button>
+      </div>
+    </div>
+  );
+}
+
 // ── PostCard (extraido fuera para evitar re-montaje) ──────────────────────────
-function PostCard({ post, expandGuion, setExpandGuion, expandFeedback, setExpandFeedback, feedbackDraft, setFeedbackDraft, onEdit, onEstado, onRevisado, onFeedback }: {
+function PostCard({ post, expandGuion, setExpandGuion, expandFeedback, setExpandFeedback, onEdit, onEstado, onRevisado, onFeedback }: {
   post: Post;
   expandGuion: number | null; setExpandGuion: (id: number | null) => void;
   expandFeedback: number | null; setExpandFeedback: (id: number | null) => void;
-  feedbackDraft: Record<number, string>; setFeedbackDraft: (d: Record<number, string> | ((prev: Record<number, string>) => Record<number, string>)) => void;
   onEdit: (p: Post) => void;
   onEstado: (id: number, e: EstadoPost) => void;
   onRevisado: (p: Post) => void;
@@ -610,7 +630,6 @@ function PostCard({ post, expandGuion, setExpandGuion, expandFeedback, setExpand
           </button>
           <button onClick={() => {
             setExpandFeedback(expandFeedback === post.id ? null : post.id);
-            if (!feedbackDraft[post.id]) setFeedbackDraft(d => ({ ...d, [post.id]: post.feedback || '' }));
           }}
             className="font-dm text-[11px] text-gray-400 hover:text-orange-400">
             {post.feedback ? 'Ver cambios' : 'Pedir cambios'}
@@ -618,17 +637,11 @@ function PostCard({ post, expandGuion, setExpandGuion, expandFeedback, setExpand
           <button onClick={() => onEdit(post)} className="font-dm text-[10px] text-gray-400 hover:text-gray-800 ml-auto">Editar</button>
         </div>
         {expandFeedback === post.id && (
-          <div className="mt-2 flex flex-col gap-2">
-            <textarea value={feedbackDraft[post.id] ?? post.feedback ?? ''} rows={3}
-              onChange={e => setFeedbackDraft(d => ({ ...d, [post.id]: e.target.value }))}
-              placeholder="Escribi los cambios..."
-              className="w-full bg-white/5 border border-orange-500/30 rounded-lg font-dm text-xs px-3 py-2 outline-none resize-none text-gray-800" />
-            <div className="flex gap-2">
-              <button onClick={() => { onFeedback(post.id, feedbackDraft[post.id] ?? ''); setExpandFeedback(null); }}
-                className="font-dm text-xs font-semibold px-3 py-1.5 rounded-lg bg-orange-500 text-black">Guardar</button>
-              <button onClick={() => setExpandFeedback(null)} className="font-dm text-xs text-gray-400 px-3 py-1.5">Cancelar</button>
-            </div>
-          </div>
+          <BBFeedbackBox
+            initialValue={post.feedback || ''}
+            onSave={v => { onFeedback(post.id, v); setExpandFeedback(null); }}
+            onCancel={() => setExpandFeedback(null)}
+          />
         )}
         {expandFeedback !== post.id && post.feedback && (
           <div className="mt-2 bg-orange-500/10 border border-orange-500/20 rounded-lg px-3 py-2">

@@ -321,7 +321,7 @@ export default function GURedes() {
                   <GUPostCard key={p.id} post={p}
                     expandGuion={expandGuion} setExpandGuion={setExpandGuion}
                     expandFeedback={expandFeedback} setExpandFeedback={setExpandFeedback}
-                    feedbackDraft={feedbackDraft} setFeedbackDraft={setFeedbackDraft}
+
                     onEdit={openEdit} onEstado={cambiarEstado}
                     onRevisado={toggleRevisado} onFeedback={saveFeedback} />
                 ))}
@@ -516,12 +516,33 @@ export default function GURedes() {
   );
 }
 
+// ── FeedbackBox: estado local para evitar pérdida de foco en Android ──────────
+function FeedbackBox({ initialValue, onSave, onCancel }: {
+  initialValue: string; onSave: (v: string) => void; onCancel: () => void;
+}) {
+  const GU = '#db2777';
+  const [draft, setDraft] = useState(initialValue);
+  return (
+    <div className="mt-2 flex flex-col gap-2">
+      <textarea value={draft} rows={3} autoFocus
+        onChange={e => setDraft(e.target.value)}
+        placeholder="Escribi los cambios que queres hacer..."
+        className="w-full px-3 py-2 rounded-xl border font-dm text-xs outline-none resize-none"
+        style={{ borderColor: '#fbcfe8', background: 'white', color: '#1f2937' }} />
+      <div className="flex gap-2">
+        <button onClick={() => onSave(draft)}
+          className="font-dm text-xs font-semibold px-3 py-1.5 rounded-xl text-white" style={{ background: GU }}>Guardar</button>
+        <button onClick={onCancel} className="font-dm text-xs text-gray-400 hover:text-gray-700 px-2 py-1.5">Cancelar</button>
+      </div>
+    </div>
+  );
+}
+
 // ── GUPostCard (fuera del componente para evitar re-montaje) ──────────────────
-function GUPostCard({ post, expandGuion, setExpandGuion, expandFeedback, setExpandFeedback, feedbackDraft, setFeedbackDraft, onEdit, onEstado, onRevisado, onFeedback }: {
+function GUPostCard({ post, expandGuion, setExpandGuion, expandFeedback, setExpandFeedback, onEdit, onEstado, onRevisado, onFeedback }: {
   post: Post;
   expandGuion: number | null; setExpandGuion: (id: number | null) => void;
   expandFeedback: number | null; setExpandFeedback: (id: number | null) => void;
-  feedbackDraft: Record<number, string>; setFeedbackDraft: (d: Record<number, string> | ((prev: Record<number, string>) => Record<number, string>)) => void;
   onEdit: (p: Post) => void;
   onEstado: (id: number, e: string) => void;
   onRevisado: (p: Post) => void;
@@ -585,7 +606,6 @@ function GUPostCard({ post, expandGuion, setExpandGuion, expandFeedback, setExpa
           </button>
           <button onClick={() => {
             setExpandFeedback(expandFeedback === post.id ? null : post.id);
-            if (!feedbackDraft[post.id]) setFeedbackDraft(d => ({ ...d, [post.id]: post.feedback || '' }));
           }}
             className="font-dm text-[11px] transition-colors"
             style={{ color: post.feedback ? GU : '#9ca3af' }}>
@@ -595,18 +615,11 @@ function GUPostCard({ post, expandGuion, setExpandGuion, expandFeedback, setExpa
         </div>
 
         {expandFeedback === post.id && (
-          <div className="mt-2 flex flex-col gap-2">
-            <textarea value={feedbackDraft[post.id] ?? post.feedback ?? ''} rows={3}
-              onChange={e => setFeedbackDraft(d => ({ ...d, [post.id]: e.target.value }))}
-              placeholder="Escribi los cambios..."
-              className="w-full px-3 py-2 rounded-xl border font-dm text-xs outline-none resize-none"
-              style={{ borderColor: '#fbcfe8', background: 'white' }} />
-            <div className="flex gap-2">
-              <button onClick={() => { onFeedback(post.id, feedbackDraft[post.id] ?? ''); setExpandFeedback(null); }}
-                className="font-dm text-xs font-semibold px-3 py-1.5 rounded-xl text-white" style={{ background: GU }}>Guardar</button>
-              <button onClick={() => setExpandFeedback(null)} className="font-dm text-xs text-gray-400 hover:text-gray-700 px-2 py-1.5">Cancelar</button>
-            </div>
-          </div>
+          <FeedbackBox
+            initialValue={post.feedback || ''}
+            onSave={v => { onFeedback(post.id, v); setExpandFeedback(null); }}
+            onCancel={() => setExpandFeedback(null)}
+          />
         )}
         {expandFeedback !== post.id && post.feedback && (
           <div className="mt-2 rounded-xl px-3 py-2" style={{ background: '#fce7f3', border: '1px solid #fbcfe8' }}>
