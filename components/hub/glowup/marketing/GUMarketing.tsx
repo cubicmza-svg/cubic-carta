@@ -21,6 +21,19 @@ export default function GUMarketing() {
   const [tab, setTab] = useState<Tab>('redes');
   return (
     <div className="panel-light relative min-h-screen flex flex-col overflow-hidden" style={{ background: '#fefcff' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .panel-light input, .panel-light textarea, .panel-light select,
+        .panel-light input[type="text"], .panel-light input[type="email"],
+        .panel-light input[type="tel"], .panel-light input[type="date"],
+        .panel-light input[type="number"], .panel-light input[type="time"] {
+          color: #1f2937 !important;
+          -webkit-text-fill-color: #1f2937 !important;
+        }
+        .panel-light input::placeholder, .panel-light textarea::placeholder {
+          color: #9ca3af !important;
+          -webkit-text-fill-color: #9ca3af !important;
+        }
+      `}} />
 
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
         {PASTEL_DOTS.map((d, i) => (
