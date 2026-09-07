@@ -20,7 +20,7 @@ const PASTEL_DOTS = [
 export default function GUMarketing() {
   const [tab, setTab] = useState<Tab>('redes');
   return (
-    <div className="relative min-h-screen flex flex-col overflow-hidden" style={{ background: '#fefcff' }}>
+    <div className="panel-light relative min-h-screen flex flex-col overflow-hidden" style={{ background: '#fefcff' }}>
 
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
         {PASTEL_DOTS.map((d, i) => (

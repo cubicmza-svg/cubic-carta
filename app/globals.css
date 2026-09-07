@@ -24,6 +24,17 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Panel de admin Glow Up y Big Bang: texto oscuro en formularios */
+.panel-light input,
+.panel-light textarea,
+.panel-light select {
+  color: #1f2937 !important;
+}
+.panel-light input::placeholder,
+.panel-light textarea::placeholder {
+  color: #9ca3af !important;
+}
+
 /* Scrollbar personalizado */
 ::-webkit-scrollbar {
   width: 6px;

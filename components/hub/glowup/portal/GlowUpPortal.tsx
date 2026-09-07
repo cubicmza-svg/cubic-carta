@@ -24,7 +24,7 @@ const PASTEL_DOTS = [
 export default function GlowUpPortal() {
   const [tab, setTab] = useState<Tab>('agenda');
   return (
-    <div className="relative min-h-screen flex flex-col overflow-hidden" style={{ background: '#fefcff' }}>
+    <div className="panel-light relative min-h-screen flex flex-col overflow-hidden" style={{ background: '#fefcff' }}>
 
       {/* Manchas pastel */}
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>

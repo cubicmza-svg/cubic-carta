@@ -419,7 +419,7 @@ export default function StudioRedes() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ backgroundColor: 'rgba(10,8,18,0.88)', backdropFilter: 'blur(6px)' }}
           onClick={resetForm}>
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 w-full max-w-lg flex flex-col gap-4 max-h-[92vh] overflow-y-auto shadow-2xl"
+          <div className="panel-light bg-white border border-gray-200 rounded-2xl p-6 w-full max-w-lg flex flex-col gap-4 max-h-[92vh] overflow-y-auto shadow-2xl"
             onClick={e => e.stopPropagation()}>
             <h3 className="font-bebas text-xl tracking-widest text-gray-800">
               {editId !== null ? 'Editar publicacion' : 'Nueva publicacion'}
