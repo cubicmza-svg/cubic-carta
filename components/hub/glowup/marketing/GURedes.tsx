@@ -372,7 +372,6 @@ export default function GURedes() {
               <GUPostCard key={p.id} post={p}
                 expandGuion={expandGuion} setExpandGuion={setExpandGuion}
                 expandFeedback={expandFeedback} setExpandFeedback={setExpandFeedback}
-                feedbackDraft={feedbackDraft} setFeedbackDraft={setFeedbackDraft}
                 onEdit={openEdit} onEstado={cambiarEstado}
                 onRevisado={toggleRevisado} onFeedback={saveFeedback} />
             ))}
