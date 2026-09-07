@@ -20,6 +20,19 @@ const ESTADO_TEXT: Record<string, string> = {
 };
 const GU = '#db2777';
 
+function Input({ label, val, onChange, type = 'text', ph = '' }: {
+  label: string; val: string | number; onChange: (v: string) => void; type?: string; ph?: string;
+}) {
+  return (
+    <div>
+      <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">{label}</label>
+      <input type={type} value={val} onChange={e => onChange(e.target.value)} placeholder={ph}
+        className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
+        style={{ borderColor: '#fbcfe8' }} />
+    </div>
+  );
+}
+
 const EMPTY: Omit<Pedido, 'id'> = {
   cliente: '', telefono: '', fecha_evento: '', hora: '', lugar: '',
   nombre_cumple: '', edad: 0, tematica: '', servicio_id: null,
@@ -104,17 +117,6 @@ export default function GUPedidos() {
   }
 
   const filtered = filtroEstado === 'todos' ? items : items.filter(p => p.estado === filtroEstado);
-
-  const Input = ({ label, val, onChange, type = 'text', ph = '' }: {
-    label: string; val: string | number; onChange: (v: string) => void; type?: string; ph?: string;
-  }) => (
-    <div>
-      <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">{label}</label>
-      <input type={type} value={val} onChange={e => onChange(e.target.value)} placeholder={ph}
-        className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
-        style={{ borderColor: '#fbcfe8' }} />
-    </div>
-  );
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
