@@ -1,5 +1,5 @@
 ﻿'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface Servicio { id: number; nombre: string; }
 interface Pedido {
@@ -23,10 +23,17 @@ const GU = '#db2777';
 function Input({ label, val, onChange, type = 'text', ph = '' }: {
   label: string; val: string | number; onChange: (v: string) => void; type?: string; ph?: string;
 }) {
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.style.setProperty('color', '#1f2937', 'important');
+      ref.current.style.setProperty('-webkit-text-fill-color', '#1f2937', 'important');
+    }
+  }, []);
   return (
     <div>
       <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">{label}</label>
-      <input type={type} value={val} onChange={e => onChange(e.target.value)} placeholder={ph}
+      <input ref={ref} type={type} value={val} onChange={e => onChange(e.target.value)} placeholder={ph}
         className="w-full px-3 py-2 rounded-xl border font-dm text-sm bg-white outline-none"
         style={{ borderColor: '#fbcfe8', color: '#1f2937', WebkitTextFillColor: '#1f2937' }} />
     </div>
