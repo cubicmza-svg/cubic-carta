@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import BellNotif from '@/components/BellNotif';
 
 const BRANDS = [
   {
@@ -79,12 +80,15 @@ export default function HubLanding() {
             style={{ background: 'linear-gradient(135deg, #4ADE80, #a855f7)' }}>⚡</div>
           <span className="font-bebas text-xl tracking-widest text-white">PORTAL ADMIN</span>
         </div>
-        <form action="/api/admin/logout" method="POST">
-          <button type="submit"
-            className="font-dm text-xs uppercase tracking-widest text-white/30 hover:text-white transition-colors">
-            Salir
-          </button>
-        </form>
+        <div className="flex items-center gap-3">
+          <BellNotif portal="cubic" accentColor="#f59e0b" />
+          <form action="/api/admin/logout" method="POST">
+            <button type="submit"
+              className="font-dm text-xs uppercase tracking-widest text-white/30 hover:text-white transition-colors">
+              Salir
+            </button>
+          </form>
+        </div>
       </header>
 
       {/* Main */}

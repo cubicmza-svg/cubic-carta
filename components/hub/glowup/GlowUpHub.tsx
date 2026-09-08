@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import BellNotif from '@/components/BellNotif';
 
 const SECTIONS = [
   {
@@ -75,11 +76,14 @@ export default function GlowUpHub() {
             <span className="font-dm text-[10px] text-gray-400 ml-2 uppercase tracking-widest">Decoraciones · Tamara Sosa</span>
           </div>
         </div>
-        <form action="/api/admin/logout" method="POST">
-          <button type="submit" className="font-dm text-xs uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors">
-            Salir
-          </button>
-        </form>
+        <div className="flex items-center gap-3">
+          <BellNotif portal="glowup" accentColor="#db2777" />
+          <form action="/api/admin/logout" method="POST">
+            <button type="submit" className="font-dm text-xs uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors">
+              Salir
+            </button>
+          </form>
+        </div>
       </header>
 
       {/* Main */}

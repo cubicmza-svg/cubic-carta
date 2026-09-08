@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import BellNotif from '@/components/BellNotif';
 import BBSpaceBackground from './BBSpaceBackground';
 
 const SECTIONS = [
@@ -72,12 +73,15 @@ export default function BigBangHub() {
             <span className="font-dm text-[10px] text-gray-400 ml-2 uppercase tracking-widest">Eventos</span>
           </div>
         </div>
-        <form action="/api/admin/logout" method="POST">
-          <button type="submit"
-            className="font-dm text-xs uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors">
-            Salir
-          </button>
-        </form>
+        <div className="flex items-center gap-3">
+          <BellNotif portal="bigbang" accentColor="#f97316" />
+          <form action="/api/admin/logout" method="POST">
+            <button type="submit"
+              className="font-dm text-xs uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors">
+              Salir
+            </button>
+          </form>
+        </div>
       </header>
 
       {/* Main */}
