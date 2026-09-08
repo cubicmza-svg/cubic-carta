@@ -72,6 +72,12 @@ export default function BellNotif({ portal, accentColor }: { portal: string; acc
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(() => {});
+      // Check if already subscribed
+      navigator.serviceWorker.ready.then(reg => {
+        reg.pushManager.getSubscription().then(sub => {
+          if (sub) setPushOk(true);
+        }).catch(() => {});
+      }).catch(() => {});
     }
   }, []);
 
