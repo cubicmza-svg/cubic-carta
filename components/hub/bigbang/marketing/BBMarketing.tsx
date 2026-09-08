@@ -5,6 +5,7 @@ import Link from 'next/link';
 import BBDiseno from './BBDiseno';
 import BBRedes from './BBRedes';
 import BBSpaceBackground from '../BBSpaceBackground';
+import BellNotif from '@/components/BellNotif';
 
 type Tab = 'diseno' | 'redes';
 
@@ -35,12 +36,15 @@ export default function BBMarketing() {
           <span className="text-xl">🎯</span>
           <span className="font-bebas text-xl tracking-widest text-gray-800">MARKETING</span>
         </div>
-        <form action="/api/admin/logout" method="POST">
-          <button type="submit"
-            className="font-dm text-xs uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors">
-            Salir
-          </button>
-        </form>
+        <div className="flex items-center gap-3">
+          <BellNotif portal="bigbang" accentColor="#f97316" />
+          <form action="/api/admin/logout" method="POST">
+            <button type="submit"
+              className="font-dm text-xs uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors">
+              Salir
+            </button>
+          </form>
+        </div>
       </header>
 
       <div className="flex gap-1 px-6 pt-4"

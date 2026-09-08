@@ -107,6 +107,14 @@ export default function GUPedidos() {
     const method = editId ? 'PUT' : 'POST';
     await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     await load(); resetForm(); setSaving(false);
+    fetch('/api/notificaciones-push', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        titulo: editId ? `✏️ Pedido editado: ${form.cliente}` : `🎀 Nuevo pedido: ${form.cliente}`,
+        cuerpo: `${form.servicio_nombre || 'Decoración'} · ${form.fecha_evento}`,
+        portal: 'glowup', url: '/hub/glowup/portal',
+      }),
+    }).catch(() => {});
   }
 
   async function del(id: number) {

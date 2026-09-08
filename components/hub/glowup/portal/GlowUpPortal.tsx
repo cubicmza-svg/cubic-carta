@@ -5,6 +5,7 @@ import GUServicios from './GUServicios';
 import GUPedidos from './GUPedidos';
 import GUPresupuestos from './GUPresupuestos';
 import GUAgenda from './GUAgenda';
+import BellNotif from '@/components/BellNotif';
 
 type Tab = 'agenda' | 'pedidos' | 'presupuestos' | 'servicios';
 
@@ -67,11 +68,14 @@ export default function GlowUpPortal() {
           <span className="text-xl">📋</span>
           <span className="font-bebas text-xl tracking-widest text-gray-800">PORTAL</span>
         </div>
-        <form action="/api/admin/logout" method="POST">
-          <button type="submit" className="font-dm text-xs uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors">
-            Salir
-          </button>
-        </form>
+        <div className="flex items-center gap-3">
+          <BellNotif portal="glowup" accentColor="#db2777" />
+          <form action="/api/admin/logout" method="POST">
+            <button type="submit" className="font-dm text-xs uppercase tracking-widest text-gray-400 hover:text-gray-700 transition-colors">
+              Salir
+            </button>
+          </form>
+        </div>
       </header>
 
       {/* Tabs */}

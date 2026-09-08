@@ -140,6 +140,14 @@ export default function GURedes() {
       await load();
       resetForm();
       setView('lista');
+      fetch('/api/notificaciones-push', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          titulo: editId !== null ? `✏️ Post editado: ${body.titulo}` : `📲 Nuevo post: ${body.titulo}`,
+          cuerpo: body.plataforma + ' · ' + body.formato,
+          portal: 'glowup', url: '/hub/glowup/marketing',
+        }),
+      }).catch(() => {});
     } catch (e: unknown) {
       setSaveError('Error de red: ' + (e instanceof Error ? e.message : 'desconocido'));
     } finally { setSaving(false); }

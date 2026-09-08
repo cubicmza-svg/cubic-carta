@@ -158,6 +158,14 @@ export default function StudioRedes() {
       await fetchPosts();
       resetForm();
       setView('lista');
+      fetch('/api/notificaciones-push', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          titulo: editId !== null ? `✏️ Post BB editado: ${body.titulo}` : `📲 Nuevo post BB: ${body.titulo}`,
+          cuerpo: body.plataforma + ' · ' + body.formato,
+          portal: 'bigbang', url: '/hub/bigbang/marketing',
+        }),
+      }).catch(() => {});
     } catch (e: unknown) {
       setSaveError('Error de red: ' + (e instanceof Error ? e.message : 'desconocido'));
     } finally { setSaving(false); }
