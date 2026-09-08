@@ -76,6 +76,14 @@ export default function StudioDiseno() {
       }
       await fetchCards();
       resetForm();
+      fetch('/api/notificaciones-push', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          titulo: editId !== null ? `✏️ Diseño editado: ${nombre.trim()}` : `🎨 Nuevo pedido de diseño: ${nombre.trim()}`,
+          cuerpo: desc.trim(),
+          portal: 'bigbang', url: '/hub/bigbang/marketing',
+        }),
+      }).catch(() => {});
     } finally { setSaving(false); }
   };
 
@@ -92,13 +100,21 @@ export default function StudioDiseno() {
     resetForm();
   };
 
-  const setStatus = async (id: number, status: Status) => {
+  const setStatus = async (id: number, status: Status, nombre: string) => {
     await fetch(`/api/bigbang/marketing/diseno/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
     });
     setCards((prev) => prev.map((c) => c.id === id ? { ...c, status } : c));
+    const statusLabel: Record<Status, string> = { pendiente: 'Pendiente', en_proceso: 'En proceso', entregado: '✅ Entregado' };
+    fetch('/api/notificaciones-push', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        titulo: `🎨 Diseño: ${nombre} → ${statusLabel[status]}`,
+        cuerpo: '', portal: 'bigbang', url: '/hub/bigbang/marketing',
+      }),
+    }).catch(() => {});
   };
 
   const handleFileUpload = async (card: DisenoCard, file: File) => {
@@ -200,7 +216,7 @@ export default function StudioDiseno() {
               <div key={card.id} className="bg-white/5 border border-white/10 rounded-xl p-5 flex flex-col gap-3 hover:border-white/10/80 transition-all">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-dm font-semibold text-gray-800 text-sm leading-snug flex-1">{card.nombre}</h3>
-                  <select value={card.status} onChange={(e) => setStatus(card.id, e.target.value as Status)}
+                  <select value={card.status} onChange={(e) => setStatus(card.id, e.target.value as Status, card.nombre)}
                     className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 outline-none cursor-pointer bg-transparent ${STATUS_COLOR[card.status]}`}>
                     {(Object.entries(STATUS_LABEL) as [Status, string][]).map(([v, l]) => (
                       <option key={v} value={v}>{l}</option>

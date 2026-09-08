@@ -27,20 +27,27 @@ function timeAgo(iso: string) {
 
 const VAPID_PUBLIC = 'BDfQCVOrQoRsSXEYA05rVRoalgOfXrUvVpKrg0VQCsgty4kUL1UfIdeyovwdKVlvuXWNjoMW5pDJwT3RH669mWA';
 
-async function subscribePush(portal: string) {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  const reg = await navigator.serviceWorker.ready;
-  const perm = await Notification.requestPermission();
-  if (perm !== 'granted') return;
-  const sub = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC),
-  });
-  await fetch('/api/push', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ subscription: sub, portal }),
-  });
+async function subscribePush(portal: string): Promise<string | null> {
+  if (!('serviceWorker' in navigator)) return 'Tu navegador no soporta service workers';
+  if (!('PushManager' in window)) return 'Tu navegador no soporta push notifications';
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') return 'Permiso denegado';
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC),
+    });
+    const res = await fetch('/api/push', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: sub, portal }),
+    });
+    if (!res.ok) return `Error al guardar suscripción (${res.status})`;
+    return null;
+  } catch (e) {
+    return String(e);
+  }
 }
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -54,6 +61,7 @@ export default function BellNotif({ portal, accentColor }: { portal: string; acc
   const [notifs, setNotifs] = useState<Notif[]>([]);
   const [open, setOpen] = useState(false);
   const [pushOk, setPushOk] = useState(false);
+  const [pushErr, setPushErr] = useState('');
   const ref = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
@@ -100,7 +108,9 @@ export default function BellNotif({ portal, accentColor }: { portal: string; acc
   }
 
   async function handlePush() {
-    await subscribePush(portal);
+    setPushErr('');
+    const err = await subscribePush(portal);
+    if (err) { setPushErr(err); return; }
     setPushOk(true);
   }
 
@@ -131,6 +141,7 @@ export default function BellNotif({ portal, accentColor }: { portal: string; acc
               </button>
             )}
             {pushOk && <span className="font-dm text-xs text-green-600">Push activado ✓</span>}
+            {pushErr && <span className="font-dm text-xs text-red-500 max-w-[160px] truncate" title={pushErr}>⚠️ {pushErr}</span>}
           </div>
           <div className="max-h-80 overflow-y-auto">
             {notifs.length === 0 && (
