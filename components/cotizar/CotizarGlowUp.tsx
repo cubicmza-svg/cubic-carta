@@ -32,7 +32,7 @@ export default function CotizarGlowUp() {
   const [enviado, setEnviado] = useState(false);
 
   useEffect(() => {
-    fetch('/api/glowup/servicios')
+    fetch('/api/glowup/servicios-publicos')
       .then(r => r.ok ? r.json() : [])
       .then((data: Servicio[]) => setServicios(data.filter(s => s.activo)))
       .catch(() => {});
