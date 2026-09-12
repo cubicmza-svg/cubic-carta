@@ -120,8 +120,8 @@ export default function CotizarGlowUp() {
 
         {/* Fondo cuadros */}
         <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
-          <Image src="/glowup-bg.jpg" alt="" fill style={{ objectFit: 'cover', opacity: 0.35 }} priority />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg,rgba(253,242,248,0.7),rgba(250,245,255,0.7))' }} />
+          <Image src="/glowup-bg.jpg" alt="" fill style={{ objectFit: 'cover', opacity: 0.18 }} priority />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg,rgba(253,242,248,0.5),rgba(250,245,255,0.5))' }} />
         </div>
 
         <div style={{ position: 'relative', zIndex: 1 }}>
