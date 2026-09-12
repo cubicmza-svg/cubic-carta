@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 const TAMI_WA = '5492615734018';
 
@@ -9,11 +10,10 @@ interface Servicio {
   descripcion: string;
   precio_min: number;
   precio_max: number;
-  tiempo: string;
   activo: boolean;
 }
 
-const LUGARES = ['Mi casa', 'Salón de fiestas', 'Espacio al aire libre', 'Otro'];
+const LUGARES = ['Mi casa', 'Salón de fiestas', 'Aire libre', 'Otro'];
 const PERSONAS = ['Hasta 20', '20–50', '50–100', 'Más de 100'];
 
 export default function CotizarGlowUp() {
@@ -53,7 +53,7 @@ export default function CotizarGlowUp() {
       `*Servicio:* ${servicio ? servicio.nombre : '—'}`,
       `*Temática / Idea:* ${form.tematica}`,
       `*Fecha del evento:* ${form.fecha}`,
-      `*Lugar:* ${lugar}`,
+      lugar ? `*Lugar:* ${lugar}` : '',
       form.personas ? `*Cantidad de personas:* ${form.personas}` : '',
       form.mensaje ? `*Detalles adicionales:* ${form.mensaje}` : '',
     ].filter(Boolean).join('\n');
@@ -67,170 +67,216 @@ export default function CotizarGlowUp() {
     setEnviado(true);
   }
 
-  const valid = form.nombre.trim() && form.servicioId && form.fecha && form.tematica.trim();
-
-  if (enviado) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
-        style={{ background: 'linear-gradient(135deg,#fdf2f8,#faf5ff,#eff6ff)' }}>
-        <div className="text-6xl mb-6">🎉</div>
-        <h2 className="font-dm text-2xl font-bold text-gray-800 text-center mb-3">¡Listo! Ya te abrió WhatsApp</h2>
-        <p className="font-dm text-gray-500 text-center max-w-xs">
-          Enviá el mensaje y Tami te responde a la brevedad 🌸
-        </p>
-        <button onClick={() => setEnviado(false)}
-          className="mt-8 font-dm text-sm text-pink-500 underline underline-offset-2">
-          Hacer otra consulta
-        </button>
-      </div>
-    );
-  }
+  const valid = !!(form.nombre.trim() && form.servicioId && form.fecha && form.tematica.trim());
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg,#fdf2f8,#faf5ff,#eff6ff)' }}>
-      {/* Header */}
-      <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg,#fbcfe8,#ddd6fe)' }}>
-        <div className="relative z-10 flex flex-col items-center justify-center px-6 py-12 text-center">
-          <div className="text-5xl mb-4">🌸</div>
-          <h1 className="font-bebas text-4xl tracking-widest text-gray-800 mb-2">GLOW UP</h1>
-          <p className="font-dm text-gray-600 text-base max-w-sm">
-            Contanos tu idea y te armamos un presupuesto personalizado
-          </p>
+    <>
+      <style>{`
+        @font-face {
+          font-family: 'PCMerchis';
+          src: url('/fonts/PCMerchisDEMO-Regular.otf') format('opentype');
+          font-weight: 400;
+        }
+        @font-face {
+          font-family: 'PCMerchis';
+          src: url('/fonts/PCMerchisDEMO-Expanded.otf') format('opentype');
+          font-weight: 700;
+        }
+        .merchis { font-family: 'PCMerchis', cursive; }
+        .cotizar-input {
+          width: 100%;
+          border-radius: 16px;
+          border: 2px solid #f9c6d8;
+          padding: 12px 16px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px;
+          color: #1f2937;
+          background: rgba(255,255,255,0.85);
+          outline: none;
+          transition: border-color 0.2s;
+          -webkit-text-fill-color: #1f2937;
+        }
+        .cotizar-input:focus { border-color: #db2777; }
+        .cotizar-input::placeholder { color: #c4b5c0; -webkit-text-fill-color: #c4b5c0; }
+        .chip {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          padding: 8px 18px;
+          border-radius: 999px;
+          border: 2px solid #f9c6d8;
+          background: rgba(255,255,255,0.8);
+          color: #9b6b7a;
+          cursor: pointer;
+          transition: all 0.15s;
+        }
+        .chip.active {
+          border-color: #db2777;
+          background: #db2777;
+          color: #fff;
+        }
+      `}</style>
+
+      <div style={{ minHeight: '100vh', position: 'relative' }}>
+
+        {/* Fondo cuadros */}
+        <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
+          <Image src="/glowup-bg.jpg" alt="" fill style={{ objectFit: 'cover', opacity: 0.35 }} priority />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg,rgba(253,242,248,0.7),rgba(250,245,255,0.7))' }} />
         </div>
-        {/* Blobs */}
-        <div style={{ position:'absolute',top:'-40px',right:'-40px',width:180,height:180,borderRadius:'50%',background:'#f9a8d4',opacity:0.3,filter:'blur(50px)' }} />
-        <div style={{ position:'absolute',bottom:'-30px',left:'-30px',width:140,height:140,borderRadius:'50%',background:'#c4b5fd',opacity:0.3,filter:'blur(40px)' }} />
-      </div>
 
-      {/* Form */}
-      <div className="max-w-lg mx-auto px-5 py-10 flex flex-col gap-6">
+        <div style={{ position: 'relative', zIndex: 1 }}>
 
-        {/* Nombre */}
-        <Field label="Tu nombre *">
-          <input value={form.nombre} onChange={e => set('nombre', e.target.value)}
-            placeholder="¿Cómo te llamás?"
-            className="w-full rounded-xl border px-4 py-3 font-dm text-sm text-gray-800 outline-none focus:border-pink-400"
-            style={{ borderColor: '#e9d5ff', background: '#fff' }} />
-        </Field>
-
-        {/* Teléfono */}
-        <Field label="Tu WhatsApp (opcional)">
-          <input value={form.telefono} onChange={e => set('telefono', e.target.value)}
-            placeholder="Para que Tami te pueda responder"
-            type="tel"
-            className="w-full rounded-xl border px-4 py-3 font-dm text-sm text-gray-800 outline-none focus:border-pink-400"
-            style={{ borderColor: '#e9d5ff', background: '#fff' }} />
-        </Field>
-
-        {/* Servicio */}
-        <Field label="¿Qué servicio buscás? *">
-          <select value={form.servicioId} onChange={e => set('servicioId', e.target.value)}
-            className="w-full rounded-xl border px-4 py-3 font-dm text-sm text-gray-800 outline-none focus:border-pink-400 appearance-none"
-            style={{ borderColor: '#e9d5ff', background: '#fff' }}>
-            <option value="">Seleccioná un servicio</option>
-            {servicios.map(s => (
-              <option key={s.id} value={String(s.id)}>
-                {s.nombre}{s.precio_min > 0 ? ` · desde $${s.precio_min.toLocaleString('es-AR')}` : ''}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        {/* Temática */}
-        <Field label="¿Cuál es tu temática o idea? *">
-          <textarea value={form.tematica} onChange={e => set('tematica', e.target.value)}
-            placeholder="Ej: Cumple de 15 estilo París, Baby shower celeste, etc."
-            rows={3}
-            className="w-full rounded-xl border px-4 py-3 font-dm text-sm text-gray-800 outline-none focus:border-pink-400 resize-none"
-            style={{ borderColor: '#e9d5ff', background: '#fff' }} />
-        </Field>
-
-        {/* Fecha */}
-        <Field label="Fecha del evento *">
-          <input value={form.fecha} onChange={e => set('fecha', e.target.value)}
-            type="date"
-            className="w-full rounded-xl border px-4 py-3 font-dm text-sm text-gray-800 outline-none focus:border-pink-400"
-            style={{ borderColor: '#e9d5ff', background: '#fff' }} />
-        </Field>
-
-        {/* Lugar */}
-        <Field label="¿Dónde es el evento?">
-          <div className="flex flex-wrap gap-2">
-            {LUGARES.map(l => (
-              <button key={l} type="button" onClick={() => set('lugar', l)}
-                className="font-dm text-sm px-4 py-2 rounded-full border transition-all"
-                style={{
-                  borderColor: form.lugar === l ? '#db2777' : '#e9d5ff',
-                  background: form.lugar === l ? '#db2777' : '#fff',
-                  color: form.lugar === l ? '#fff' : '#6b7280',
-                }}>
-                {l}
-              </button>
-            ))}
+          {/* Header */}
+          <div style={{ textAlign: 'center', paddingTop: 48, paddingBottom: 32, paddingLeft: 24, paddingRight: 24 }}>
+            <div style={{ display: 'inline-block', marginBottom: 20 }}>
+              <Image src="/glowup-logo.png" alt="Glow Up" width={220} height={110} style={{ objectFit: 'contain' }} />
+            </div>
+            <p className="merchis" style={{ fontSize: 22, color: '#c2436b', letterSpacing: 2, marginBottom: 6 }}>
+              COTIZÁ TU EVENTO
+            </p>
+            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: '#9b6b7a', maxWidth: 300, margin: '0 auto' }}>
+              Contanos tu idea y Tami te arma un presupuesto personalizado 🌸
+            </p>
           </div>
-          {form.lugar === 'Otro' && (
-            <input value={form.lugarCustom} onChange={e => set('lugarCustom', e.target.value)}
-              placeholder="¿Dónde exactamente?"
-              className="mt-3 w-full rounded-xl border px-4 py-3 font-dm text-sm text-gray-800 outline-none focus:border-pink-400"
-              style={{ borderColor: '#e9d5ff', background: '#fff' }} />
+
+          {enviado ? (
+            <div style={{ textAlign: 'center', padding: '40px 24px' }}>
+              <div style={{ fontSize: 64, marginBottom: 20 }}>🎉</div>
+              <p className="merchis" style={{ fontSize: 26, color: '#c2436b', marginBottom: 12 }}>¡LISTO!</p>
+              <p style={{ fontFamily: 'DM Sans, sans-serif', color: '#9b6b7a', fontSize: 15, maxWidth: 280, margin: '0 auto 32px' }}>
+                Se abrió WhatsApp con tu consulta — ¡enviala y Tami te responde a la brevedad!
+              </p>
+              <button onClick={() => setEnviado(false)} className="chip">
+                Hacer otra consulta
+              </button>
+            </div>
+          ) : (
+            <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px 60px' }}>
+              <Card>
+
+                <Field label="Tu nombre *">
+                  <input className="cotizar-input" value={form.nombre}
+                    onChange={e => set('nombre', e.target.value)}
+                    placeholder="¿Cómo te llamás?" />
+                </Field>
+
+                <Field label="Tu WhatsApp (opcional)">
+                  <input className="cotizar-input" value={form.telefono} type="tel"
+                    onChange={e => set('telefono', e.target.value)}
+                    placeholder="Para que Tami pueda responderte" />
+                </Field>
+
+                <Field label="¿Qué servicio buscás? *">
+                  <select className="cotizar-input" value={form.servicioId}
+                    onChange={e => set('servicioId', e.target.value)}
+                    style={{ appearance: 'none', cursor: 'pointer' }}>
+                    <option value="">Seleccioná un servicio</option>
+                    {servicios.map(s => (
+                      <option key={s.id} value={String(s.id)}>
+                        {s.nombre}{s.precio_min > 0 ? ` · desde $${s.precio_min.toLocaleString('es-AR')}` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+
+                <Field label="¿Cuál es tu temática o idea? *">
+                  <textarea className="cotizar-input" value={form.tematica} rows={3}
+                    onChange={e => set('tematica', e.target.value)}
+                    style={{ resize: 'none' }}
+                    placeholder="Ej: Cumple de 15 estilo París, Baby shower celeste..." />
+                </Field>
+
+                <Field label="Fecha del evento *">
+                  <input className="cotizar-input" value={form.fecha} type="date"
+                    onChange={e => set('fecha', e.target.value)} />
+                </Field>
+
+                <Field label="¿Dónde es el evento?">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {LUGARES.map(l => (
+                      <button key={l} type="button"
+                        className={`chip${form.lugar === l ? ' active' : ''}`}
+                        onClick={() => set('lugar', l)}>{l}</button>
+                    ))}
+                  </div>
+                  {form.lugar === 'Otro' && (
+                    <input className="cotizar-input" style={{ marginTop: 10 }}
+                      value={form.lugarCustom}
+                      onChange={e => set('lugarCustom', e.target.value)}
+                      placeholder="¿Dónde exactamente?" />
+                  )}
+                </Field>
+
+                <Field label="Cantidad de personas">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {PERSONAS.map(p => (
+                      <button key={p} type="button"
+                        className={`chip${form.personas === p ? ' active' : ''}`}
+                        onClick={() => set('personas', p)}>{p}</button>
+                    ))}
+                  </div>
+                </Field>
+
+                <Field label="¿Algo más que quieras contar?">
+                  <textarea className="cotizar-input" value={form.mensaje} rows={3}
+                    onChange={e => set('mensaje', e.target.value)}
+                    style={{ resize: 'none' }}
+                    placeholder="Colores, referencias, dudas..." />
+                </Field>
+
+                <button onClick={handleEnviar} disabled={!valid}
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    borderRadius: 20,
+                    border: 'none',
+                    background: valid ? 'linear-gradient(135deg,#db2777,#9333ea)' : '#e5d6db',
+                    color: valid ? '#fff' : '#c4b5c0',
+                    cursor: valid ? 'pointer' : 'not-allowed',
+                    boxShadow: valid ? '0 8px 30px rgba(219,39,119,0.4)' : 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                    transition: 'all 0.2s',
+                  }}>
+                  <span className="merchis" style={{ fontSize: 18, letterSpacing: 1 }}>
+                    💬 SOLICITAR INFORMACIÓN
+                  </span>
+                </button>
+
+                <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 11, color: '#c4b5c0', textAlign: 'center', marginTop: 12 }}>
+                  Se abre WhatsApp con tu consulta lista para enviar
+                </p>
+
+              </Card>
+            </div>
           )}
-        </Field>
-
-        {/* Personas */}
-        <Field label="Cantidad de personas">
-          <div className="flex flex-wrap gap-2">
-            {PERSONAS.map(p => (
-              <button key={p} type="button" onClick={() => set('personas', p)}
-                className="font-dm text-sm px-4 py-2 rounded-full border transition-all"
-                style={{
-                  borderColor: form.personas === p ? '#db2777' : '#e9d5ff',
-                  background: form.personas === p ? '#db2777' : '#fff',
-                  color: form.personas === p ? '#fff' : '#6b7280',
-                }}>
-                {p}
-              </button>
-            ))}
-          </div>
-        </Field>
-
-        {/* Mensaje adicional */}
-        <Field label="¿Algo más que quieras contar?">
-          <textarea value={form.mensaje} onChange={e => set('mensaje', e.target.value)}
-            placeholder="Colores que te gustan, referencias, dudas..."
-            rows={3}
-            className="w-full rounded-xl border px-4 py-3 font-dm text-sm text-gray-800 outline-none focus:border-pink-400 resize-none"
-            style={{ borderColor: '#e9d5ff', background: '#fff' }} />
-        </Field>
-
-        {/* Botón */}
-        <button onClick={handleEnviar} disabled={!valid}
-          className="w-full py-4 rounded-2xl font-dm font-bold text-base text-white transition-all flex items-center justify-center gap-3"
-          style={{
-            background: valid ? 'linear-gradient(135deg,#db2777,#9333ea)' : '#d1d5db',
-            cursor: valid ? 'pointer' : 'not-allowed',
-            boxShadow: valid ? '0 8px 25px rgba(219,39,119,0.35)' : 'none',
-          }}>
-          <span>💬</span>
-          Solicitar información por WhatsApp
-        </button>
-
-        <p className="font-dm text-xs text-gray-400 text-center">
-          Al tocar el botón se va a abrir WhatsApp con tu consulta lista para enviar
-        </p>
+        </div>
       </div>
+    </>
+  );
+}
 
-      {/* Footer */}
-      <div className="text-center py-8">
-        <p className="font-dm text-xs text-gray-400">✨ Glow Up · Decoración de eventos</p>
-      </div>
+function Card({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{
+      background: 'rgba(255,255,255,0.6)',
+      backdropFilter: 'blur(16px)',
+      borderRadius: 28,
+      border: '1.5px solid rgba(249,198,216,0.5)',
+      padding: '28px 24px',
+      display: 'flex', flexDirection: 'column', gap: 20,
+      boxShadow: '0 8px 40px rgba(219,39,119,0.08)',
+    }}>
+      {children}
     </div>
   );
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-2">
-      <label className="font-dm text-sm font-semibold text-gray-700">{label}</label>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <label style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 600, color: '#9b6b7a' }}>
+        {label}
+      </label>
       {children}
     </div>
   );
