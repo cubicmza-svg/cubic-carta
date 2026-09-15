@@ -1,11 +1,11 @@
-import { isAuthenticated } from '@/lib/adminAuth';
+import { isAuthenticatedAsync } from '@/lib/adminAuth';
 import { seedDatabase } from '@/lib/db';
 import { SEED_ITEMS } from '@/lib/seedData';
 
 // POST — crea la tabla (si no existe) y carga los 140 ítems iniciales
 // ⚠ Operación destructiva: trunca y re-inserta
 export async function POST() {
-  if (!isAuthenticated()) {
+  if (!await isAuthenticatedAsync()) {
     return Response.json({ error: 'No autorizado' }, { status: 401 });
   }
   try {

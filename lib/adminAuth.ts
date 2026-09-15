@@ -17,3 +17,15 @@ export function isAuthenticated(): boolean {
     return false;
   }
 }
+
+export async function isAuthenticatedAsync(): Promise<boolean> {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(COOKIE_NAME)?.value;
+    if (!token) return false;
+    const expected = makeToken(process.env.ADMIN_PASSWORD ?? '');
+    return token === expected;
+  } catch {
+    return false;
+  }
+}

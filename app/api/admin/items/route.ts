@@ -1,9 +1,9 @@
-import { isAuthenticated } from '@/lib/adminAuth';
+import { isAuthenticatedAsync } from '@/lib/adminAuth';
 import { getAllItems, addItem } from '@/lib/db';
 import type { MenuItem } from '@/lib/types';
 
 export async function GET() {
-  if (!isAuthenticated()) {
+  if (!await isAuthenticatedAsync()) {
     return Response.json({ error: 'No autorizado' }, { status: 401 });
   }
   try {
@@ -16,7 +16,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  if (!isAuthenticated()) {
+  if (!await isAuthenticatedAsync()) {
     return Response.json({ error: 'No autorizado' }, { status: 401 });
   }
   try {

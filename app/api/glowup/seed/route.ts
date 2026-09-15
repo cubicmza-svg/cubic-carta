@@ -1,4 +1,4 @@
-import { isAuthenticated } from '@/lib/adminAuth';
+import { isAuthenticatedAsync } from '@/lib/adminAuth';
 import { ensureGlowUpTables } from '@/lib/glowupDb';
 import postgres from 'postgres';
 
@@ -83,7 +83,7 @@ const SERVICIOS = [
 ];
 
 export async function POST() {
-  if (!isAuthenticated()) return Response.json({ error: 'No autorizado' }, { status: 401 });
+  if (!await isAuthenticatedAsync()) return Response.json({ error: 'No autorizado' }, { status: 401 });
   await ensureGlowUpTables();
   const sql = getClient();
   try {

@@ -1,4 +1,4 @@
-import { isAuthenticated } from '@/lib/adminAuth';
+import { isAuthenticatedAsync } from '@/lib/adminAuth';
 import { getAllItems, updateItem, addItem } from '@/lib/db';
 import ExcelJS from 'exceljs';
 import * as XLSX from 'xlsx';
@@ -33,7 +33,7 @@ function darken(argb: string): string {
 
 // GET — descarga Excel con estilos
 export async function GET() {
-  if (!isAuthenticated()) return new Response('No autorizado', { status: 401 });
+  if (!await isAuthenticatedAsync()) return new Response('No autorizado', { status: 401 });
 
   const items = await getAllItems();
   const wb = new ExcelJS.Workbook();
@@ -123,7 +123,7 @@ export async function GET() {
 
 // POST — importa Excel modificado, actualiza sin tocar imágenes
 export async function POST(req: Request) {
-  if (!isAuthenticated()) return Response.json({ error: 'No autorizado' }, { status: 401 });
+  if (!await isAuthenticatedAsync()) return Response.json({ error: 'No autorizado' }, { status: 401 });
 
   const formData = await req.formData();
   const file = formData.get('file') as File | null;
