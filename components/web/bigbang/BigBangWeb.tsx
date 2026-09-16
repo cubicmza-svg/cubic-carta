@@ -24,6 +24,28 @@ const PHOTOS = [
   { id: '1Rueuki_-g9EFv1I1jAF5PvC8anQXrEyt', label: 'Inflable' },
 ];
 
+const COMMON_INCLUDES = [
+  { icon: '👩‍🍳', text: 'Coordinadora de evento' },
+  { icon: '🍳', text: 'Cocinera' },
+  { icon: '🤝', text: 'Moza' },
+  { icon: '🎮', text: 'Auxiliar de juegos' },
+  { icon: '🏠', text: 'Salón exclusivo para 60 personas' },
+  { icon: '⏱️', text: '3 horas de evento' },
+  { icon: '🍽️', text: 'Cocina totalmente equipada' },
+  { icon: '❄️', text: 'Aire acondicionado y calefacción' },
+  { icon: '🎵', text: 'Música ambiental a elección' },
+  { icon: '🍬', text: 'Mesas de candy bar' },
+  { icon: '🌿', text: 'Sector patio' },
+  { icon: '🚻', text: 'Baños con cambiador para bebés' },
+  { icon: '🎈', text: '3 inflables enormes' },
+  { icon: '🏃', text: '2 laberintos gigantes' },
+  { icon: '🏰', text: 'Plaza blanda con castillo' },
+  { icon: '⚽', text: 'Cancha de fútbol' },
+  { icon: '🎯', text: 'Pool, metegol, ping pong y tejo' },
+  { icon: '🕹️', text: 'Videojuegos tipo arcade' },
+  { icon: '📺', text: '2 TV + consolas de videojuegos' },
+];
+
 const PROMOS = [
   {
     key: 'super',
@@ -32,10 +54,13 @@ const PROMOS = [
     bg: 'rgba(245,158,11,0.12)',
     border: 'rgba(245,158,11,0.4)',
     diasLabel: 'Lunes a Viernes',
+    turnos: ['13:00 a 16:00 hs', '16:30 a 19:30 hs'],
     precios: [{ label: 'Lun–Vie', precio: '$265.000' }],
-    sena: 'Se abona el total al momento de contratar',
+    sena: 'Se abona el total en efectivo al momento de contratar',
+    cancelacion: null,
     menu: null,
-    badge: null,
+    badge: 'MÁS ECONÓMICA',
+    extras: [],
   },
   {
     key: 'clasic',
@@ -44,13 +69,16 @@ const PROMOS = [
     bg: 'rgba(239,68,68,0.12)',
     border: 'rgba(239,68,68,0.4)',
     diasLabel: 'Todos los días',
+    turnos: ['13:00 a 16:00 hs', '16:30 a 19:30 hs', '20:00 a 23:00 hs'],
     precios: [
       { label: 'Lun–Jue', precio: '$310.000' },
       { label: 'Vie–Dom y feriados', precio: '$335.000' },
     ],
     sena: 'Señá con $150.000 (efectivo o transferencia)',
+    cancelacion: 'Saldo cancelado 15 días antes del evento (solo efectivo)',
     menu: null,
     badge: null,
+    extras: [],
   },
   {
     key: 'full',
@@ -59,13 +87,16 @@ const PROMOS = [
     bg: 'rgba(6,182,212,0.12)',
     border: 'rgba(6,182,212,0.4)',
     diasLabel: 'Todos los días',
+    turnos: ['13:00 a 16:00 hs', '16:30 a 19:30 hs', '20:00 a 23:00 hs'],
     precios: [
       { label: 'Lun–Jue', precio: '$370.000' },
       { label: 'Vie–Dom y feriados', precio: '$399.000' },
     ],
     sena: 'Señá con el 50% (efectivo o transferencia)',
-    menu: '5 pizzas muzzarella (60 porciones) + 24 panchos con aderezos',
-    badge: 'MÁS COMPLETO',
+    cancelacion: 'Saldo cancelado 15 días antes del evento (solo efectivo)',
+    menu: '🍕 5 pizzas muzzarella de 12 porciones (60 porciones totales) + 🌭 24 panchos individuales con aderezos',
+    badge: 'MÁS COMPLETA',
+    extras: ['Menú básico incluido en el precio'],
   },
 ] as const;
 
@@ -168,7 +199,14 @@ export default function BigBangWeb() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=DM+Sans:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+        @font-face {
+          font-family: 'SuperHistories';
+          src: url('/fonts/SuperHistories.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
         body { background: #050818; color: #e2e8f0; font-family: 'DM Sans', sans-serif; }
@@ -471,46 +509,73 @@ export default function BigBangWeb() {
           </div>
 
           {/* Promo Card */}
-          <div className="bb-glass" style={{ maxWidth: 600, margin: '0 auto', padding: '36px 32px', border: `1px solid ${promo.border}` }}>
-            {promo.badge && (
-              <div style={{ display: 'inline-block', background: promo.color, color: '#000', padding: '4px 14px', borderRadius: 99, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, marginBottom: 16 }}>
-                {promo.badge}
+          <div className="bb-glass" style={{ maxWidth: 680, margin: '0 auto', padding: '36px 32px', border: `1px solid ${promo.border}` }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
+              <div>
+                {promo.badge && (
+                  <div style={{ display: 'inline-block', background: promo.color, color: '#000', padding: '3px 12px', borderRadius: 99, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8 }}>
+                    ⭐ {promo.badge}
+                  </div>
+                )}
+                <div className="fredoka" style={{ fontSize: 36, color: promo.color, lineHeight: 1 }}>{promo.name}</div>
+                <div style={{ fontSize: 14, color: '#64748b', marginTop: 6 }}>📅 {promo.diasLabel}</div>
               </div>
-            )}
-            <div className="fredoka" style={{ fontSize: 32, color: promo.color, marginBottom: 6 }}>{promo.name}</div>
-            <div style={{ fontSize: 14, color: '#64748b', marginBottom: 28 }}>📅 {promo.diasLabel}</div>
+            </div>
 
             {/* Precios */}
-            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 28 }}>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 28 }}>
               {promo.precios.map((pr, i) => (
-                <div key={i} style={{ flex: 1, minWidth: 140, background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: '16px 20px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div key={i} style={{ flex: 1, minWidth: 130, background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: '16px 20px', border: `1px solid ${promo.border}` }}>
                   <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>{pr.label}</div>
                   <div className="fredoka" style={{ fontSize: 28, color: '#fff' }}>{pr.precio}</div>
                 </div>
               ))}
             </div>
 
-            {/* Seña */}
-            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: '14px 16px', marginBottom: promo.menu ? 16 : 0 }}>
-              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>💳 Seña</div>
-              <div style={{ fontSize: 14, color: '#cbd5e1' }}>{promo.sena}</div>
+            {/* Turnos */}
+            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: '14px 16px', marginBottom: 12 }}>
+              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>🕐 Turnos disponibles</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {promo.turnos.map(t => (
+                  <span key={t} style={{ fontSize: 13, color: '#cbd5e1', background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: 99 }}>{t}</span>
+                ))}
+              </div>
             </div>
 
+            {/* Seña y cancelación */}
+            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: '14px 16px', marginBottom: 12 }}>
+              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>💳 Seña</div>
+              <div style={{ fontSize: 14, color: '#cbd5e1' }}>{promo.sena}</div>
+              {promo.cancelacion && (
+                <div style={{ fontSize: 13, color: '#475569', marginTop: 6 }}>⚠️ {promo.cancelacion}</div>
+              )}
+            </div>
+
+            {/* Menú incluido (solo FULL) */}
             {promo.menu && (
-              <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: '14px 16px', marginTop: 16 }}>
-                <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>🍕 Menú incluido</div>
-                <div style={{ fontSize: 14, color: '#cbd5e1' }}>{promo.menu}</div>
+              <div style={{ background: `rgba(6,182,212,0.08)`, borderRadius: 12, padding: '14px 16px', marginBottom: 12, border: '1px solid rgba(6,182,212,0.2)' }}>
+                <div style={{ fontSize: 12, color: '#06b6d4', marginBottom: 6, fontWeight: 700 }}>MENÚ INCLUIDO EN EL PRECIO</div>
+                <div style={{ fontSize: 14, color: '#cbd5e1', lineHeight: 1.6 }}>{promo.menu}</div>
               </div>
             )}
 
-            <div style={{ marginTop: 28, fontSize: 12, color: '#475569' }}>
-              ⚠️ El saldo debe estar cancelado 15 días antes del evento (solo efectivo)
+            {/* Todo lo que incluye */}
+            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: '14px 16px', marginBottom: 24 }}>
+              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>✅ Todo esto incluido</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 6 }}>
+                {COMMON_INCLUDES.map((item, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#94a3b8' }}>
+                    <span style={{ fontSize: 15 }}>{item.icon}</span>
+                    <span>{item.text}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <a href={waLink(`¡Hola! Me interesa la promo ${promo.name} de Big Bang Pelotero, ¿me podés dar más info?`)}
               target="_blank" rel="noopener noreferrer"
               className="bb-btn bb-btn-wa"
-              style={{ display: 'flex', justifyContent: 'center', marginTop: 28, fontSize: 16 }}>
+              style={{ display: 'flex', justifyContent: 'center', fontSize: 16 }}>
               💬 Consultar promo {promo.name}
             </a>
           </div>
