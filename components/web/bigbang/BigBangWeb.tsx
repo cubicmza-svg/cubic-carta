@@ -511,84 +511,123 @@ export default function BigBangWeb() {
       </div>
 
       {/* PROMOS */}
-      <section id="promos">
-        <div className="bb-section">
-          <h2 className="bb-section-title">Nuestras promos</h2>
+      <section id="promos" style={{ position: 'relative', zIndex: 1 }}>
+        {/* Glow de fondo */}
+        <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 50% 0%, rgba(245,158,11,0.08) 0%, transparent 70%)`, pointerEvents: 'none', zIndex: 0 }} />
+
+        <div className="bb-section" style={{ position: 'relative', zIndex: 1 }}>
+          {/* Pill label */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+            <span style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.4)', color: '#f59e0b', fontSize: 11, fontWeight: 700, letterSpacing: 2, padding: '6px 18px', borderRadius: 99, textTransform: 'uppercase' }}>
+              🎉 Precios 2025
+            </span>
+          </div>
+
+          <h2 className="bb-section-title" style={{ fontSize: 'clamp(36px,6vw,60px)', background: 'linear-gradient(135deg, #fff 30%, #f59e0b)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            Nuestras promos
+          </h2>
           <p className="bb-section-sub">Elegí la que mejor se adapta a tu evento</p>
 
           {/* Tabs */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 40, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 40, flexWrap: 'wrap' }}>
             {PROMOS.map(p => (
-              <button key={p.key} className={`promo-tab${activePromo === p.key ? ' active' : ''}`}
+              <button key={p.key}
                 onClick={() => setActivePromo(p.key as typeof activePromo)}
                 style={{
-                  borderColor: activePromo === p.key ? p.color : 'transparent',
-                  color: activePromo === p.key ? p.color : '#94a3b8',
-                  background: activePromo === p.key ? p.bg : 'transparent',
+                  padding: '12px 28px', borderRadius: 99,
+                  border: `2px solid ${activePromo === p.key ? p.color : 'rgba(255,255,255,0.1)'}`,
+                  color: activePromo === p.key ? '#fff' : '#94a3b8',
+                  background: activePromo === p.key ? `linear-gradient(135deg, ${p.color}33, ${p.color}11)` : 'transparent',
+                  fontFamily: "'SuperHistories', sans-serif", fontSize: 16,
+                  cursor: 'pointer', transition: 'all 0.25s',
+                  boxShadow: activePromo === p.key ? `0 0 20px ${p.color}44` : 'none',
+                  transform: activePromo === p.key ? 'scale(1.06)' : 'scale(1)',
                 }}>
                 {p.name}
+                {p.badge && <span style={{ display: 'block', fontSize: 9, letterSpacing: 1, opacity: 0.8, marginTop: 2 }}>★ {p.badge}</span>}
               </button>
             ))}
           </div>
 
           {/* Promo Card */}
-          <div className="bb-glass" style={{ maxWidth: 680, margin: '0 auto', padding: '36px 32px', border: `1px solid ${promo.border}` }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
-              <div>
+          <div style={{
+            maxWidth: 700, margin: '0 auto',
+            background: `linear-gradient(160deg, ${promo.bg}, rgba(5,8,24,0.9))`,
+            border: `1.5px solid ${promo.color}66`,
+            borderRadius: 28,
+            padding: '40px 32px',
+            boxShadow: `0 0 60px ${promo.color}22, inset 0 1px 0 rgba(255,255,255,0.06)`,
+            transition: 'all 0.3s',
+          }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28, flexWrap: 'wrap' }}>
+              <div style={{ flex: 1 }}>
                 {promo.badge && (
-                  <div style={{ display: 'inline-block', background: promo.color, color: '#000', padding: '3px 12px', borderRadius: 99, fontSize: 11, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8 }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: promo.color, color: '#000', padding: '4px 14px', borderRadius: 99, fontSize: 11, fontWeight: 800, letterSpacing: 1.5, marginBottom: 10 }}>
                     ⭐ {promo.badge}
                   </div>
                 )}
-                <div className="fredoka" style={{ fontSize: 36, color: promo.color, lineHeight: 1 }}>{promo.name}</div>
-                <div style={{ fontSize: 14, color: '#64748b', marginTop: 6 }}>📅 {promo.diasLabel}</div>
+                <div className="fredoka" style={{ fontSize: 42, color: promo.color, lineHeight: 1, textShadow: `0 0 30px ${promo.color}88` }}>
+                  {promo.name}
+                </div>
+                <div style={{ fontSize: 14, color: '#94a3b8', marginTop: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  📅 <span>{promo.diasLabel}</span>
+                </div>
               </div>
             </div>
 
-            {/* Precios */}
+            {/* Precios — destacados */}
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 28 }}>
               {promo.precios.map((pr, i) => (
-                <div key={i} style={{ flex: 1, minWidth: 130, background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: '16px 20px', border: `1px solid ${promo.border}` }}>
-                  <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>{pr.label}</div>
-                  <div className="fredoka" style={{ fontSize: 28, color: '#fff' }}>{$$(precios, pr.precioKey)}</div>
+                <div key={i} style={{
+                  flex: 1, minWidth: 140,
+                  background: `linear-gradient(135deg, ${promo.color}22, ${promo.color}08)`,
+                  borderRadius: 20, padding: '20px 24px',
+                  border: `1px solid ${promo.color}44`,
+                  textAlign: 'center',
+                }}>
+                  <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 1 }}>{pr.label}</div>
+                  <div className="fredoka" style={{ fontSize: 34, color: '#fff', lineHeight: 1, textShadow: `0 0 20px ${promo.color}66` }}>
+                    {$$(precios, pr.precioKey)}
+                  </div>
                 </div>
               ))}
             </div>
 
             {/* Turnos */}
-            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: '14px 16px', marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>🕐 Turnos disponibles</div>
+            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: '16px 20px', marginBottom: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>🕐 Turnos</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {promo.turnos.map(t => (
-                  <span key={t} style={{ fontSize: 13, color: '#cbd5e1', background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: 99 }}>{t}</span>
+                  <span key={t} style={{ fontSize: 13, color: '#e2e8f0', background: 'rgba(255,255,255,0.07)', padding: '6px 14px', borderRadius: 99, border: '1px solid rgba(255,255,255,0.08)' }}>{t}</span>
                 ))}
               </div>
             </div>
 
-            {/* Seña y cancelación */}
-            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: '14px 16px', marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>💳 Seña</div>
+            {/* Seña */}
+            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: '16px 20px', marginBottom: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>💳 Seña</div>
               <div style={{ fontSize: 14, color: '#cbd5e1' }}>{promo.sena}</div>
               {promo.cancelacion && (
-                <div style={{ fontSize: 13, color: '#475569', marginTop: 6 }}>⚠️ {promo.cancelacion}</div>
+                <div style={{ fontSize: 13, color: '#64748b', marginTop: 6 }}>⚠️ {promo.cancelacion}</div>
               )}
             </div>
 
             {/* Menú incluido (solo FULL) */}
             {promo.menu && (
-              <div style={{ background: `rgba(6,182,212,0.08)`, borderRadius: 12, padding: '14px 16px', marginBottom: 12, border: '1px solid rgba(6,182,212,0.2)' }}>
-                <div style={{ fontSize: 12, color: '#06b6d4', marginBottom: 6, fontWeight: 700 }}>MENÚ INCLUIDO EN EL PRECIO</div>
-                <div style={{ fontSize: 14, color: '#cbd5e1', lineHeight: 1.6 }}>{promo.menu}</div>
+              <div style={{ background: 'rgba(6,182,212,0.1)', borderRadius: 16, padding: '16px 20px', marginBottom: 12, border: '1px solid rgba(6,182,212,0.3)' }}>
+                <div style={{ fontSize: 12, color: '#06b6d4', marginBottom: 8, fontWeight: 800, letterSpacing: 1 }}>🍕 MENÚ INCLUIDO</div>
+                <div style={{ fontSize: 14, color: '#cbd5e1', lineHeight: 1.7 }}>{promo.menu}</div>
               </div>
             )}
 
-            {/* Todo lo que incluye */}
-            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: '14px 16px', marginBottom: 24 }}>
-              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>✅ Todo esto incluido</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 6 }}>
+            {/* Todo incluido */}
+            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: '16px 20px', marginBottom: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>✅ Todo esto incluido</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: 8 }}>
                 {COMMON_INCLUDES.map((item, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#94a3b8' }}>
-                    <span style={{ fontSize: 15 }}>{item.icon}</span>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, color: '#94a3b8', background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '7px 10px' }}>
+                    <span style={{ fontSize: 16 }}>{item.icon}</span>
                     <span>{item.text}</span>
                   </div>
                 ))}
@@ -598,19 +637,26 @@ export default function BigBangWeb() {
             <a href={waLink(`¡Hola! Me interesa la promo ${promo.name} de Big Bang Pelotero, ¿me podés dar más info?`)}
               target="_blank" rel="noopener noreferrer"
               className="bb-btn bb-btn-wa"
-              style={{ display: 'flex', justifyContent: 'center', fontSize: 16 }}>
+              style={{ display: 'flex', justifyContent: 'center', fontSize: 17, padding: '16px 32px' }}>
               💬 Consultar promo {promo.name}
             </a>
           </div>
 
           {/* Comparativa rápida */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 40, maxWidth: 700, margin: '40px auto 0' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 32, maxWidth: 680, margin: '32px auto 0' }}>
             {PROMOS.map(p => (
-              <div key={p.key} className="bb-glass" style={{ padding: '20px 16px', textAlign: 'center', border: `1px solid ${activePromo === p.key ? p.color : 'rgba(255,255,255,0.06)'}`, cursor: 'pointer', transition: 'all 0.2s' }}
-                onClick={() => setActivePromo(p.key as typeof activePromo)}>
-                <div className="fredoka" style={{ color: p.color, fontSize: 14, marginBottom: 4 }}>{p.name}</div>
-                <div style={{ fontSize: 12, color: '#64748b' }}>{$$(precios, p.precios[0].precioKey)}</div>
-                <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>{p.diasLabel}</div>
+              <div key={p.key}
+                onClick={() => setActivePromo(p.key as typeof activePromo)}
+                style={{
+                  background: activePromo === p.key ? `linear-gradient(135deg, ${p.color}22, ${p.color}08)` : 'rgba(255,255,255,0.03)',
+                  borderRadius: 18, padding: '18px 14px', textAlign: 'center',
+                  border: `1.5px solid ${activePromo === p.key ? p.color : 'rgba(255,255,255,0.06)'}`,
+                  cursor: 'pointer', transition: 'all 0.25s',
+                  boxShadow: activePromo === p.key ? `0 0 20px ${p.color}33` : 'none',
+                }}>
+                <div className="fredoka" style={{ color: p.color, fontSize: 15, marginBottom: 6 }}>{p.name}</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 4 }}>{$$(precios, p.precios[0].precioKey)}</div>
+                <div style={{ fontSize: 11, color: '#475569' }}>{p.diasLabel}</div>
               </div>
             ))}
           </div>
