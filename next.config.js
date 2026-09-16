@@ -16,20 +16,6 @@ const nextConfig = {
       },
     ];
   },
-  async rewrites() {
-    return [
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'bigbangpelotero.com' }],
-        destination: '/bigbang/:path*',
-      },
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'www.bigbangpelotero.com' }],
-        destination: '/bigbang/:path*',
-      },
-    ];
-  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'drive.google.com' },
