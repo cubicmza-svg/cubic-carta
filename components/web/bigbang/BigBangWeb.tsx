@@ -6,6 +6,21 @@ const WA = '5492613861323';
 const waLink = (msg: string) => `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
 const DEFAULT_MSG = '¡Hola! Quiero info sobre las promos de Big Bang Pelotero 🎉';
 
+const DEFAULTS: Record<string, string> = {
+  promo_super_lv: '265000', promo_clasic_lj: '310000', promo_clasic_finde: '335000',
+  promo_clasic_sena: '150000', promo_full_lj: '370000', promo_full_finde: '399000',
+  adic_hora_extra: '103000', adic_invitado_extra: '5170', adic_moza: '40500',
+  adic_parrillero: '49000', adic_dispenser: '18000',
+  menu_pizza_muzza: '17500', menu_pizza_napo: '20700', menu_panchos_24: '53500',
+  menu_hamburguesas_12: '70000', menu_snack: '48500', menu_empanadas: '20000', menu_sandwiches: '110000',
+  beb_gaseosa: '7500', beb_agua_sab: '7500', beb_agua_min: '7500', beb_cerveza: '9200', beb_hielo: '7900',
+};
+
+const $$ = (precios: Record<string, string>, key: string) => {
+  const n = parseInt(precios[key] ?? DEFAULTS[key] ?? '0', 10);
+  return '$' + n.toLocaleString('es-AR');
+};
+
 const DRIVE1 = (id: string, w = 600) =>
   `https://drive.google.com/thumbnail?id=${id}&sz=w${w}`;
 
@@ -55,7 +70,7 @@ const PROMOS = [
     border: 'rgba(245,158,11,0.4)',
     diasLabel: 'Lunes a Viernes',
     turnos: ['13:00 a 16:00 hs', '16:30 a 19:30 hs'],
-    precios: [{ label: 'Lun–Vie', precio: '$265.000' }],
+    precios: [{ label: 'Lun–Vie', precioKey: 'promo_super_lv' }],
     sena: 'Se abona el total en efectivo al momento de contratar',
     cancelacion: null,
     menu: null,
@@ -71,8 +86,8 @@ const PROMOS = [
     diasLabel: 'Todos los días',
     turnos: ['13:00 a 16:00 hs', '16:30 a 19:30 hs', '20:00 a 23:00 hs'],
     precios: [
-      { label: 'Lun–Jue', precio: '$310.000' },
-      { label: 'Vie–Dom y feriados', precio: '$335.000' },
+      { label: 'Lun–Jue', precioKey: 'promo_clasic_lj' },
+      { label: 'Vie–Dom y feriados', precioKey: 'promo_clasic_finde' },
     ],
     sena: 'Señá con $150.000 (efectivo o transferencia)',
     cancelacion: 'Saldo cancelado 15 días antes del evento (solo efectivo)',
@@ -89,8 +104,8 @@ const PROMOS = [
     diasLabel: 'Todos los días',
     turnos: ['13:00 a 16:00 hs', '16:30 a 19:30 hs', '20:00 a 23:00 hs'],
     precios: [
-      { label: 'Lun–Jue', precio: '$370.000' },
-      { label: 'Vie–Dom y feriados', precio: '$399.000' },
+      { label: 'Lun–Jue', precioKey: 'promo_full_lj' },
+      { label: 'Vie–Dom y feriados', precioKey: 'promo_full_finde' },
     ],
     sena: 'Señá con el 50% (efectivo o transferencia)',
     cancelacion: 'Saldo cancelado 15 días antes del evento (solo efectivo)',
@@ -98,7 +113,7 @@ const PROMOS = [
     badge: 'MÁS COMPLETA',
     extras: ['Menú básico incluido en el precio'],
   },
-] as const;
+];
 
 const JUEGOS = [
   { icon: '🎈', text: '3 Inflables enormes' },
@@ -123,31 +138,31 @@ const SERVICIOS = [
 ];
 
 const ADICIONALES = [
-  { item: 'Hora extra', lj: '$103.000', finde: '$—' },
-  { item: 'Invitado extra (sobre 60)', lj: '$5.170 c/u', finde: '$5.170 c/u' },
-  { item: 'Moza', lj: '$40.500', finde: '$40.500' },
-  { item: 'Parrillero + leña', lj: '$49.000', finde: '$49.000' },
-  { item: 'Dispenser de jugo o café', lj: '$18.000', finde: '$18.000' },
-  { item: 'Menú salado o dulce', lj: 'Consultar', finde: 'Consultar' },
-  { item: 'Bebidas', lj: 'Consultar', finde: 'Consultar' },
+  { item: 'Hora extra', precioKey: 'adic_hora_extra', suffix: '' },
+  { item: 'Invitado extra (sobre 60)', precioKey: 'adic_invitado_extra', suffix: ' c/u' },
+  { item: 'Moza', precioKey: 'adic_moza', suffix: '' },
+  { item: 'Parrillero + leña', precioKey: 'adic_parrillero', suffix: '' },
+  { item: 'Dispenser de jugo o café', precioKey: 'adic_dispenser', suffix: '' },
+  { item: 'Menú salado o dulce', precioKey: null, suffix: '' },
+  { item: 'Bebidas', precioKey: null, suffix: '' },
 ];
 
 const MENU_SALADO = [
-  { item: 'Pizza muzzarella 12 porciones', precio: '$17.500' },
-  { item: 'Pizza napolitana o especial 12 porciones', precio: '$20.700' },
-  { item: 'Combo 24 panchos con aderezos', precio: '$53.500' },
-  { item: 'Combo 12 hamburguesas a la parrilla', precio: '$70.000' },
-  { item: 'Combo snack (papas, chizitos, palitos)', precio: '$48.500' },
-  { item: 'Docena de empanadas (carne o jamón/queso)', precio: '$20.000' },
-  { item: 'Sandwich de miga triples x100', precio: '$110.000' },
+  { item: 'Pizza muzzarella 12 porciones', precioKey: 'menu_pizza_muzza' },
+  { item: 'Pizza napolitana o especial 12 porciones', precioKey: 'menu_pizza_napo' },
+  { item: 'Combo 24 panchos con aderezos', precioKey: 'menu_panchos_24' },
+  { item: 'Combo 12 hamburguesas a la parrilla', precioKey: 'menu_hamburguesas_12' },
+  { item: 'Combo snack (papas, chizitos, palitos)', precioKey: 'menu_snack' },
+  { item: 'Docena de empanadas (carne o jamón/queso)', precioKey: 'menu_empanadas' },
+  { item: 'Sandwich de miga triples x100', precioKey: 'menu_sandwiches' },
 ];
 
 const MENU_BEBIDAS = [
-  { item: 'Gaseosa Pepsi 1,5 lts', precio: '$7.500' },
-  { item: 'Agua saborizada H2O 1,5 lts', precio: '$7.500' },
-  { item: 'Agua mineral Eco de los Andes 1,5 lts', precio: '$7.500' },
-  { item: 'Cerveza Quilmes 1 lt', precio: '$9.200' },
-  { item: 'Bolsa de hielo 3,5 kg', precio: '$7.900' },
+  { item: 'Gaseosa Pepsi 1,5 lts', precioKey: 'beb_gaseosa' },
+  { item: 'Agua saborizada H2O 1,5 lts', precioKey: 'beb_agua_sab' },
+  { item: 'Agua mineral Eco de los Andes 1,5 lts', precioKey: 'beb_agua_min' },
+  { item: 'Cerveza Quilmes 1 lt', precioKey: 'beb_cerveza' },
+  { item: 'Bolsa de hielo 3,5 kg', precioKey: 'beb_hielo' },
 ];
 
 function useCounter(target: number, active: boolean) {
@@ -179,9 +194,17 @@ function StatItem({ value, label, suffix = '', active }: { value: number; label:
 }
 
 export default function BigBangWeb() {
+  const [precios, setPrecios] = useState<Record<string, string>>(DEFAULTS);
   const [statsVisible, setStatsVisible] = useState(false);
   const [activePromo, setActivePromo] = useState<'super' | 'clasic' | 'full'>('clasic');
   const [navScrolled, setNavScrolled] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/bigbang/precios-web')
+      .then(r => r.ok ? r.json() : DEFAULTS)
+      .then(data => setPrecios(data))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setNavScrolled(window.scrollY > 60);
@@ -527,7 +550,7 @@ export default function BigBangWeb() {
               {promo.precios.map((pr, i) => (
                 <div key={i} style={{ flex: 1, minWidth: 130, background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: '16px 20px', border: `1px solid ${promo.border}` }}>
                   <div style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>{pr.label}</div>
-                  <div className="fredoka" style={{ fontSize: 28, color: '#fff' }}>{pr.precio}</div>
+                  <div className="fredoka" style={{ fontSize: 28, color: '#fff' }}>{$$(precios, pr.precioKey)}</div>
                 </div>
               ))}
             </div>
@@ -586,7 +609,7 @@ export default function BigBangWeb() {
               <div key={p.key} className="bb-glass" style={{ padding: '20px 16px', textAlign: 'center', border: `1px solid ${activePromo === p.key ? p.color : 'rgba(255,255,255,0.06)'}`, cursor: 'pointer', transition: 'all 0.2s' }}
                 onClick={() => setActivePromo(p.key as typeof activePromo)}>
                 <div className="fredoka" style={{ color: p.color, fontSize: 14, marginBottom: 4 }}>{p.name}</div>
-                <div style={{ fontSize: 12, color: '#64748b' }}>{p.precios[0].precio}</div>
+                <div style={{ fontSize: 12, color: '#64748b' }}>{$$(precios, p.precios[0].precioKey)}</div>
                 <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>{p.diasLabel}</div>
               </div>
             ))}
@@ -604,7 +627,9 @@ export default function BigBangWeb() {
             {ADICIONALES.map((a, i) => (
               <div key={i} className="adicional-row">
                 <div className="adicional-item">{a.item}</div>
-                <div className="adicional-precio">{a.lj !== a.finde ? `${a.lj} / ${a.finde}` : a.lj}</div>
+                <div className="adicional-precio">
+                  {a.precioKey ? $$(precios, a.precioKey) + a.suffix : 'Consultar'}
+                </div>
               </div>
             ))}
           </div>
@@ -624,7 +649,7 @@ export default function BigBangWeb() {
             {MENU_SALADO.map((m, i) => (
               <div key={i} className="menu-row">
                 <span className="menu-item">{m.item}</span>
-                <span className="menu-precio">{m.precio}</span>
+                <span className="menu-precio">{$$(precios, m.precioKey)}</span>
               </div>
             ))}
           </div>
@@ -634,7 +659,7 @@ export default function BigBangWeb() {
             {MENU_BEBIDAS.map((m, i) => (
               <div key={i} className="menu-row">
                 <span className="menu-item">{m.item}</span>
-                <span className="menu-precio">{m.precio}</span>
+                <span className="menu-precio">{$$(precios, m.precioKey)}</span>
               </div>
             ))}
             <div style={{ marginTop: 20, padding: '12px 16px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, fontSize: 13, color: '#64748b' }}>

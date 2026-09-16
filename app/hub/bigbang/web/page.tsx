@@ -1,18 +1,30 @@
 import Link from 'next/link';
-import { isAuthenticated } from '@/lib/adminAuth';
+import { isAuthenticatedAsync } from '@/lib/adminAuth';
 import { redirect } from 'next/navigation';
+import BBWebPrecios from '@/components/hub/bigbang/web/BBWebPrecios';
 export const dynamic = 'force-dynamic';
-export default function BigBangWebPage() {
-  if (!isAuthenticated()) redirect('/hub');
+
+export default async function BigBangWebPage() {
+  if (!await isAuthenticatedAsync()) redirect('/hub');
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-8"
-      style={{ background: 'linear-gradient(160deg, #020818 0%, #050d24 100%)' }}>
-      <div className="text-6xl">🌐</div>
-      <h1 className="font-bebas text-5xl text-white tracking-widest">PÁGINA WEB</h1>
-      <p className="font-dm text-sm text-white/40">En construcción</p>
-      <Link href="/hub/bigbang" className="font-dm text-xs uppercase tracking-widest text-sky-400/70 hover:text-sky-400 transition-colors mt-4">
-        ← Big Bang
-      </Link>
+    <div className="min-h-screen" style={{ background: '#f9fafb' }}>
+      {/* Header */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #f3f4f6', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Link href="/hub/bigbang" style={{ fontSize: 12, color: '#9ca3af', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 2 }}>
+            ← Big Bang
+          </Link>
+          <span style={{ color: '#e5e7eb' }}>|</span>
+          <span style={{ fontSize: 20 }}>🌐</span>
+          <span style={{ fontWeight: 800, fontSize: 16, letterSpacing: 2, textTransform: 'uppercase', color: '#111827' }}>Página Web</span>
+        </div>
+        <a href="https://bigbangpelotero.com" target="_blank" rel="noopener noreferrer"
+          style={{ fontSize: 12, color: '#3b82f6', textDecoration: 'none' }}>
+          Ver web pública →
+        </a>
+      </div>
+
+      <BBWebPrecios />
     </div>
   );
 }

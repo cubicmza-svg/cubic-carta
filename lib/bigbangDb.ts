@@ -90,9 +90,66 @@ export async function ensureBigBangTables() {
     await sql`ALTER TABLE bb_redes ADD COLUMN IF NOT EXISTS tipo_grabacion TEXT NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE bb_redes ADD COLUMN IF NOT EXISTS guion TEXT NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE bb_redes ADD COLUMN IF NOT EXISTS imagen TEXT NOT NULL DEFAULT ''`;
+    // Precios web
+    await sql`
+      CREATE TABLE IF NOT EXISTS bb_precios_web (
+        clave       TEXT PRIMARY KEY,
+        valor       TEXT NOT NULL DEFAULT '',
+        updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
   } finally {
     await sql.end();
   }
+}
+
+// ── PRECIOS WEB ───────────────────────────────────────────────────────────────
+export const BB_PRECIOS_DEFAULT: Record<string, string> = {
+  promo_super_lv:       '265000',
+  promo_clasic_lj:      '310000',
+  promo_clasic_finde:   '335000',
+  promo_clasic_sena:    '150000',
+  promo_full_lj:        '370000',
+  promo_full_finde:     '399000',
+  adic_hora_extra:      '103000',
+  adic_invitado_extra:  '5170',
+  adic_moza:            '40500',
+  adic_parrillero:      '49000',
+  adic_dispenser:       '18000',
+  menu_pizza_muzza:     '17500',
+  menu_pizza_napo:      '20700',
+  menu_panchos_24:      '53500',
+  menu_hamburguesas_12: '70000',
+  menu_snack:           '48500',
+  menu_empanadas:       '20000',
+  menu_sandwiches:      '110000',
+  beb_gaseosa:          '7500',
+  beb_agua_sab:         '7500',
+  beb_agua_min:         '7500',
+  beb_cerveza:          '9200',
+  beb_hielo:            '7900',
+};
+
+export async function getBBPreciosWeb(): Promise<Record<string, string>> {
+  const sql = getClient();
+  try {
+    const rows = await sql<{ clave: string; valor: string }[]>`SELECT clave, valor FROM bb_precios_web`;
+    const result = { ...BB_PRECIOS_DEFAULT };
+    for (const r of rows) result[r.clave] = r.valor;
+    return result;
+  } finally { await sql.end(); }
+}
+
+export async function setBBPreciosWeb(data: Record<string, string>) {
+  const sql = getClient();
+  try {
+    for (const [clave, valor] of Object.entries(data)) {
+      await sql`
+        INSERT INTO bb_precios_web (clave, valor, updated_at) VALUES (${clave}, ${valor}, NOW())
+        ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor, updated_at = NOW()
+      `;
+    }
+  } finally { await sql.end(); }
 }
 
 // ── MARKETING: DISEÑO ────────────────────────────────────────────────────────
