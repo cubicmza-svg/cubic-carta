@@ -228,7 +228,7 @@ export default function BigBangWeb() {
         .bb-stars::after { animation-delay: 2s; opacity: 0.4; }
         @keyframes twinkle { from { opacity: 0.6; } to { opacity: 1; } }
 
-        .fredoka { font-family: 'Fredoka One', cursive; }
+        .fredoka { font-family: 'SuperHistories', 'Fredoka One', cursive; }
 
         .bb-nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
