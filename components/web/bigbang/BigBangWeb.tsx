@@ -505,7 +505,12 @@ export default function BigBangWeb() {
 
           {/* RIGHT — 4 photos */}
           <div className="bb-photo-grid-4">
-            {PHOTOS.slice(0, 4).map((p) => (
+            {[
+              { id: '1Rueuki_-g9EFv1I1jAF5PvC8anQXrEyt', label: '3 Inflables Gigantes', color: '#10b981' },
+              { id: '1cAig93_4i5wOjtoOucopXkK7VmySx1QL', label: 'Laberinto', color: '#ef4444' },
+              { id: '1-3o8b-Sh41cqE-TnqJ4hEOQJI1ar5B-F', label: 'Mini Cancha de Fútbol', color: '#22c55e' },
+              { id: '1rqMg9_jnepmftZwyt63geejGvnDN2oPF', label: 'Juegos Arcade Originales', color: '#8b5cf6' },
+            ].map((p) => (
               <div key={p.id} className="bb-photo-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={DRIVE(p.id)} alt={p.label} loading="lazy" />
