@@ -14,17 +14,19 @@ const nextConfig = {
         destination: '/cotizar/glowup',
         permanent: false,
       },
+    ];
+  },
+  async rewrites() {
+    return [
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'bigbangpelotero.com' }],
         destination: '/bigbang/:path*',
-        permanent: false,
       },
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'www.bigbangpelotero.com' }],
         destination: '/bigbang/:path*',
-        permanent: false,
       },
     ];
   },
