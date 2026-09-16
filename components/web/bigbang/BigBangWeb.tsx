@@ -251,7 +251,7 @@ export default function BigBangWeb() {
         .bb-stars::after { animation-delay: 2s; opacity: 0.4; }
         @keyframes twinkle { from { opacity: 0.6; } to { opacity: 1; } }
 
-        .fredoka { font-family: 'SuperHistories', 'Fredoka One', cursive; }
+        .fredoka { font-family: 'SuperHistories', sans-serif; }
 
         .bb-nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
@@ -269,7 +269,7 @@ export default function BigBangWeb() {
           display: inline-flex; align-items: center; gap: 8px;
           padding: 12px 24px; border-radius: 99px;
           border: none; cursor: pointer;
-          font-family: 'Fredoka One', cursive; font-size: 16px;
+          font-family: 'SuperHistories', sans-serif; font-size: 16px;
           text-decoration: none; transition: all 0.2s;
         }
         .bb-btn-primary {
@@ -291,7 +291,7 @@ export default function BigBangWeb() {
 
         .bb-section { position: relative; z-index: 1; padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
         .bb-section-title {
-          font-family: 'Fredoka One', cursive;
+          font-family: 'SuperHistories', sans-serif;
           font-size: clamp(28px, 5vw, 48px);
           color: #fff; text-align: center; margin-bottom: 12px;
         }
@@ -320,7 +320,7 @@ export default function BigBangWeb() {
         .promo-tab {
           padding: 10px 22px; border-radius: 99px;
           border: 2px solid transparent; cursor: pointer;
-          font-family: 'Fredoka One', cursive; font-size: 15px;
+          font-family: 'SuperHistories', sans-serif; font-size: 15px;
           background: transparent; color: #94a3b8;
           transition: all 0.2s;
         }
@@ -462,7 +462,7 @@ export default function BigBangWeb() {
       {/* TOUR 360° */}
       <section id="tour" style={{ position: 'relative', zIndex: 1, padding: '80px 24px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2 className="bb-section-title fredoka" style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(28px,5vw,48px)', color: '#fff', textAlign: 'center', marginBottom: 12 }}>
+          <h2 className="bb-section-title fredoka" style={{ fontFamily: "'SuperHistories', sans-serif", fontSize: 'clamp(28px,5vw,48px)', color: '#fff', textAlign: 'center', marginBottom: 12 }}>
             Recorrido virtual 360°
           </h2>
           <p style={{ textAlign: 'center', color: '#94a3b8', marginBottom: 40, fontSize: 16 }}>
@@ -483,7 +483,7 @@ export default function BigBangWeb() {
       {/* GALERÍA */}
       <section style={{ position: 'relative', zIndex: 1, padding: '0 24px 80px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2 className="bb-section-title fredoka" style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(28px,5vw,48px)', color: '#fff', textAlign: 'center', marginBottom: 48 }}>
+          <h2 className="bb-section-title fredoka" style={{ fontFamily: "'SuperHistories', sans-serif", fontSize: 'clamp(28px,5vw,48px)', color: '#fff', textAlign: 'center', marginBottom: 48 }}>
             Así la pasamos 🎉
           </h2>
           <div className="bb-photo-grid">
@@ -620,7 +620,7 @@ export default function BigBangWeb() {
       {/* ADICIONALES */}
       <section style={{ position: 'relative', zIndex: 1, padding: '0 24px 80px' }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
-          <h2 className="bb-section-title fredoka" style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(28px,5vw,48px)', color: '#fff', textAlign: 'center', marginBottom: 40 }}>
+          <h2 className="bb-section-title fredoka" style={{ fontFamily: "'SuperHistories', sans-serif", fontSize: 'clamp(28px,5vw,48px)', color: '#fff', textAlign: 'center', marginBottom: 40 }}>
             Adicionales
           </h2>
           <div className="bb-glass" style={{ padding: '28px 24px' }}>
@@ -639,7 +639,7 @@ export default function BigBangWeb() {
       {/* MENÚ */}
       <section id="menu" style={{ position: 'relative', zIndex: 1, padding: '0 24px 80px' }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
-          <h2 className="bb-section-title fredoka" style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(28px,5vw,48px)', color: '#fff', textAlign: 'center', marginBottom: 12 }}>
+          <h2 className="bb-section-title fredoka" style={{ fontFamily: "'SuperHistories', sans-serif", fontSize: 'clamp(28px,5vw,48px)', color: '#fff', textAlign: 'center', marginBottom: 12 }}>
             Lista de precios
           </h2>
           <p style={{ textAlign: 'center', color: '#94a3b8', marginBottom: 40, fontSize: 14 }}>Precios sujetos a variación sin previo aviso</p>
