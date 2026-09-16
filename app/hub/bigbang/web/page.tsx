@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { isAuthenticatedAsync } from '@/lib/adminAuth';
 import { redirect } from 'next/navigation';
-import BBWebPrecios from '@/components/hub/bigbang/web/BBWebPrecios';
+import BBWebHub from '@/components/hub/bigbang/web/BBWebHub';
 export const dynamic = 'force-dynamic';
 
 export default async function BigBangWebPage() {
@@ -24,7 +24,7 @@ export default async function BigBangWebPage() {
         </a>
       </div>
 
-      <BBWebPrecios />
+      <BBWebHub />
     </div>
   );
 }

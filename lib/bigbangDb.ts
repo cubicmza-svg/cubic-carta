@@ -98,9 +98,60 @@ export async function ensureBigBangTables() {
         updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
+    // Imágenes web
+    await sql`
+      CREATE TABLE IF NOT EXISTS bb_imagenes_web (
+        clave       TEXT PRIMARY KEY,
+        valor       TEXT NOT NULL DEFAULT '',
+        updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
   } finally {
     await sql.end();
   }
+}
+
+// ── IMÁGENES WEB ─────────────────────────────────────────────────────────────
+export const BB_IMAGENES_DEFAULT: Record<string, string> = {
+  hero:        '1rqMg9_jnepmftZwyt63geejGvnDN2oPF',
+  featured_1:  '1Rueuki_-g9EFv1I1jAF5PvC8anQXrEyt',
+  featured_2:  '1cAig93_4i5wOjtoOucopXkK7VmySx1QL',
+  featured_3:  '1-3o8b-Sh41cqE-TnqJ4hEOQJI1ar5B-F',
+  featured_4:  '1rqMg9_jnepmftZwyt63geejGvnDN2oPF',
+  galeria_1:   '1uxVr8q2TCZqpS-DHbBaStNa8fd_ioQz4',
+  galeria_2:   '1cAig93_4i5wOjtoOucopXkK7VmySx1QL',
+  galeria_3:   '1rqMg9_jnepmftZwyt63geejGvnDN2oPF',
+  galeria_4:   '1j5JJdLCg8r6RP_49vgAeXKTQF3W3e5Bq',
+  galeria_5:   '1tbGYmdkt1kDBn3EkDBqYFahkWhV47BKX',
+  galeria_6:   '1lBUXlOID7rN0XpR6qlFGCBjOnVh4X8k9',
+  galeria_7:   '1z6uHKUwYk-HKBjT35Wx-ViHzY3JOI0g1',
+  galeria_8:   '1nvqtnhzXEYN_eleRhvMBFCvZ-Fg_dJ-R',
+  galeria_9:   '18hdqot3j9kr3PYJwTP7NSbSJY_0bBkmS',
+  galeria_10:  '1TKv6DWbdQ-JThIikz5WfH6UNsORf5rcM',
+  galeria_11:  '1-3o8b-Sh41cqE-TnqJ4hEOQJI1ar5B-F',
+  galeria_12:  '1Rueuki_-g9EFv1I1jAF5PvC8anQXrEyt',
+};
+
+export async function getBBImagenesWeb(): Promise<Record<string, string>> {
+  const sql = getClient();
+  try {
+    const rows = await sql<{ clave: string; valor: string }[]>`SELECT clave, valor FROM bb_imagenes_web`;
+    const result = { ...BB_IMAGENES_DEFAULT };
+    for (const r of rows) result[r.clave] = r.valor;
+    return result;
+  } finally { await sql.end(); }
+}
+
+export async function setBBImagenesWeb(data: Record<string, string>) {
+  const sql = getClient();
+  try {
+    for (const [clave, valor] of Object.entries(data)) {
+      await sql`
+        INSERT INTO bb_imagenes_web (clave, valor, updated_at) VALUES (${clave}, ${valor}, NOW())
+        ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor, updated_at = NOW()
+      `;
+    }
+  } finally { await sql.end(); }
 }
 
 // ── PRECIOS WEB ───────────────────────────────────────────────────────────────

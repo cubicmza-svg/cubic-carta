@@ -6,6 +6,29 @@ const WA = '5492613861323';
 const waLink = (msg: string) => `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
 const DEFAULT_MSG = '¡Hola! Quiero info sobre las promos de Big Bang Pelotero 🎉';
 
+const IMAGEN_DEFAULTS: Record<string, string> = {
+  hero:        '1rqMg9_jnepmftZwyt63geejGvnDN2oPF',
+  featured_1:  '1Rueuki_-g9EFv1I1jAF5PvC8anQXrEyt',
+  featured_2:  '1cAig93_4i5wOjtoOucopXkK7VmySx1QL',
+  featured_3:  '1-3o8b-Sh41cqE-TnqJ4hEOQJI1ar5B-F',
+  featured_4:  '1rqMg9_jnepmftZwyt63geejGvnDN2oPF',
+  galeria_1:   '1uxVr8q2TCZqpS-DHbBaStNa8fd_ioQz4',
+  galeria_2:   '1cAig93_4i5wOjtoOucopXkK7VmySx1QL',
+  galeria_3:   '1rqMg9_jnepmftZwyt63geejGvnDN2oPF',
+  galeria_4:   '1j5JJdLCg8r6RP_49vgAeXKTQF3W3e5Bq',
+  galeria_5:   '1tbGYmdkt1kDBn3EkDBqYFahkWhV47BKX',
+  galeria_6:   '1lBUXlOID7rN0XpR6qlFGCBjOnVh4X8k9',
+  galeria_7:   '1z6uHKUwYk-HKBjT35Wx-ViHzY3JOI0g1',
+  galeria_8:   '1nvqtnhzXEYN_eleRhvMBFCvZ-Fg_dJ-R',
+  galeria_9:   '18hdqot3j9kr3PYJwTP7NSbSJY_0bBkmS',
+  galeria_10:  '1TKv6DWbdQ-JThIikz5WfH6UNsORf5rcM',
+  galeria_11:  '1-3o8b-Sh41cqE-TnqJ4hEOQJI1ar5B-F',
+  galeria_12:  '1Rueuki_-g9EFv1I1jAF5PvC8anQXrEyt',
+};
+
+const imgId = (imagenes: Record<string, string>, key: string) =>
+  imagenes[key] ?? IMAGEN_DEFAULTS[key] ?? '';
+
 const DEFAULTS: Record<string, string> = {
   promo_super_lv: '265000', promo_clasic_lj: '310000', promo_clasic_finde: '335000',
   promo_clasic_sena: '150000', promo_full_lj: '370000', promo_full_finde: '399000',
@@ -147,6 +170,7 @@ const MENU_BEBIDAS = [
 
 export default function BigBangWeb() {
   const [precios, setPrecios] = useState<Record<string, string>>(DEFAULTS);
+  const [imagenes, setImagenes] = useState<Record<string, string>>(IMAGEN_DEFAULTS);
   const [activePromo, setActivePromo] = useState<'super' | 'clasic' | 'full'>('clasic');
   const [navScrolled, setNavScrolled] = useState(false);
 
@@ -154,6 +178,10 @@ export default function BigBangWeb() {
     fetch('/api/bigbang/precios-web')
       .then(r => r.ok ? r.json() : DEFAULTS)
       .then(data => setPrecios(data))
+      .catch(() => {});
+    fetch('/api/bigbang/imagenes-web')
+      .then(r => r.ok ? r.json() : IMAGEN_DEFAULTS)
+      .then(data => setImagenes(data))
       .catch(() => {});
   }, []);
 
@@ -437,7 +465,7 @@ export default function BigBangWeb() {
           <div className="bb-hero-img" style={{ position: 'relative' }}>
             <div style={{ borderRadius: 32, overflow: 'hidden', border: '2px solid rgba(245,158,11,0.3)', boxShadow: '0 0 80px rgba(245,158,11,0.15)', aspectRatio: '4/5', position: 'relative' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={DRIVE('1rqMg9_jnepmftZwyt63geejGvnDN2oPF', 800)} alt="Arcade Big Bang" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={DRIVE(imgId(imagenes, 'hero'), 800)} alt="Arcade Big Bang" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(6,8,26,0.6) 0%, transparent 50%)' }} />
               {/* Badge */}
               <div style={{ position: 'absolute', top: 20, right: 20, background: '#f59e0b', color: '#000', padding: '8px 16px', borderRadius: 12, fontWeight: 900, fontSize: 13, letterSpacing: 1 }}>
@@ -506,14 +534,14 @@ export default function BigBangWeb() {
           {/* RIGHT — 4 photos */}
           <div className="bb-photo-grid-4">
             {[
-              { id: '1Rueuki_-g9EFv1I1jAF5PvC8anQXrEyt', label: '3 Inflables Gigantes', color: '#10b981' },
-              { id: '1cAig93_4i5wOjtoOucopXkK7VmySx1QL', label: 'Laberinto', color: '#ef4444' },
-              { id: '1-3o8b-Sh41cqE-TnqJ4hEOQJI1ar5B-F', label: 'Mini Cancha de Fútbol', color: '#22c55e' },
-              { id: '1rqMg9_jnepmftZwyt63geejGvnDN2oPF', label: 'Juegos Arcade Originales', color: '#8b5cf6' },
+              { key: 'featured_1', label: '3 Inflables Gigantes', color: '#10b981' },
+              { key: 'featured_2', label: 'Laberinto', color: '#ef4444' },
+              { key: 'featured_3', label: 'Mini Cancha de Fútbol', color: '#22c55e' },
+              { key: 'featured_4', label: 'Juegos Arcade Originales', color: '#8b5cf6' },
             ].map((p) => (
-              <div key={p.id} className="bb-photo-card">
+              <div key={p.key} className="bb-photo-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={DRIVE(p.id)} alt={p.label} loading="lazy" />
+                <img src={DRIVE(imgId(imagenes, p.key))} alt={p.label} loading="lazy" />
                 <div className="bb-photo-label" style={{ background: p.color }}>
                   {p.label}
                 </div>
@@ -579,10 +607,10 @@ export default function BigBangWeb() {
             </a>
           </div>
           <div className="bb-gallery-grid">
-            {PHOTOS.map(p => (
-              <div key={p.id} className="bb-gallery-item">
+            {Array.from({ length: 12 }, (_, i) => `galeria_${i + 1}`).map(key => (
+              <div key={key} className="bb-gallery-item">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={DRIVE(p.id)} alt={p.label} loading="lazy" />
+                <img src={DRIVE(imgId(imagenes, key))} alt={key} loading="lazy" />
               </div>
             ))}
           </div>
