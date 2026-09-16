@@ -14,6 +14,18 @@ const nextConfig = {
         destination: '/cotizar/glowup',
         permanent: false,
       },
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'bigbangpelotero.com' }],
+        destination: '/bigbang/:path*',
+        permanent: false,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.bigbangpelotero.com' }],
+        destination: '/bigbang/:path*',
+        permanent: false,
+      },
     ];
   },
   images: {
@@ -23,6 +35,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'i.imgur.com' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'https', hostname: '*.googleusercontent.com' },
+      { protocol: 'https', hostname: 'drive.usercontent.google.com' },
     ],
     unoptimized: true,
   },
