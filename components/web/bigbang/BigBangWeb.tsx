@@ -585,7 +585,7 @@ export default function BigBangWeb() {
           </p>
           <div style={{ borderRadius: 24, overflow: 'hidden', border: '1.5px solid rgba(139,92,246,0.3)', boxShadow: '0 0 60px rgba(139,92,246,0.2)', marginBottom: 28 }}>
             <iframe
-              src="https://kuula.co/share/collection/7TQQ3?logo=0&info=0&fs=1&vr=1&sd=1&initload=0&thumbs=1"
+              src="https://explora360mendoza.viewin360.co/share/collection/7TtQP?logo=-1&info=0&fs=1&vr=1&zoom=1&initload=0&thumbs=1&inst=es"
               style={{ width: '100%', height: 'clamp(280px, 50vw, 560px)', border: 'none', display: 'block' }}
               allowFullScreen allow="xr-spatial-tracking"
               title="Tour 360° Big Bang Pelotero"
