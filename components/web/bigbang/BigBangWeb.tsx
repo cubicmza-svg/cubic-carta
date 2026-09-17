@@ -315,14 +315,27 @@ export default function BigBangWeb() {
           position: relative; z-index: 1;
         }
 
+        /* SALON SECTION GRID */
+        .bb-salon-grid {
+          max-width: 1200px; margin: 0 auto;
+          padding: 80px 40px;
+          display: grid;
+          grid-template-columns: 1fr 1.4fr;
+          gap: 60px;
+          align-items: center;
+        }
+        @media (max-width: 768px) {
+          .bb-salon-grid { grid-template-columns: 1fr; padding: 48px 20px; gap: 32px; }
+        }
+
         /* PHOTO GRID */
         .bb-photo-grid-4 {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(2, 1fr);
           gap: 10px;
         }
-        @media (max-width: 768px) {
-          .bb-photo-grid-4 { grid-template-columns: repeat(2, 1fr); }
+        @media (min-width: 769px) {
+          .bb-photo-grid-4 { grid-template-columns: repeat(4, 1fr); }
         }
         .bb-photo-card {
           border-radius: 16px; overflow: hidden;
@@ -504,7 +517,7 @@ export default function BigBangWeb() {
 
       {/* UN MUNDO DE DIVERSIÓN — sección clara */}
       <section id="salon" className="bb-light-section">
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 40px', display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 60, alignItems: 'center' }}>
+        <div className="bb-salon-grid">
           {/* LEFT */}
           <div>
             <div style={{ fontSize: 48, marginBottom: 16 }}>👨‍🚀</div>
@@ -551,7 +564,7 @@ export default function BigBangWeb() {
         </div>
 
         {/* Juegos grid */}
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px 80px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 14 }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px 60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
           {[
             { icon: '🎈', text: '3 Inflables enormes', color: '#fef3c7' },
             { icon: '🏃', text: '2 Laberintos gigantes', color: '#dbeafe' },
