@@ -6,8 +6,9 @@ export function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? '';
   const { pathname } = request.nextUrl;
 
-  // No reescribir archivos estáticos (imágenes, fuentes, etc.)
+  // No reescribir archivos estáticos ni rutas API
   if (/\.[^/]+$/.test(pathname)) return;
+  if (pathname.startsWith('/api/')) return;
 
   if (BIGBANG_HOSTS.includes(host) && !pathname.startsWith('/bigbang')) {
     const url = request.nextUrl.clone();
