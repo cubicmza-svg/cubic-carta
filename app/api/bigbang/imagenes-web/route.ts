@@ -1,6 +1,8 @@
 import { isAuthenticatedAsync } from '@/lib/adminAuth';
 import { ensureBigBangTables, getBBImagenesWeb, setBBImagenesWeb } from '@/lib/bigbangDb';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     await ensureBigBangTables();

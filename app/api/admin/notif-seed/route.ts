@@ -1,4 +1,5 @@
-import { addNotif, ensureNotifTables } from '@/lib/notifDb';
+import { ensureNotifTables } from '@/lib/notifDb';
+import { sendPush } from '@/lib/sendPush';
 
 // Endpoint de un solo uso para insertar notificaciones de sistema
 export async function GET(req: Request) {
@@ -14,7 +15,7 @@ export async function GET(req: Request) {
   if (!titulo) return Response.json({ error: 'Falta titulo' }, { status: 400 });
   try {
     await ensureNotifTables();
-    await addNotif({ titulo, cuerpo, portal, url });
+    await sendPush({ titulo, cuerpo, portal, url });
     return Response.json({ ok: true });
   } catch (e) {
     return Response.json({ error: String(e) }, { status: 500 });
