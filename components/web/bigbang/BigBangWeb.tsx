@@ -674,7 +674,7 @@ export default function BigBangWeb() {
           <div style={{
             background: `linear-gradient(160deg, ${promo.bg}, rgba(6,8,26,0.95))`,
             border: `1.5px solid ${promo.color}55`,
-            borderRadius: 28, padding: '36px 32px',
+            borderRadius: 28, padding: 'clamp(20px,5vw,36px) clamp(16px,5vw,32px)',
             boxShadow: `0 0 80px ${promo.color}20, inset 0 1px 0 rgba(255,255,255,0.05)`,
           }}>
             {/* Card header */}
@@ -686,7 +686,7 @@ export default function BigBangWeb() {
                     ⭐ {promo.badge}
                   </div>
                 )}
-                <div className="bb-font" style={{ fontSize: 44, color: promo.color, lineHeight: 1, textShadow: `0 0 40px ${promo.color}66` }}>
+                <div className="bb-font" style={{ fontSize: 'clamp(28px,8vw,44px)', color: promo.color, lineHeight: 1, textShadow: `0 0 40px ${promo.color}66` }}>
                   {promo.name}
                 </div>
                 <div style={{ fontSize: 14, color: '#64748b', marginTop: 6 }}>📅 {promo.diasLabel}</div>
@@ -698,7 +698,7 @@ export default function BigBangWeb() {
               {promo.precios.map((pr, i) => (
                 <div key={i} style={{ flex: 1, minWidth: 140, background: `linear-gradient(135deg, ${promo.color}28, ${promo.color}0a)`, borderRadius: 20, padding: '20px 24px', border: `1px solid ${promo.color}44`, textAlign: 'center' }}>
                   <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>{pr.label}</div>
-                  <div className="bb-font" style={{ fontSize: 36, color: '#fff', textShadow: `0 0 20px ${promo.color}77` }}>
+                  <div className="bb-font" style={{ fontSize: 'clamp(20px,6vw,36px)', color: '#fff', textShadow: `0 0 20px ${promo.color}77` }}>
                     {$$(precios, pr.precioKey)}
                   </div>
                 </div>
