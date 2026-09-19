@@ -47,11 +47,16 @@ const EMPTY = {
   titulo: '', caption: '', plataforma: 'instagram' as Plataforma,
   formato: 'feed' as Formato, estado: 'idea' as EstadoPost,
   fechas_prog: [] as string[], link_drive: '', pilar: PILARES[0],
-  guion: '', tipo_grabacion: '', imagen: '',
+  guion: '', tipo_grabacion: '', imagenes: [] as string[],
 };
 
 function parseFechas(raw: string): string[] {
   try { return JSON.parse(raw) || []; } catch { return []; }
+}
+function parseImagenes(raw: string | undefined): string[] {
+  if (!raw) return [];
+  try { const p = JSON.parse(raw); return Array.isArray(p) ? p : [raw]; }
+  catch { return [raw]; }
 }
 
 function formatDateAR(iso: string) {
@@ -145,7 +150,7 @@ export default function StudioRedes() {
         fechas_prog: JSON.stringify(form.fechas_prog),
         link_drive: form.link_drive.trim(), pilar: form.pilar,
         guion: form.guion, tipo_grabacion: form.tipo_grabacion,
-        imagen: form.imagen,
+        imagen: JSON.stringify(form.imagenes),
       };
       const url = editId !== null ? `/api/bigbang/marketing/redes/${editId}` : '/api/bigbang/marketing/redes';
       const method = editId !== null ? 'PUT' : 'POST';
@@ -178,7 +183,7 @@ export default function StudioRedes() {
       fechas_prog: parseFechas(post.fechas_prog),
       link_drive: post.link_drive || '', pilar: post.pilar,
       guion: post.guion || '', tipo_grabacion: post.tipo_grabacion || '',
-      imagen: post.imagen || '',
+      imagenes: parseImagenes(post.imagen),
     });
     setEditId(post.id); setShowForm(true); setDateInput('');
   };
@@ -210,10 +215,10 @@ export default function StudioRedes() {
     setPosts(prev => prev.map(p => p.id === id ? { ...p, feedback } : p));
   };
 
-  const handleImageFile = async (file: File) => {
+  const handleImageFiles = async (files: FileList) => {
     setUploadingImg(true);
-    const b64 = await resizeImage(file);
-    setForm(f => ({ ...f, imagen: b64 }));
+    const b64s = await Promise.all(Array.from(files).map(resizeImage));
+    setForm(f => ({ ...f, imagenes: [...f.imagenes, ...b64s] }));
     setUploadingImg(false);
   };
 
@@ -457,24 +462,27 @@ export default function StudioRedes() {
                 className="w-full border border-gray-200 rounded-lg font-dm text-sm px-3 py-2 outline-none focus:border-orange-400 resize-none" />
             </div>
 
-            {/* Imagen */}
+            {/* Imágenes */}
             <div>
-              <label className="font-dm text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Imagen de la publicacion</label>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden"
-                onChange={e => { if (e.target.files?.[0]) handleImageFile(e.target.files[0]); }} />
-              {form.imagen ? (
-                <div className="relative inline-block">
-                  <img src={form.imagen} alt="preview" className="w-full max-h-48 object-cover rounded-lg border border-gray-200" />
-                  <button onClick={() => setForm(f => ({ ...f, imagen: '' }))}
-                    className="absolute top-2 right-2 bg-white/80 rounded-full w-6 h-6 flex items-center justify-center font-bold text-gray-600 hover:text-red-500 text-sm">✕</button>
+              <label className="font-dm text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Imágenes de la publicacion</label>
+              <input ref={fileRef} type="file" accept="image/*" multiple className="hidden"
+                onChange={e => { if (e.target.files?.length) handleImageFiles(e.target.files); e.target.value = ''; }} />
+              {form.imagenes.length > 0 && (
+                <div className="grid gap-2 mb-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}>
+                  {form.imagenes.map((img, i) => (
+                    <div key={i} className="relative" style={{ aspectRatio: '1' }}>
+                      <img src={img} alt={`img ${i + 1}`} className="w-full h-full object-cover rounded-lg border border-gray-200" />
+                      <button onClick={() => setForm(f => ({ ...f, imagenes: f.imagenes.filter((_, j) => j !== i) }))}
+                        className="absolute top-1 right-1 bg-white/80 rounded-full w-5 h-5 flex items-center justify-center font-bold text-gray-600 hover:text-red-500 text-xs">✕</button>
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                <button onClick={() => fileRef.current?.click()} disabled={uploadingImg}
-                  className="w-full border-2 border-dashed border-gray-200 rounded-lg py-6 font-dm text-sm text-gray-400 hover:border-orange-400 hover:text-orange-400 transition-colors flex flex-col items-center gap-1">
-                  <span className="text-2xl">📷</span>
-                  {uploadingImg ? 'Procesando...' : 'Subir imagen'}
-                </button>
               )}
+              <button onClick={() => fileRef.current?.click()} disabled={uploadingImg}
+                className="w-full border-2 border-dashed border-gray-200 rounded-lg py-4 font-dm text-sm text-gray-400 hover:border-orange-400 hover:text-orange-400 transition-colors flex flex-col items-center gap-1">
+                <span className="text-2xl">📷</span>
+                {uploadingImg ? 'Procesando...' : form.imagenes.length > 0 ? '+ Agregar más fotos' : 'Subir fotos'}
+              </button>
             </div>
 
             <div>

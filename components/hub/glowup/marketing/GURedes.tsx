@@ -15,7 +15,7 @@ interface Post {
   feedback: string;
   tipo_grabacion: string;
   guion: string;
-  imagen: string;
+  imagen: string; // stored as JSON string array in DB
   creado_el: string;
 }
 
@@ -41,11 +41,16 @@ const GU_V = '#7c3aed';
 const EMPTY = {
   titulo: '', caption: '', plataforma: 'instagram', formato: 'story',
   estado: 'idea', fechas_prog: [] as string[], link_drive: '',
-  pilar: 'contenido', guion: '', tipo_grabacion: 'diseno', imagen: '',
+  pilar: 'contenido', guion: '', tipo_grabacion: 'diseno', imagenes: [] as string[],
 };
 
 function parseFechas(raw: string): string[] {
   try { return JSON.parse(raw) || []; } catch { return []; }
+}
+function parseImagenes(raw: string | undefined): string[] {
+  if (!raw) return [];
+  try { const p = JSON.parse(raw); return Array.isArray(p) ? p : [raw]; }
+  catch { return [raw]; }
 }
 function formatAR(iso: string) {
   const [, m, d] = iso.split('-');
@@ -128,7 +133,7 @@ export default function GURedes() {
         fechas_prog: JSON.stringify(form.fechas_prog),
         link_drive: form.link_drive, pilar: form.pilar,
         guion: form.guion, tipo_grabacion: form.tipo_grabacion,
-        imagen: form.imagen,
+        imagen: JSON.stringify(form.imagenes),
       };
       const url = editId !== null ? `/api/glowup/redes/${editId}` : '/api/glowup/redes';
       const res = await fetch(url, { method: editId !== null ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -160,7 +165,7 @@ export default function GURedes() {
       fechas_prog: parseFechas(p.fechas_prog),
       link_drive: p.link_drive || '', pilar: p.pilar,
       guion: p.guion || '', tipo_grabacion: p.tipo_grabacion || 'diseno',
-      imagen: p.imagen || '',
+      imagenes: parseImagenes(p.imagen),
     });
     setEditId(p.id); setShowForm(true); setDateInput('');
   }
@@ -193,10 +198,10 @@ export default function GURedes() {
     setPosts(prev => prev.map(p => p.id === id ? { ...p, feedback } : p));
   }
 
-  async function handleImageFile(file: File) {
+  async function handleImageFiles(files: FileList) {
     setUploadingImg(true);
-    const b64 = await resizeImage(file);
-    setForm(f => ({ ...f, imagen: b64 }));
+    const b64s = await Promise.all(Array.from(files).map(resizeImage));
+    setForm(f => ({ ...f, imagenes: [...f.imagenes, ...b64s] }));
     setUploadingImg(false);
   }
 
@@ -429,25 +434,28 @@ export default function GURedes() {
                 style={{ borderColor: '#fbcfe8', color: '#1f2937', WebkitTextFillColor: '#1f2937' }} placeholder="Texto completo con emojis..." />
             </div>
 
-            {/* Imagen */}
+            {/* Imágenes */}
             <div>
-              <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Imagen de la publicacion</label>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden"
-                onChange={e => { if (e.target.files?.[0]) handleImageFile(e.target.files[0]); }} />
-              {form.imagen ? (
-                <div className="relative">
-                  <img src={form.imagen} alt="preview" className="w-full max-h-48 object-cover rounded-xl" style={{ border: '1px solid #fbcfe8' }} />
-                  <button onClick={() => setForm(f => ({ ...f, imagen: '' }))}
-                    className="absolute top-2 right-2 bg-white rounded-full w-6 h-6 flex items-center justify-center font-bold text-gray-500 hover:text-red-500 text-sm shadow">✕</button>
+              <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Imágenes de la publicacion</label>
+              <input ref={fileRef} type="file" accept="image/*" multiple className="hidden"
+                onChange={e => { if (e.target.files?.length) handleImageFiles(e.target.files); e.target.value = ''; }} />
+              {form.imagenes.length > 0 && (
+                <div className="grid gap-2 mb-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}>
+                  {form.imagenes.map((img, i) => (
+                    <div key={i} className="relative" style={{ aspectRatio: '1' }}>
+                      <img src={img} alt={`img ${i + 1}`} className="w-full h-full object-cover rounded-xl" style={{ border: '1px solid #fbcfe8' }} />
+                      <button onClick={() => setForm(f => ({ ...f, imagenes: f.imagenes.filter((_, j) => j !== i) }))}
+                        className="absolute top-1 right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-gray-500 hover:text-red-500 text-xs shadow">✕</button>
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                <button onClick={() => fileRef.current?.click()} disabled={uploadingImg}
-                  className="w-full rounded-xl py-6 font-dm text-sm text-gray-400 flex flex-col items-center gap-1 transition-colors hover:opacity-80"
-                  style={{ border: '2px dashed #fbcfe8', background: '#fdf2f8' }}>
-                  <span className="text-2xl">📷</span>
-                  {uploadingImg ? 'Procesando...' : 'Subir imagen'}
-                </button>
               )}
+              <button onClick={() => fileRef.current?.click()} disabled={uploadingImg}
+                className="w-full rounded-xl py-4 font-dm text-sm text-gray-400 flex flex-col items-center gap-1 transition-colors hover:opacity-80"
+                style={{ border: '2px dashed #fbcfe8', background: '#fdf2f8' }}>
+                <span className="text-2xl">📷</span>
+                {uploadingImg ? 'Procesando...' : form.imagenes.length > 0 ? '+ Agregar más fotos' : 'Subir fotos'}
+              </button>
             </div>
 
             {/* Fechas */}
