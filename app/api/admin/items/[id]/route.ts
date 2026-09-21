@@ -1,11 +1,11 @@
-import { isAuthenticated } from '@/lib/adminAuth';
+import { isAuthenticatedAsync } from '@/lib/adminAuth';
 import { updateItem, deleteItem } from '@/lib/db';
 import type { MenuItem } from '@/lib/types';
 
 type Ctx = { params: { id: string } };
 
 export async function PUT(req: Request, { params }: Ctx) {
-  if (!isAuthenticated()) {
+  if (!await isAuthenticatedAsync()) {
     return Response.json({ error: 'No autorizado' }, { status: 401 });
   }
   const id = parseInt(params.id, 10);
@@ -22,7 +22,7 @@ export async function PUT(req: Request, { params }: Ctx) {
 }
 
 export async function DELETE(_: Request, { params }: Ctx) {
-  if (!isAuthenticated()) {
+  if (!await isAuthenticatedAsync()) {
     return Response.json({ error: 'No autorizado' }, { status: 401 });
   }
   const id = parseInt(params.id, 10);
