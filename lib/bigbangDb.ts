@@ -90,6 +90,7 @@ export async function ensureBigBangTables() {
     await sql`ALTER TABLE bb_redes ADD COLUMN IF NOT EXISTS tipo_grabacion TEXT NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE bb_redes ADD COLUMN IF NOT EXISTS guion TEXT NOT NULL DEFAULT ''`;
     await sql`ALTER TABLE bb_redes ADD COLUMN IF NOT EXISTS imagen TEXT NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE bb_redes ADD COLUMN IF NOT EXISTS video_url TEXT NOT NULL DEFAULT ''`;
     // Precios web
     await sql`
       CREATE TABLE IF NOT EXISTS bb_precios_web (

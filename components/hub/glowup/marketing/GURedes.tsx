@@ -16,6 +16,7 @@ interface Post {
   tipo_grabacion: string;
   guion: string;
   imagen: string; // stored as JSON string array in DB
+  video_url: string;
   creado_el: string;
 }
 
@@ -41,7 +42,7 @@ const GU_V = '#7c3aed';
 const EMPTY = {
   titulo: '', caption: '', plataforma: 'instagram', formato: 'story',
   estado: 'idea', fechas_prog: [] as string[], link_drive: '',
-  pilar: 'contenido', guion: '', tipo_grabacion: 'diseno', imagenes: [] as string[],
+  pilar: 'contenido', guion: '', tipo_grabacion: 'diseno', imagenes: [] as string[], video_url: '',
 };
 
 function parseFechas(raw: string): string[] {
@@ -51,6 +52,13 @@ function parseImagenes(raw: string | undefined): string[] {
   if (!raw) return [];
   try { const p = JSON.parse(raw); return Array.isArray(p) ? p : [raw]; }
   catch { return [raw]; }
+}
+function driveEmbedUrl(url: string): string {
+  const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
+  if (driveMatch) return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+  const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+  return url;
 }
 function formatAR(iso: string) {
   const [, m, d] = iso.split('-');
@@ -134,6 +142,7 @@ export default function GURedes() {
         link_drive: form.link_drive, pilar: form.pilar,
         guion: form.guion, tipo_grabacion: form.tipo_grabacion,
         imagen: JSON.stringify(form.imagenes),
+        video_url: form.video_url,
       };
       const url = editId !== null ? `/api/glowup/redes/${editId}` : '/api/glowup/redes';
       const res = await fetch(url, { method: editId !== null ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -166,6 +175,7 @@ export default function GURedes() {
       link_drive: p.link_drive || '', pilar: p.pilar,
       guion: p.guion || '', tipo_grabacion: p.tipo_grabacion || 'diseno',
       imagenes: parseImagenes(p.imagen),
+      video_url: p.video_url || '',
     });
     setEditId(p.id); setShowForm(true); setDateInput('');
   }
@@ -456,6 +466,21 @@ export default function GURedes() {
                 <span className="text-2xl">📷</span>
                 {uploadingImg ? 'Procesando...' : form.imagenes.length > 0 ? '+ Agregar más fotos' : 'Subir fotos'}
               </button>
+            </div>
+
+            {/* Video */}
+            <div>
+              <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Link de video (Drive o YouTube)</label>
+              <input type="text" value={form.video_url}
+                onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))}
+                placeholder="https://drive.google.com/file/d/... o youtu.be/..."
+                className="w-full px-3 py-2 rounded-xl border font-dm text-sm outline-none"
+                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} />
+              {form.video_url && (
+                <div className="mt-2 rounded-xl overflow-hidden" style={{ border: '1px solid #fbcfe8', aspectRatio: '16/9' }}>
+                  <iframe src={driveEmbedUrl(form.video_url)} className="w-full h-full" allowFullScreen style={{ border: 'none' }} />
+                </div>
+              )}
             </div>
 
             {/* Fechas */}

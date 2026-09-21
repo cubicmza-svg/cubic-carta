@@ -22,6 +22,7 @@ interface Post {
   tipo_grabacion: string;
   guion: string;
   imagen: string;
+  video_url: string;
 }
 
 const PLATAFORMA_ICON: Record<Plataforma, string> = {
@@ -47,7 +48,7 @@ const EMPTY = {
   titulo: '', caption: '', plataforma: 'instagram' as Plataforma,
   formato: 'feed' as Formato, estado: 'idea' as EstadoPost,
   fechas_prog: [] as string[], link_drive: '', pilar: PILARES[0],
-  guion: '', tipo_grabacion: '', imagenes: [] as string[],
+  guion: '', tipo_grabacion: '', imagenes: [] as string[], video_url: '',
 };
 
 function parseFechas(raw: string): string[] {
@@ -57,6 +58,13 @@ function parseImagenes(raw: string | undefined): string[] {
   if (!raw) return [];
   try { const p = JSON.parse(raw); return Array.isArray(p) ? p : [raw]; }
   catch { return [raw]; }
+}
+function driveEmbedUrl(url: string): string {
+  const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
+  if (driveMatch) return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+  const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+  return url;
 }
 
 function formatDateAR(iso: string) {
@@ -151,6 +159,7 @@ export default function StudioRedes() {
         link_drive: form.link_drive.trim(), pilar: form.pilar,
         guion: form.guion, tipo_grabacion: form.tipo_grabacion,
         imagen: JSON.stringify(form.imagenes),
+        video_url: form.video_url,
       };
       const url = editId !== null ? `/api/bigbang/marketing/redes/${editId}` : '/api/bigbang/marketing/redes';
       const method = editId !== null ? 'PUT' : 'POST';
@@ -184,6 +193,7 @@ export default function StudioRedes() {
       link_drive: post.link_drive || '', pilar: post.pilar,
       guion: post.guion || '', tipo_grabacion: post.tipo_grabacion || '',
       imagenes: parseImagenes(post.imagen),
+      video_url: post.video_url || '',
     });
     setEditId(post.id); setShowForm(true); setDateInput('');
   };
@@ -483,6 +493,20 @@ export default function StudioRedes() {
                 <span className="text-2xl">📷</span>
                 {uploadingImg ? 'Procesando...' : form.imagenes.length > 0 ? '+ Agregar más fotos' : 'Subir fotos'}
               </button>
+            </div>
+
+            {/* Video */}
+            <div>
+              <label className="font-dm text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Link de video (Drive o YouTube)</label>
+              <input type="text" value={form.video_url}
+                onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))}
+                placeholder="https://drive.google.com/file/d/... o youtu.be/..."
+                className="w-full border border-gray-200 rounded-lg font-dm text-sm px-3 py-2 outline-none focus:border-orange-400" />
+              {form.video_url && (
+                <div className="mt-2 rounded-lg overflow-hidden border border-gray-200" style={{ aspectRatio: '16/9' }}>
+                  <iframe src={driveEmbedUrl(form.video_url)} className="w-full h-full" allowFullScreen style={{ border: 'none' }} />
+                </div>
+              )}
             </div>
 
             <div>
