@@ -124,8 +124,10 @@ export default function StudioRedes() {
   const [expandFeedback, setExpandFeedback] = useState<number | null>(null);
   const [feedbackDraft, setFeedbackDraft]   = useState<Record<number, string>>({});
   const [uploadingImg, setUploadingImg]     = useState(false);
+  const [uploadingVid, setUploadingVid]     = useState(false);
   const [saveError, setSaveError]           = useState('');
-  const fileRef = useRef<HTMLInputElement>(null);
+  const fileRef  = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLInputElement>(null);
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -230,6 +232,25 @@ export default function StudioRedes() {
     const b64s = await Promise.all(Array.from(files).map(resizeImage));
     setForm(f => ({ ...f, imagenes: [...f.imagenes, ...b64s] }));
     setUploadingImg(false);
+  };
+
+  const handleVideoFile = async (file: File) => {
+    setUploadingVid(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const r = await fetch('/api/upload/video', { method: 'POST', body: fd });
+      if (r.ok) {
+        const { url } = await r.json();
+        setForm(f => ({ ...f, video_url: url }));
+      } else {
+        setSaveError('Error al subir el video. Intentá de nuevo.');
+      }
+    } catch {
+      setSaveError('Error al subir el video. Intentá de nuevo.');
+    } finally {
+      setUploadingVid(false);
+    }
   };
 
   const filtered = filtro === 'todos' ? posts : posts.filter(p => p.estado === filtro);
@@ -497,14 +518,20 @@ export default function StudioRedes() {
 
             {/* Video */}
             <div>
-              <label className="font-dm text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Link de video (Drive o YouTube)</label>
-              <input type="text" value={form.video_url}
-                onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))}
-                placeholder="https://drive.google.com/file/d/... o youtu.be/..."
-                className="w-full border border-gray-200 rounded-lg font-dm text-sm px-3 py-2 outline-none focus:border-orange-400" />
-              {form.video_url && (
-                <div className="mt-2 rounded-lg overflow-hidden border border-gray-200" style={{ aspectRatio: '16/9' }}>
-                  <iframe src={driveEmbedUrl(form.video_url)} className="w-full h-full" allowFullScreen style={{ border: 'none' }} />
+              <label className="font-dm text-[10px] text-gray-500 uppercase tracking-widest block mb-1">Video de la publicacion</label>
+              <input ref={videoRef} type="file" accept="video/*" className="hidden"
+                onChange={e => { if (e.target.files?.[0]) handleVideoFile(e.target.files[0]); e.target.value = ''; }} />
+              {!form.video_url ? (
+                <button onClick={() => videoRef.current?.click()} disabled={uploadingVid}
+                  className="w-full flex flex-col items-center justify-center gap-1 border-2 border-dashed border-orange-200 rounded-xl py-5 font-dm text-sm font-medium text-gray-400 bg-orange-50 transition-colors">
+                  <span className="text-2xl">🎬</span>
+                  {uploadingVid ? 'Subiendo video...' : 'Subir video'}
+                </button>
+              ) : (
+                <div>
+                  <video src={form.video_url} controls className="w-full rounded-xl mt-1" style={{ maxHeight: 220, background: '#000' }} />
+                  <button onClick={() => setForm(f => ({ ...f, video_url: '' }))}
+                    className="font-dm text-xs text-red-400 hover:text-red-600 mt-1">Quitar video</button>
                 </div>
               )}
             </div>

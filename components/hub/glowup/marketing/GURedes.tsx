@@ -115,8 +115,10 @@ export default function GURedes() {
   const [expandFeedback, setExpandFeedback] = useState<number | null>(null);
   const [feedbackDraft, setFeedbackDraft]   = useState<Record<number, string>>({});
   const [uploadingImg, setUploadingImg]     = useState(false);
+  const [uploadingVid, setUploadingVid]     = useState(false);
   const [saveError, setSaveError]           = useState('');
-  const fileRef = useRef<HTMLInputElement>(null);
+  const fileRef    = useRef<HTMLInputElement>(null);
+  const videoRef   = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -216,6 +218,25 @@ export default function GURedes() {
     const b64s = await Promise.all(Array.from(files).map(resizeImage));
     setForm(f => ({ ...f, imagenes: [...f.imagenes, ...b64s] }));
     setUploadingImg(false);
+  }
+
+  async function handleVideoFile(file: File) {
+    setUploadingVid(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const r = await fetch('/api/upload/video', { method: 'POST', body: fd });
+      if (r.ok) {
+        const { url } = await r.json();
+        setForm(f => ({ ...f, video_url: url }));
+      } else {
+        setSaveError('Error al subir el video. Intentá de nuevo.');
+      }
+    } catch {
+      setSaveError('Error al subir el video. Intentá de nuevo.');
+    } finally {
+      setUploadingVid(false);
+    }
   }
 
   // ── Calendario ──────────────────────────────────────────────────────────────
@@ -473,15 +494,21 @@ export default function GURedes() {
 
             {/* Video */}
             <div>
-              <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Link de video (Drive o YouTube)</label>
-              <input type="text" value={form.video_url}
-                onChange={e => setForm(f => ({ ...f, video_url: e.target.value }))}
-                placeholder="https://drive.google.com/file/d/... o youtu.be/..."
-                className="w-full px-3 py-2 rounded-xl border font-dm text-sm outline-none"
-                style={{ borderColor: '#fbcfe8', color: '#1f2937' }} />
-              {form.video_url && (
-                <div className="mt-2 rounded-xl overflow-hidden" style={{ border: '1px solid #fbcfe8', aspectRatio: '16/9' }}>
-                  <iframe src={driveEmbedUrl(form.video_url)} className="w-full h-full" allowFullScreen style={{ border: 'none' }} />
+              <label className="font-dm text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-1">Video de la publicacion</label>
+              <input ref={videoRef} type="file" accept="video/*" className="hidden"
+                onChange={e => { if (e.target.files?.[0]) handleVideoFile(e.target.files[0]); e.target.value = ''; }} />
+              {!form.video_url ? (
+                <button onClick={() => videoRef.current?.click()} disabled={uploadingVid}
+                  className="w-full flex flex-col items-center justify-center gap-1 rounded-xl py-5 font-dm text-sm font-medium transition-colors"
+                  style={{ border: '2px dashed #fbcfe8', color: uploadingVid ? '#db2777' : '#9ca3af', background: '#fdf2f8' }}>
+                  <span className="text-2xl">🎬</span>
+                  {uploadingVid ? 'Subiendo video...' : 'Subir video'}
+                </button>
+              ) : (
+                <div>
+                  <video src={form.video_url} controls className="w-full rounded-xl mt-1" style={{ maxHeight: 220, background: '#000' }} />
+                  <button onClick={() => setForm(f => ({ ...f, video_url: '' }))}
+                    className="font-dm text-xs text-red-400 hover:text-red-600 mt-1">Quitar video</button>
                 </div>
               )}
             </div>
