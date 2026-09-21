@@ -1,20 +1,26 @@
-import { put } from '@vercel/blob';
+import { handleUpload, type HandleUploadBody } from '@vercel/blob/next';
 import { isAuthenticatedAsync } from '@/lib/adminAuth';
+import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request) {
-  if (!await isAuthenticatedAsync()) return Response.json({ error: 'No autorizado' }, { status: 401 });
-
-  const form = await req.formData();
-  const file = form.get('file') as File | null;
-  if (!file) return Response.json({ error: 'Sin archivo' }, { status: 400 });
-
+export async function POST(request: Request): Promise<NextResponse> {
+  const body = (await request.json()) as HandleUploadBody;
   try {
-    const blob = await put(`videos/${Date.now()}-${file.name}`, file, { access: 'public' });
-    return Response.json({ url: blob.url });
+    const jsonResponse = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async () => {
+        if (!await isAuthenticatedAsync()) throw new Error('No autorizado');
+        return {
+          allowedContentTypes: ['video/mp4', 'video/quicktime', 'video/webm', 'video/*'],
+          maximumSizeInBytes: 500 * 1024 * 1024, // 500 MB
+        };
+      },
+      onUploadCompleted: async () => { /* noop */ },
+    });
+    return NextResponse.json(jsonResponse);
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return Response.json({ error: msg }, { status: 500 });
+    return NextResponse.json({ error: (e as Error).message }, { status: 400 });
   }
 }
