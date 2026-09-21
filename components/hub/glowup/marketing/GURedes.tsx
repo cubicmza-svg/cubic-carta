@@ -123,6 +123,9 @@ export default function GURedes() {
     try {
       const r = await fetch('/api/glowup/redes');
       if (r.ok) setPosts(await r.json());
+      else console.error('GURedes load error:', r.status, await r.text().catch(() => ''));
+    } catch (e) {
+      console.error('GURedes load exception:', e);
     } finally { setLoading(false); }
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -320,8 +323,8 @@ export default function GURedes() {
                         {dayPosts.slice(0, 3).map(p => (
                           <div key={p.id} className="rounded text-[9px] font-dm px-1 py-0.5 truncate leading-tight"
                             style={{ background: `${FORMATO_DOT[p.formato] || '#f472b6'}22`, color: FORMATO_DOT[p.formato] || GU, border: `1px solid ${FORMATO_DOT[p.formato] || GU}44` }}>
-                            {p.imagen
-                              ? <span className="flex items-center gap-1"><img src={p.imagen} alt="" className="w-3 h-3 rounded object-cover inline" />{p.titulo}</span>
+                            {parseImagenes(p.imagen)[0]
+                              ? <span className="flex items-center gap-1"><img src={parseImagenes(p.imagen)[0]} alt="" className="w-3 h-3 rounded object-cover inline" />{p.titulo}</span>
                               : p.titulo
                             }
                           </div>
@@ -608,8 +611,8 @@ function GUPostCard({ post, expandGuion, setExpandGuion, expandFeedback, setExpa
   const fechas = parseFechas(post.fechas_prog);
   return (
     <div className="rounded-2xl p-4 flex gap-3" style={{ background: post.revisado ? '#f0fdf4' : '#fdf2f8', border: `1.5px solid ${post.revisado ? '#bbf7d0' : '#fbcfe8'}` }}>
-      {post.imagen && (
-        <img src={post.imagen} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0" style={{ border: '1px solid #fbcfe8' }} />
+      {parseImagenes(post.imagen)[0] && (
+        <img src={parseImagenes(post.imagen)[0]} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0" style={{ border: '1px solid #fbcfe8' }} />
       )}
       <div className="flex-1 min-w-0">
         <div className="flex items-start gap-2 justify-between mb-1">

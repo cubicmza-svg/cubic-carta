@@ -346,8 +346,8 @@ export default function StudioRedes() {
                         {dayPosts.slice(0, 3).map(p => (
                           <div key={p.id} className="rounded text-[9px] font-dm px-1 py-0.5 truncate leading-tight"
                             style={{ background: `${FORMATO_DOT[p.formato]}22`, color: FORMATO_DOT[p.formato], border: `1px solid ${FORMATO_DOT[p.formato]}44` }}>
-                            {p.imagen
-                              ? <span className="flex items-center gap-1"><img src={p.imagen} alt="" className="w-3 h-3 rounded object-cover inline" />{p.titulo}</span>
+                            {parseImagenes(p.imagen)[0]
+                              ? <span className="flex items-center gap-1"><img src={parseImagenes(p.imagen)[0]} alt="" className="w-3 h-3 rounded object-cover inline" />{p.titulo}</span>
                               : p.titulo
                             }
                           </div>
@@ -627,10 +627,9 @@ function PostCard({ post, expandGuion, setExpandGuion, expandFeedback, setExpand
   return (
     <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex gap-3">
       {/* Thumbnail si tiene imagen */}
-      {post.imagen && (
-        <img src={post.imagen} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0 border border-white/10" />
-      )}
-      {!post.imagen && (
+      {parseImagenes(post.imagen)[0] ? (
+        <img src={parseImagenes(post.imagen)[0]} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0 border border-white/10" />
+      ) : (
         <div className="text-2xl shrink-0 pt-0.5">{PLATAFORMA_ICON[post.plataforma]}</div>
       )}
       <div className="flex-1 min-w-0">
