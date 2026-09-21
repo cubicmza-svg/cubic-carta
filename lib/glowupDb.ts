@@ -89,13 +89,16 @@ export async function ensureGlowUpTables() {
         creado_el   TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
-    // Columnas de revision y guion (se agregan si no existen)
-    await sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS revisado BOOLEAN NOT NULL DEFAULT FALSE`;
-    await sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS feedback TEXT NOT NULL DEFAULT ''`;
-    await sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS tipo_grabacion TEXT NOT NULL DEFAULT ''`;
-    await sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS guion TEXT NOT NULL DEFAULT ''`;
-    await sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS imagen TEXT NOT NULL DEFAULT ''`;
-    await sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS video_url TEXT NOT NULL DEFAULT ''`;
+    // Columnas opcionales (se agregan si no existen; ignorar si ya existen o hay error)
+    const alters = [
+      sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS revisado BOOLEAN NOT NULL DEFAULT FALSE`,
+      sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS feedback TEXT NOT NULL DEFAULT ''`,
+      sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS tipo_grabacion TEXT NOT NULL DEFAULT ''`,
+      sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS guion TEXT NOT NULL DEFAULT ''`,
+      sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS imagen TEXT NOT NULL DEFAULT ''`,
+      sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS video_url TEXT NOT NULL DEFAULT ''`,
+    ];
+    for (const alter of alters) { try { await alter; } catch { /* columna ya existe */ } }
   } finally { await sql.end(); }
 }
 
