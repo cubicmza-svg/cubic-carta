@@ -1,26 +1,18 @@
-import { handleUpload, type HandleUploadBody } from '@vercel/blob/next';
-import { isAuthenticatedAsync } from '@/lib/adminAuth';
-import { NextResponse } from 'next/server';
+import { put } from '@vercel/blob';
 
+// Edge runtime: no 4.5 MB body limit
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: Request): Promise<NextResponse> {
-  const body = (await request.json()) as HandleUploadBody;
+export async function POST(req: Request) {
   try {
-    const jsonResponse = await handleUpload({
-      body,
-      request,
-      onBeforeGenerateToken: async () => {
-        if (!await isAuthenticatedAsync()) throw new Error('No autorizado');
-        return {
-          allowedContentTypes: ['video/mp4', 'video/quicktime', 'video/webm', 'video/*'],
-          maximumSizeInBytes: 500 * 1024 * 1024, // 500 MB
-        };
-      },
-      onUploadCompleted: async () => { /* noop */ },
-    });
-    return NextResponse.json(jsonResponse);
+    const form = await req.formData();
+    const file = form.get('file') as File | null;
+    if (!file) return Response.json({ error: 'Sin archivo' }, { status: 400 });
+
+    const blob = await put(`videos/${Date.now()}-${file.name}`, file, { access: 'public' });
+    return Response.json({ url: blob.url });
   } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 400 });
+    return Response.json({ error: (e as Error).message }, { status: 500 });
   }
 }
