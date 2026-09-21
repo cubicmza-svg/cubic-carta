@@ -1,5 +1,6 @@
 ﻿'use client';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { upload } from '@vercel/blob/client';
 
 interface Post {
   id: number;
@@ -223,12 +224,11 @@ export default function GURedes() {
   async function handleVideoFile(file: File) {
     setUploadingVid(true);
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const r = await fetch('/api/upload/video', { method: 'POST', body: fd });
-      const data = await r.json().catch(() => ({}));
-      if (r.ok) setForm(f => ({ ...f, video_url: data.url }));
-      else setSaveError(`Error video: ${data.error || r.status}`);
+      const blob = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload/video',
+      });
+      setForm(f => ({ ...f, video_url: blob.url }));
     } catch (e) {
       setSaveError(`Error video: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
