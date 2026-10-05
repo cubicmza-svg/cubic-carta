@@ -31,6 +31,20 @@ const SECTIONS = [
     tagText: '#5b21b6',
     tags: ['Diseño', 'Redes', 'Contenido'],
   },
+  {
+    id: 'catalogo',
+    titulo: 'CATÁLOGO',
+    subtitulo: 'Servicios para compartir',
+    descripcion: 'Armá el catálogo de decoraciones para compartirle a los clientes. Cada ítem tiene foto, precio y WhatsApp directo.',
+    href: '/hub/glowup/catalogo',
+    emoji: '🛍️',
+    bg: '#fff7ed',
+    border: '#fed7aa',
+    accent: '#ea580c',
+    tagBg: '#ffedd5',
+    tagText: '#c2410c',
+    tags: ['Ítems', 'Fotos', 'Precios', 'Link público'],
+  },
 ];
 
 const PASTEL_DOTS = [
@@ -97,7 +111,7 @@ export default function GlowUpHub() {
               style={{ background: 'linear-gradient(90deg,#f472b6,#a78bfa,#60a5fa)' }} />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {SECTIONS.map(sec => (
               <Link key={sec.id} href={sec.href}
                 className="group flex flex-col gap-5 p-7 rounded-3xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"

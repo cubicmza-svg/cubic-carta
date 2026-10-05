@@ -89,6 +89,20 @@ export async function ensureGlowUpTables() {
         creado_el   TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS gu_catalogo (
+        id          SERIAL PRIMARY KEY,
+        nombre      TEXT    NOT NULL DEFAULT '',
+        categoria   TEXT    NOT NULL DEFAULT '',
+        descripcion TEXT    NOT NULL DEFAULT '',
+        incluye     TEXT    NOT NULL DEFAULT '[]',
+        precio_desde INTEGER NOT NULL DEFAULT 0,
+        imagen_url  TEXT    NOT NULL DEFAULT '',
+        activo      BOOLEAN NOT NULL DEFAULT TRUE,
+        orden       INTEGER NOT NULL DEFAULT 0,
+        creado_el   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
     // Columnas opcionales (se agregan si no existen; ignorar si ya existen o hay error)
     const alters = [
       sql`ALTER TABLE gu_redes ADD COLUMN IF NOT EXISTS revisado BOOLEAN NOT NULL DEFAULT FALSE`,
@@ -203,6 +217,37 @@ export async function updateGUDiseno(id: number, data: Record<string, unknown>) 
 export async function deleteGUDiseno(id: number) {
   const sql = getClient();
   try { await sql`DELETE FROM gu_diseno WHERE id=${id}`; }
+  finally { await sql.end(); }
+}
+
+// ── CATÁLOGO ──────────────────────────────────────────────────────────────────
+export async function getGUCatalogo() {
+  const sql = getClient();
+  try { return await sql`SELECT * FROM gu_catalogo ORDER BY orden ASC, id ASC`; }
+  finally { await sql.end(); }
+}
+export async function getGUCatalogoActivo() {
+  const sql = getClient();
+  try { return await sql`SELECT * FROM gu_catalogo WHERE activo=TRUE ORDER BY orden ASC, id ASC`; }
+  finally { await sql.end(); }
+}
+export async function addGUCatalogo(data: Record<string, unknown>) {
+  const sql = getClient();
+  try {
+    const [row] = await sql`INSERT INTO gu_catalogo ${sql(data)} RETURNING *`;
+    return row;
+  } finally { await sql.end(); }
+}
+export async function updateGUCatalogo(id: number, data: Record<string, unknown>) {
+  const sql = getClient();
+  try {
+    const [row] = await sql`UPDATE gu_catalogo SET ${sql(data)} WHERE id=${id} RETURNING *`;
+    return row;
+  } finally { await sql.end(); }
+}
+export async function deleteGUCatalogo(id: number) {
+  const sql = getClient();
+  try { await sql`DELETE FROM gu_catalogo WHERE id=${id}`; }
   finally { await sql.end(); }
 }
 
