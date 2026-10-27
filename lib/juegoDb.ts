@@ -13,15 +13,15 @@ function getClient() {
 }
 
 // ─── Premios ──────────────────────────────────────────────────────────────────
-// peso = chance relativa (suman 100 → es el %). topeDia = máximo por día; si se agota sale el "reemplazo".
-export const PREMIOS = [
-  { id: 'off10',     titulo: '10% off',          detalle: '10% de descuento en tu consumo', peso: 30 },
-  { id: 'medialuna', titulo: 'medialuna gratis', detalle: 'una medialuna de regalo',         peso: 16, topeDia: 30, reemplazo: 'off10' },
-  { id: 'cafe',      titulo: 'café gratis',      detalle: 'un café chico de regalo',         peso: 15, topeDia: 20, reemplazo: 'off10' },
-  { id: 'brunch',    titulo: 'brunch gratis',    detalle: 'un brunch individual de regalo',  peso: 2,  topeDia: 1,  reemplazo: 'cafe' },
-  { id: 'nada',      titulo: 'esta vez no',      detalle: '',                                peso: 37 },
-] as const;
-type Premio = (typeof PREMIOS)[number];
+// Los carga Cubic desde /admin/juego (tabla juego_premios): título, detalle, chance (%) y stock.
+// Cada premio que sale descuenta 1 del stock; sin stock no sale más. Lo que falta para llegar a 100% es "sin premio".
+export interface Premio { id: number; titulo: string; detalle: string; chance: number; stock: number; entregados: number; activo: boolean; orden: number }
+const PREMIOS_INICIALES = [
+  { titulo: 'brunch gratis',    detalle: 'un brunch individual de regalo',  chance: 2,  stock: 2 },
+  { titulo: 'café gratis',      detalle: 'un café chico de regalo',         chance: 15, stock: 20 },
+  { titulo: 'medialuna gratis', detalle: 'una medialuna de regalo',         chance: 16, stock: 30 },
+  { titulo: '10% off',          detalle: '10% de descuento en tu consumo', chance: 30, stock: 100 },
+];
 
 export const DIAS_VALIDEZ = 7;
 export const CONDICIONES = 'Válido por 7 días en Cubic (25 de Mayo 2985). Uno por persona, no acumulable con otras promos. Mostrale el código al mozo antes de pedir la cuenta.';
@@ -77,6 +77,20 @@ export async function ensureJuegoTables() {
         creado   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         canjeado TIMESTAMPTZ
       )`;
+    await sql`
+      CREATE TABLE IF NOT EXISTS juego_premios (
+        id         SERIAL PRIMARY KEY,
+        titulo     TEXT NOT NULL,
+        detalle    TEXT NOT NULL DEFAULT '',
+        chance     NUMERIC(5,2) NOT NULL DEFAULT 0,
+        stock      INTEGER NOT NULL DEFAULT 0,
+        entregados INTEGER NOT NULL DEFAULT 0,
+        activo     BOOLEAN NOT NULL DEFAULT TRUE,
+        orden      INTEGER NOT NULL DEFAULT 0
+      )`;
+    const [{ n }] = await sql`SELECT COUNT(*)::int AS n FROM juego_premios`;
+    if (!n) for (const [i, p] of PREMIOS_INICIALES.entries())
+      await sql`INSERT INTO juego_premios (titulo, detalle, chance, stock, orden) VALUES (${p.titulo}, ${p.detalle}, ${p.chance}, ${p.stock}, ${i})`;
   } finally {
     await sql.end();
   }
@@ -107,43 +121,43 @@ export async function jugar(nombre: string, telCrudo: string, promos: boolean) {
       return { yaJugo: true, nombre, premio: String(previa[0].premio), cupon: c.length ? aCupon(c[0]) : null };
     }
 
-    // sorteo
-    const total = PREMIOS.reduce((s, p) => s + p.peso, 0);
-    let r = randomInt(0, total * 100) / 100;
-    let p: Premio = PREMIOS[PREMIOS.length - 1];
-    for (const x of PREMIOS) { if (r < x.peso) { p = x; break; } r -= x.peso; }
-    for (let i = 0; i < 4 && 'topeDia' in p; i++) {   // topes diarios
-      const [{ n }] = await sql`SELECT COUNT(*)::int AS n FROM juego_jugadas WHERE fecha = ${fecha} AND premio = ${p.id}`;
-      if (n < p.topeDia) break;
-      const rep: string = p.reemplazo;
-      p = PREMIOS.find(x => x.id === rep) ?? PREMIOS[0];
-    }
+    // sorteo entre los premios activos con stock; si las chances suman más de 100 se reparten proporcional
+    const disponibles = (await sql`SELECT id, titulo, detalle, chance::float AS chance FROM juego_premios WHERE activo AND stock > 0 ORDER BY orden, id`)
+      .map(x => ({ id: Number(x.id), titulo: String(x.titulo), detalle: String(x.detalle), chance: Number(x.chance) }));
+    const total = Math.max(100, disponibles.reduce((s, x) => s + x.chance, 0));
+    let r = randomInt(0, Math.round(total * 100)) / 100;
+    let p: { id: number; titulo: string; detalle: string } | null = null;
+    for (const x of disponibles) { if (r < x.chance) { p = x; break; } r -= x.chance; }
+    // descuenta del stock (si justo se agotó en otra mesa, no hay premio)
+    if (p && !(await sql`UPDATE juego_premios SET stock = stock - 1, entregados = entregados + 1 WHERE id = ${p.id} AND stock > 0 RETURNING id`).length) p = null;
+    const premioId = p ? 'p' + p.id : 'nada';
 
     let codigo: string | null = null;
-    if (p.id !== 'nada') {
+    if (p) {
       const vence = hoyMza(new Date(Date.now() + DIAS_VALIDEZ * 864e5));
       for (let intento = 0; !codigo; intento++) {   // si el código ya existe (rarísimo), se genera otro
         const cod = nuevoCodigo();
         const ok = await sql`
           INSERT INTO juego_cupones (codigo, tel, nombre, premio, titulo, detalle, fecha, vence)
-          VALUES (${cod}, ${tel}, ${nombre}, ${p.id}, ${p.titulo}, ${p.detalle}, ${fecha}, ${vence})
+          VALUES (${cod}, ${tel}, ${nombre}, ${premioId}, ${p.titulo}, ${p.detalle}, ${fecha}, ${vence})
           ON CONFLICT (codigo) DO NOTHING RETURNING codigo`;
         if (ok.length) codigo = cod;
         else if (intento > 5) throw new Error('No se pudo generar el código');
       }
     }
     const ins = await sql`
-      INSERT INTO juego_jugadas (tel, fecha, premio, codigo) VALUES (${tel}, ${fecha}, ${p.id}, ${codigo})
+      INSERT INTO juego_jugadas (tel, fecha, premio, codigo) VALUES (${tel}, ${fecha}, ${premioId}, ${codigo})
       ON CONFLICT (tel, fecha) DO NOTHING RETURNING tel`;
-    if (!ins.length) {   // jugó dos veces al mismo tiempo: vale la primera
+    if (!ins.length) {   // jugó dos veces al mismo tiempo: vale la primera (y se devuelve el stock)
       if (codigo) await sql`DELETE FROM juego_cupones WHERE codigo = ${codigo}`;
+      if (p) await sql`UPDATE juego_premios SET stock = stock + 1, entregados = entregados - 1 WHERE id = ${p.id}`;
       return jugar(nombre, telCrudo, promos);
     }
     const c = codigo ? await sql.unsafe(`SELECT ${COLS_CUPON} FROM juego_cupones WHERE codigo = $1`, [codigo]) : [];
     // lo que había "en los otros vasos" (solo para el show; el premio real es el de arriba)
-    const show = PREMIOS.filter(x => x.id !== 'brunch');
-    const otras = [0, 1].map(() => show[randomInt(0, show.length)].titulo);
-    return { nombre, premio: p.id, titulo: p.titulo, cupon: c.length ? aCupon(c[0]) : null, otras };
+    const show = disponibles.filter(x => x.chance >= 5).map(x => x.titulo).concat('esta vez no');
+    const otras = [0, 1].map(() => show[randomInt(0, show.length)]);
+    return { nombre, premio: premioId, titulo: p?.titulo ?? 'esta vez no', cupon: c.length ? aCupon(c[0]) : null, otras };
   } finally {
     await sql.end();
   }
@@ -191,6 +205,54 @@ export async function resumenJuego() {
       registros: registros.map(r => ({ ...r, alta: new Date(r.alta).toISOString(), ultima: new Date(r.ultima).toISOString() })),
       cupones: cupones.map(aCupon),
     };
+  } finally {
+    await sql.end();
+  }
+}
+
+// ─── Premios (panel) ──────────────────────────────────────────────────────────
+const aPremio = (r: Record<string, unknown>): Premio => ({
+  id: Number(r.id), titulo: String(r.titulo), detalle: String(r.detalle), chance: Number(r.chance),
+  stock: Number(r.stock), entregados: Number(r.entregados), activo: Boolean(r.activo), orden: Number(r.orden),
+});
+
+export async function listarPremios(): Promise<Premio[]> {
+  const sql = getClient();
+  try {
+    return (await sql`SELECT id, titulo, detalle, chance::float AS chance, stock, entregados, activo, orden FROM juego_premios ORDER BY orden, id`).map(aPremio);
+  } finally {
+    await sql.end();
+  }
+}
+
+// para la página del juego: los que pueden salir, del más valioso (menos chance) al más común
+export async function premiosEnJuego(): Promise<string[]> {
+  const sql = getClient();
+  try {
+    return (await sql`SELECT titulo FROM juego_premios WHERE activo AND stock > 0 AND chance > 0 ORDER BY chance, id`).map(r => String(r.titulo));
+  } finally {
+    await sql.end();
+  }
+}
+
+export async function guardarPremio(p: { id?: number; titulo: string; detalle: string; chance: number; stock: number; activo: boolean }) {
+  const sql = getClient();
+  try {
+    if (p.id) {
+      await sql`UPDATE juego_premios SET titulo = ${p.titulo}, detalle = ${p.detalle}, chance = ${p.chance}, stock = ${p.stock}, activo = ${p.activo} WHERE id = ${p.id}`;
+    } else {
+      const [{ orden }] = await sql`SELECT COALESCE(MAX(orden), 0) + 1 AS orden FROM juego_premios`;
+      await sql`INSERT INTO juego_premios (titulo, detalle, chance, stock, activo, orden) VALUES (${p.titulo}, ${p.detalle}, ${p.chance}, ${p.stock}, ${p.activo}, ${orden})`;
+    }
+  } finally {
+    await sql.end();
+  }
+}
+
+export async function borrarPremio(id: number) {
+  const sql = getClient();
+  try {
+    await sql`DELETE FROM juego_premios WHERE id = ${id}`;   // los cupones ya entregados guardan su título y siguen valiendo
   } finally {
     await sql.end();
   }

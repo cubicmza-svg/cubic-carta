@@ -4,14 +4,15 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 // Juego de las mesas: el mozo busca el código que le muestra el cliente y lo canjea.
-// Abajo: números del día, premios entregados y registrados (con exportación a CSV).
+// Abajo: números del día, premios con su stock (los carga Cubic), premios entregados y registrados (con exportación a CSV).
 
 interface Cupon {
   codigo: string; tel: string; nombre: string; premio: string; titulo: string; detalle: string;
   fecha: string; vence: string; creado: string; canjeado: string | null;
 }
 interface Registro { tel: string; nombre: string; promos: boolean; alta: string; ultima: string; jugadas: number; premios: number }
-interface Resumen { hoy: { jugadas: number; premios: number; canjeados: number }; registros: Registro[]; cupones: Cupon[] }
+interface Premio { id?: number; titulo: string; detalle: string; chance: number; stock: number; entregados?: number; activo: boolean }
+interface Resumen { hoy: { jugadas: number; premios: number; canjeados: number }; registros: Registro[]; cupones: Cupon[]; premios: Premio[] }
 
 const hoyMza = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Argentina/Mendoza' });
 const fecha = (f: string) => f.split('-').reverse().slice(0, 2).join('/');
@@ -143,6 +144,8 @@ export default function JuegoPanel() {
           ))}
         </section>
 
+        {resumen && <PremiosStock premios={resumen.premios} alGuardar={ps => setResumen({ ...resumen, premios: ps })} />}
+
         {/* Listas */}
         <section className="rounded-2xl bg-cubic-card border border-cubic-border overflow-hidden">
           <div className="flex border-b border-cubic-border">
@@ -197,5 +200,102 @@ export default function JuegoPanel() {
         </section>
       </main>
     </div>
+  );
+}
+
+// ─── Premios y stock ──────────────────────────────────────────────────────────
+const VACIO: Premio = { titulo: '', detalle: '', chance: 10, stock: 10, activo: true };
+
+function PremiosStock({ premios, alGuardar }: { premios: Premio[]; alGuardar: (p: Premio[]) => void }) {
+  const [editando, setEditando] = useState<Premio | null>(null);
+  const [borrar, setBorrar] = useState(false);
+  const [error, setError] = useState('');
+  const [guardando, setGuardando] = useState(false);
+
+  const enJuego = premios.filter(p => p.activo && p.stock > 0);
+  const suma = enJuego.reduce((s, p) => s + p.chance, 0);
+
+  async function enviar(cuerpo: object) {
+    setGuardando(true); setError('');
+    try {
+      const r = await fetch('/api/admin/juego', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cuerpo) });
+      const d = await r.json();
+      if (!r.ok || d.error) throw new Error(d.error || 'No se pudo guardar');
+      alGuardar(d.premios); setEditando(null); setBorrar(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo guardar');
+    }
+    setGuardando(false);
+  }
+
+  const campo = 'w-full px-3 py-2 rounded-lg bg-[#1A1721] border border-cubic-border font-dm text-sm focus:outline-none focus:border-cubic-accent';
+  const etiqueta = 'font-dm text-[11px] text-cubic-muted uppercase tracking-wider';
+
+  return (
+    <section className="rounded-2xl bg-cubic-card border border-cubic-border p-5">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-bebas text-2xl tracking-widest">PREMIOS Y STOCK</h2>
+        {!editando && <button onClick={() => { setEditando({ ...VACIO }); setBorrar(false); setError(''); }} className="font-bebas tracking-widest text-sm px-3 py-1.5 rounded-lg bg-cubic-accent text-[#0F0D14]">+ AGREGAR</button>}
+      </div>
+      <p className="font-dm text-sm text-cubic-muted mt-1">
+        Cada premio que sale en el juego descuenta 1 del stock. Cuando llega a 0 deja de salir.
+        {' '}Hoy se gana algo en el <b className="text-white">{Math.min(100, Math.round(suma))}%</b> de las jugadas{suma < 100 && <> (el {Math.round(100 - suma)}% sale “vacío”)</>}.
+      </p>
+      {suma > 100 && <p className="font-dm text-xs mt-2 rounded-lg px-3 py-2 bg-amber-500/10 text-amber-200 border border-amber-500/20">Las chances suman {Math.round(suma)}%: siempre sale algún premio y se reparten en proporción.</p>}
+
+      {editando && (
+        <div className="mt-4 rounded-xl bg-[#1A1721] border border-cubic-accent/40 p-4 flex flex-col gap-3">
+          <p className="font-bebas tracking-widest text-cubic-accent">{editando.id ? 'EDITAR PREMIO' : 'NUEVO PREMIO'}</p>
+          <label className="flex flex-col gap-1"><span className={etiqueta}>Premio</span>
+            <input className={campo} value={editando.titulo} maxLength={40} placeholder="café gratis" onChange={e => setEditando({ ...editando, titulo: e.target.value })} /></label>
+          <label className="flex flex-col gap-1"><span className={etiqueta}>Qué incluye (lo ve el cliente)</span>
+            <input className={campo} value={editando.detalle} maxLength={80} placeholder="un café chico de regalo" onChange={e => setEditando({ ...editando, detalle: e.target.value })} /></label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex flex-col gap-1"><span className={etiqueta}>Chance (%)</span>
+              <input className={campo} type="number" inputMode="decimal" min={0} max={100} step={0.5} value={editando.chance} onChange={e => setEditando({ ...editando, chance: Number(e.target.value) })} /></label>
+            <label className="flex flex-col gap-1"><span className={etiqueta}>Stock</span>
+              <input className={campo} type="number" inputMode="numeric" min={0} step={1} value={editando.stock} onChange={e => setEditando({ ...editando, stock: Number(e.target.value) })} /></label>
+          </div>
+          <div className="flex gap-2">
+            {[5, 10, 20].map(n => <button key={n} type="button" onClick={() => setEditando({ ...editando, stock: (editando.stock || 0) + n })} className="flex-1 py-1.5 rounded-lg border border-cubic-border font-dm text-xs text-cubic-muted hover:text-white">+{n} al stock</button>)}
+          </div>
+          <label className="flex items-center gap-2 font-dm text-sm"><input type="checkbox" checked={editando.activo} onChange={e => setEditando({ ...editando, activo: e.target.checked })} className="w-4 h-4 accent-[#4ADE80]" /> En juego (destildalo para pausarlo)</label>
+          {error && <p className="font-dm text-sm text-red-300">{error}</p>}
+          <div className="flex gap-2">
+            <button onClick={() => { setEditando(null); setBorrar(false); }} className="flex-1 py-3 rounded-xl border border-cubic-border font-bebas text-lg tracking-widest text-cubic-muted">CANCELAR</button>
+            <button onClick={() => enviar({ accion: 'premio-guardar', premio: editando })} disabled={guardando} className="flex-[2] py-3 rounded-xl bg-cubic-accent text-[#0F0D14] font-bebas text-lg tracking-widest">{guardando ? '…' : 'GUARDAR'}</button>
+          </div>
+          {editando.id && (!borrar
+            ? <button onClick={() => setBorrar(true)} className="font-dm text-xs text-red-300/80 self-center">Borrar este premio</button>
+            : <div className="flex items-center justify-between gap-2 rounded-lg px-3 py-2 bg-red-500/10 border border-red-500/20">
+                <span className="font-dm text-xs text-red-200">¿Borrar “{editando.titulo}”? Los códigos ya ganados siguen valiendo.</span>
+                <button onClick={() => enviar({ accion: 'premio-borrar', id: editando.id })} className="shrink-0 font-bebas tracking-widest text-sm px-3 py-1 rounded bg-red-500/80 text-white">BORRAR</button>
+              </div>)}
+        </div>
+      )}
+
+      <ul className="mt-4 flex flex-col gap-2">
+        {premios.length === 0 && <li className="font-dm text-sm text-cubic-muted">No hay premios cargados: el juego no da premios hasta que agregues uno.</li>}
+        {premios.map(p => {
+          const estado = !p.activo ? { t: 'PAUSADO', c: 'bg-[#2D2840] text-[#9B97A8]' } : p.stock <= 0 ? { t: 'AGOTADO', c: 'bg-red-500/20 text-red-300' } : p.stock <= 3 ? { t: 'QUEDAN POCOS', c: 'bg-amber-500/20 text-amber-200' } : null;
+          return (
+            <li key={p.id}>
+              <button onClick={() => { setEditando({ ...p }); setBorrar(false); setError(''); }} className="w-full text-left rounded-xl bg-[#1A1721] border border-cubic-border hover:border-cubic-muted p-3 flex items-center gap-3">
+                <span className="flex-1 min-w-0">
+                  <span className="block font-dm text-sm font-bold truncate">{p.titulo}</span>
+                  <span className="block font-dm text-xs text-cubic-muted truncate">{p.detalle || '—'}</span>
+                  <span className="block font-dm text-xs text-cubic-muted mt-1">chance {p.chance}% · entregados {p.entregados ?? 0}</span>
+                </span>
+                <span className="shrink-0 text-right">
+                  <span className="block font-bebas text-3xl leading-none tabular-nums">{p.stock}</span>
+                  <span className="block font-dm text-[10px] text-cubic-muted uppercase tracking-wider">en stock</span>
+                  {estado && <span className={`inline-block mt-1 font-bebas tracking-widest text-[10px] px-2 py-0.5 rounded-full ${estado.c}`}>{estado.t}</span>}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

@@ -1,4 +1,4 @@
-import { ensureJuegoTables, jugar, normalizarTel, CONDICIONES } from '@/lib/juegoDb';
+import { ensureJuegoTables, jugar, normalizarTel, premiosEnJuego, CONDICIONES } from '@/lib/juegoDb';
 
 // Público: lo llama la página del QR (cubicmza.netlify.app/jugar). Registra y sortea el premio del día.
 export const dynamic = 'force-dynamic';
@@ -8,7 +8,7 @@ const cors = (req: Request) => {
   const o = req.headers.get('origin') ?? '';
   return {
     'Access-Control-Allow-Origin': ORIGENES.includes(o) ? o : ORIGENES[0],
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Cache-Control': 'no-store',
     Vary: 'Origin',
@@ -17,6 +17,16 @@ const cors = (req: Request) => {
 
 export function OPTIONS(req: Request) {
   return new Response(null, { status: 204, headers: cors(req) });
+}
+
+// los premios que pueden salir hoy (para mostrarlos en la página del juego)
+export async function GET(req: Request) {
+  try {
+    await ensureJuegoTables();
+    return Response.json({ premios: await premiosEnJuego() }, { headers: cors(req) });
+  } catch {
+    return Response.json({ premios: [] }, { status: 500, headers: cors(req) });
+  }
 }
 
 export async function POST(req: Request) {

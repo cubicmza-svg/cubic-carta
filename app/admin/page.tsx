@@ -41,11 +41,11 @@ function AdminHub() {
                   CARTA
                 </h2>
                 <p className="font-dm text-sm text-cubic-muted mt-1 leading-snug">
-                  Gestioná los ítems del menú — agregar, editar, activar/desactivar.
+                  Subí el PDF de la carta y se actualiza sola la carta online.
                 </p>
               </div>
               <span className="font-bebas text-xs tracking-widest text-cubic-muted uppercase mt-auto">
-                Menú digital →
+                Subir PDF →
               </span>
             </Link>
 
