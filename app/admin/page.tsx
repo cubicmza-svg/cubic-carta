@@ -67,6 +67,25 @@ function AdminHub() {
                 Estrategia →
               </span>
             </Link>
+
+            {/* JUEGO & PREMIOS */}
+            <Link
+              href="/admin/juego"
+              className="group relative flex flex-col gap-3 p-8 rounded-2xl bg-cubic-card border border-cubic-border hover:border-cubic-accent transition-all duration-300 sm:col-span-2"
+            >
+              <div className="text-4xl">🎟️</div>
+              <div>
+                <h2 className="font-bebas text-3xl tracking-widest text-white group-hover:text-cubic-accent transition-colors">
+                  JUEGO & PREMIOS
+                </h2>
+                <p className="font-dm text-sm text-cubic-muted mt-1 leading-snug">
+                  Canjeá los códigos que ganan los clientes con el QR de la mesa y mirá quién se registró.
+                </p>
+              </div>
+              <span className="font-bebas text-xs tracking-widest text-cubic-muted uppercase mt-auto">
+                Para el mozo →
+              </span>
+            </Link>
           </div>
         </div>
       </main>
