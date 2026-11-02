@@ -36,7 +36,8 @@ function estrella(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: numb
   for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .45 : r; ctx.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); }
   ctx.closePath(); ctx.fillStyle = color; ctx.fill();
 }
-function imagen(ctx: CanvasRenderingContext2D, img: HTMLImageElement, x: number, y: number, w: number, rot = 0) {
+function imagen(ctx: CanvasRenderingContext2D, img: HTMLImageElement | null, x: number, y: number, w: number, rot = 0) {
+  if (!img) return 0;
   const h = w * img.height / img.width;
   ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(rot); ctx.drawImage(img, -w / 2, -h / 2, w, h); ctx.restore();
   return h;
@@ -177,6 +178,7 @@ function dibujar(cv: HTMLCanvasElement, d: Datos, im: Imgs, foto: HTMLImageEleme
 export default function InvitacionDigital() {
   const [d, setD] = useState<Datos>({ nombre: '', edad: '', fecha: '', turno: TURNOS[1], confirmar: '' });
   const [listo, setListo] = useState(false);
+  const [version, setVersion] = useState(0);
   const [foto, setFoto] = useState<HTMLImageElement | null>(null);
   const [puedeCompartir, setPuedeCompartir] = useState(false);
   const cv = useRef<HTMLCanvasElement>(null);
@@ -184,16 +186,19 @@ export default function InvitacionDigital() {
 
   useEffect(() => {
     (async () => {
-      try { await Promise.all([document.fonts.load("100px 'Anton'"), document.fonts.load("800 40px 'DM Sans'")]); } catch {}
+      // en iPhone document.fonts.load a veces no resuelve nunca: no esperamos más de 2,5 s
+      const fuentes = Promise.all([document.fonts.load("100px 'Anton'"), document.fonts.load("800 40px 'DM Sans'")]).catch(() => {});
+      await Promise.race([fuentes, new Promise(r => setTimeout(r, 2500))]);
       const [cohete, saturno, astro, astroGrande, logo] = await Promise.all(['/bigbang/inv/cohete.png', '/bigbang/inv/planeta-saturno.png',
-        '/bigbang/inv/astronauta-pulgar.png', '/bigbang/inv/astronauta-estrella.png', '/logo-bigbang.png'].map(cargarImg));
-      imgs.current = { cohete, saturno, astro, astroGrande, logo };
+        '/bigbang/inv/astronauta-pulgar.png', '/bigbang/inv/astronauta-estrella.png', '/logo-bigbang.png'].map(u => cargarImg(u).catch(() => null)));
+      imgs.current = { cohete, saturno, astro, astroGrande, logo } as Imgs;
       setListo(true);
-    })().catch(() => {});
+      fuentes.then(() => setVersion(v => v + 1));   // si la letra llega tarde, se redibuja con la letra buena
+    })().catch(() => setListo(true));
     setPuedeCompartir(typeof navigator !== 'undefined' && !!navigator.canShare);
   }, []);
 
-  useEffect(() => { if (listo && cv.current && imgs.current) dibujar(cv.current, d, imgs.current, foto); }, [d, listo, foto]);
+  useEffect(() => { if (listo && cv.current && imgs.current) dibujar(cv.current, d, imgs.current, foto); }, [d, listo, foto, version]);
 
   const set = (k: keyof Datos) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setD(v => ({ ...v, [k]: e.target.value }));
   const archivo = () => `invitacion-${(d.nombre || 'cumple').toLowerCase().replace(/[^a-z0-9áéíóúñ]+/gi, '-')}.png`;
@@ -227,7 +232,7 @@ export default function InvitacionDigital() {
         @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
         .inv { position: relative; z-index: 1; padding: 80px 24px; background: linear-gradient(180deg, rgba(6,8,26,0) 0%, rgba(20,36,58,.7) 50%, rgba(6,8,26,0) 100%); }
         .inv-in { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 400px; gap: 40px; align-items: start; }
-        @media (max-width: 900px) { .inv-in { grid-template-columns: 1fr; } .inv-vista { order: -1; } }
+        @media (max-width: 900px) { .inv-in { grid-template-columns: 1fr; } } .inv-vista h3 { display: block; }
         .inv h2 { font-family: 'SuperHistories', sans-serif; font-size: clamp(34px,5.5vw,58px); color: #fff; line-height: 1; }
         .inv h2 span { color: #EDBD19; }
         .inv-bajada { color: #94a3b8; font-size: 16px; margin: 12px 0 26px; line-height: 1.5; }
@@ -237,6 +242,8 @@ export default function InvitacionDigital() {
         .inv-form label { display: grid; gap: 6px; font-size: 13px; font-weight: 700; color: #94a3b8; }
         .inv-form input, .inv-form select { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: #fff; border-radius: 12px; padding: 12px 14px; font: inherit; font-size: 15px; color-scheme: dark; }
         .inv-form input[type=file] { padding: 10px; font-size: 14px; }
+        .inv-vista h3 { display: none; font-size: 15px; font-weight: 800; color: #fff; text-align: center; margin-bottom: 12px; }
+        .inv-falta { margin-top: 10px; font-size: 13px; font-weight: 700; color: #fde047; text-align: center; }
         .inv-priv { margin-top: 14px; font-size: 12px; color: #64748b; }
         .inv-botones { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
         .inv-btn { flex: 1; min-width: 160px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 18px; border-radius: 99px; border: none; cursor: pointer; font: inherit; font-weight: 900; font-size: 16px; }
@@ -262,13 +269,15 @@ export default function InvitacionDigital() {
             {foto && <button className="inv-sacar ancho" onClick={() => setFoto(null)}>✕ Sacar la foto</button>}
           </div>
           <p className="inv-priv">🔒 La invitación (y la foto) se arman en tu celu: no guardamos ni enviamos ningún dato.</p>
+        </div>
+        <div className="inv-vista">
+          <h3>👇 Así queda tu invitación</h3>
+          <canvas ref={cv} width={W} height={H} aria-label="Vista previa de la invitación" />
+          {!d.nombre && <p className="inv-falta">Escribí el nombre del cumpleañero/a para poder descargarla</p>}
           <div className="inv-botones">
             <button className="inv-btn desc" onClick={descargar} disabled={!listo || !d.nombre}>⬇️ Descargar invitación</button>
             {puedeCompartir && <button className="inv-btn comp" onClick={compartir} disabled={!listo || !d.nombre}>📲 Compartir</button>}
           </div>
-        </div>
-        <div className="inv-vista">
-          <canvas ref={cv} width={W} height={H} aria-label="Vista previa de la invitación" />
         </div>
       </div>
     </section>
