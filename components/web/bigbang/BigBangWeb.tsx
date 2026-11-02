@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import PopupLowCost from './PopupLowCost';
+import ArmaTuCumple from './ArmaTuCumple';
+import InvitacionDigital from './InvitacionDigital';
 
 const WA = '5492613861323';
 const waLink = (msg: string) => `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
@@ -403,6 +405,11 @@ export default function BigBangWeb() {
         }
         .bb-wa-fixed:hover { transform: scale(1.1); }
 
+        /* en el celu no entran los links del menú: queda el logo + Reservar */
+        @media (max-width: 860px) {
+          .bb-nav-links-d { display: none !important; }
+        }
+
         @media (max-width: 640px) {
           .bb-stats-bar { border-radius: 24px; padding: 20px 16px; }
           .bb-outlined { -webkit-text-stroke: 2px #f59e0b; }
@@ -424,7 +431,7 @@ export default function BigBangWeb() {
       <nav className={`bb-nav${navScrolled ? ' scrolled' : ''}`}>
         <Image src="/logo-bigbang.png" alt="Big Bang" width={90} height={45} style={{ objectFit: 'contain' }} />
         <div style={{ display: 'flex', gap: 28, alignItems: 'center' }} className="bb-nav-links-d">
-          {[['#salon', 'El salón'], ['#tour', 'Tour 360°'], ['#promos', 'Promos'], ['#galeria', 'Galería'], ['#menu', 'Menú'], ['#contacto', 'Contacto']].map(([href, label]) => (
+          {[['#salon', 'El salón'], ['#tour', 'Tour 360°'], ['#promos', 'Promos'], ['#arma', 'Armá tu cumple'], ['#invitacion', 'Invitación'], ['#galeria', 'Galería'], ['#menu', 'Menú'], ['#contacto', 'Contacto']].map(([href, label]) => (
             <a key={href} href={href} className="bb-nav-link">{label}</a>
           ))}
         </div>
@@ -757,7 +764,7 @@ export default function BigBangWeb() {
           </div>
 
           {/* Comparativa */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 28 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 12, marginTop: 28 }}>
             {PROMOS.map(p => (
               <div key={p.key} onClick={() => setActivePromo(p.key as typeof activePromo)}
                 style={{ background: activePromo === p.key ? `linear-gradient(135deg, ${p.color}22, ${p.color}08)` : 'rgba(255,255,255,0.03)', borderRadius: 18, padding: '18px 14px', textAlign: 'center', border: `1.5px solid ${activePromo === p.key ? p.color : 'rgba(255,255,255,0.06)'}`, cursor: 'pointer', transition: 'all 0.25s', boxShadow: activePromo === p.key ? `0 0 20px ${p.color}33` : 'none' }}>
@@ -770,6 +777,9 @@ export default function BigBangWeb() {
           </div>
         </div>
       </section>
+
+      {/* ARMÁ TU CUMPLE: promo + fecha + extras → total y WhatsApp */}
+      <ArmaTuCumple precios={precios} waLink={waLink} />
 
       {/* ADICIONALES */}
       <section style={{ position: 'relative', zIndex: 1, padding: '0 24px 80px' }}>
@@ -825,6 +835,9 @@ export default function BigBangWeb() {
       </section>
 
       {/* CONTACTO / FOOTER */}
+      {/* INVITACIÓN DIGITAL: la arman los papás y la descargan (todo en el celu, no se guarda nada) */}
+      <InvitacionDigital />
+
       <footer id="contacto" style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.06)', padding: '60px 24px 40px', textAlign: 'center', background: 'rgba(0,0,0,0.3)' }}>
         <Image src="/logo-bigbang.png" alt="Big Bang" width={120} height={60} style={{ objectFit: 'contain', marginBottom: 24, opacity: 0.9 }} />
 
