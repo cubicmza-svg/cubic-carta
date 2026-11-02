@@ -4,6 +4,7 @@ import Image from 'next/image';
 import PopupLowCost from './PopupLowCost';
 import ArmaTuCumple from './ArmaTuCumple';
 import InvitacionDigital from './InvitacionDigital';
+import AstronautaGuia from './AstronautaGuia';
 
 const WA = '5492613861323';
 const waLink = (msg: string) => `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
@@ -426,6 +427,9 @@ export default function BigBangWeb() {
         precio={$$(precios, 'promo_lowcost')}
         waHref={waLink(`¡Hola! Quiero info de la Promo Low Cost de ${$$(precios, 'promo_lowcost')} 🚀`)}
       />
+
+      {/* Astronauta guía: acompaña el scroll y comenta cada sección */}
+      <AstronautaGuia waHref={waLink(DEFAULT_MSG)} />
 
       {/* NAV */}
       <nav className={`bb-nav${navScrolled ? ' scrolled' : ''}`}>
