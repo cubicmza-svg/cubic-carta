@@ -112,22 +112,24 @@ function dibujar(cv: HTMLCanvasElement, d: Datos, im: Imgs, foto: HTMLImageEleme
 
   // recuadro punteado con fecha, hora y lugar
   y += ch + 50;
-  const bx = 95, bw = 545, filaH = 114, bh = filaH * 2 + 212;
+  // filas con alto propio (la de la fecha lleva 2 renglones) y fondo oscuro para que las estrellas no crucen las líneas
+  const bx = 95, bw = 545, f1 = 150, f2 = 110, f3 = 222, bh = f1 + f2 + f3, y2 = y + f1, y3 = y + f1 + f2;
+  redondo(ctx, bx, y, bw, bh, 26); ctx.fillStyle = 'rgba(5,10,28,.6)'; ctx.fill();
   ctx.setLineDash([12, 10]); ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,.75)'; redondo(ctx, bx, y, bw, bh, 26); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(bx + 24, y + filaH); ctx.lineTo(bx + bw - 24, y + filaH); ctx.moveTo(bx + 24, y + filaH * 2); ctx.lineTo(bx + bw - 24, y + filaH * 2); ctx.stroke(); ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(bx + 24, y2); ctx.lineTo(bx + bw - 24, y2); ctx.moveTo(bx + 24, y3); ctx.lineTo(bx + bw - 24, y3); ctx.stroke(); ctx.setLineDash([]);
   const f = d.fecha ? new Date(d.fecha + 'T12:00:00') : null;
   ctx.textAlign = 'left';
-  iconoCal(ctx, bx + 34, y + 26);
-  ctx.fillStyle = '#fff'; ctx.font = `44px ${ANTON}`; ctx.fillText(f ? DIAS[f.getDay()].toUpperCase() : 'FECHA', bx + 140, y + 58);
+  iconoCal(ctx, bx + 34, y + 38);
+  ctx.fillStyle = '#fff'; ctx.font = `42px ${ANTON}`; ctx.fillText(f ? DIAS[f.getDay()].toUpperCase() : 'FECHA', bx + 140, y + 66);
   ctx.fillStyle = AMARILLO; ctx.font = `50px ${ANTON}`;
-  ctx.fillText(f ? `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${String(f.getFullYear()).slice(2)}` : 'A CONFIRMAR', bx + 140, y + 112);
-  iconoReloj(ctx, bx + 72, y + filaH + 64);
-  ctx.fillStyle = '#fff'; ajustar(ctx, d.turno.toUpperCase(), bw - 170, 48, ANTON); ctx.fillText(d.turno.toUpperCase(), bx + 140, y + filaH + 82);
-  iconoPin(ctx, bx + 72, y + filaH * 2 + 70);
-  ctx.fillStyle = AMARILLO; ctx.font = `40px ${ANTON}`; ctx.fillText('LUGAR DE LA MISIÓN', bx + 140, y + filaH * 2 + 62);
-  ctx.fillStyle = '#fff'; ctx.font = `800 36px ${DM}`; ctx.fillText('Big Bang Pelotero', bx + 140, y + filaH * 2 + 112);
+  ctx.fillText(f ? `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${String(f.getFullYear()).slice(2)}` : 'A CONFIRMAR', bx + 140, y + 124);
+  iconoReloj(ctx, bx + 72, y2 + f2 / 2);
+  ctx.fillStyle = '#fff'; ajustar(ctx, d.turno.toUpperCase(), bw - 170, 48, ANTON); ctx.fillText(d.turno.toUpperCase(), bx + 140, y2 + 73);
+  iconoPin(ctx, bx + 72, y3 + 72);
+  ctx.fillStyle = AMARILLO; ctx.font = `40px ${ANTON}`; ctx.fillText('LUGAR DE LA MISIÓN', bx + 140, y3 + 60);
+  ctx.fillStyle = '#fff'; ctx.font = `800 36px ${DM}`; ctx.fillText('Big Bang Pelotero', bx + 140, y3 + 108);
   ctx.fillStyle = '#c7d2fe'; ctx.font = `600 28px ${DM}`;
-  DIRECCION.forEach((l, i) => ctx.fillText(l, bx + 140, y + filaH * 2 + 154 + i * 36));
+  DIRECCION.forEach((l, i) => ctx.fillText(l, bx + 140, y3 + 148 + i * 36));
   const finCaja = y + bh;
 
   // confirmación
