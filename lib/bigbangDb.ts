@@ -160,6 +160,7 @@ export async function setBBImagenesWeb(data: Record<string, string>) {
 
 // ── PRECIOS WEB ───────────────────────────────────────────────────────────────
 export const BB_PRECIOS_DEFAULT: Record<string, string> = {
+  promo_lowcost:        '200000',
   promo_super_lv:       '265000',
   promo_clasic_lj:      '310000',
   promo_clasic_finde:   '335000',

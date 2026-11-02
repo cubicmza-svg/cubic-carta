@@ -10,6 +10,13 @@ const fmt = (v: string) => {
 
 const SECCIONES = [
   {
+    titulo: 'PROMO LOW COST (pop-up de la nave)',
+    color: '#22c55e',
+    campos: [
+      { key: 'promo_lowcost', label: 'Precio (todos los días)' },
+    ],
+  },
+  {
     titulo: 'SUPER PROMO',
     color: '#f59e0b',
     campos: [

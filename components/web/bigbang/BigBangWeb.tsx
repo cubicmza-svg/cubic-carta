@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import PopupLowCost from './PopupLowCost';
 
 const WA = '5492613861323';
 const waLink = (msg: string) => `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
@@ -30,6 +31,7 @@ const imgId = (imagenes: Record<string, string>, key: string) =>
   imagenes[key] ?? IMAGEN_DEFAULTS[key] ?? '';
 
 const DEFAULTS: Record<string, string> = {
+  promo_lowcost: '200000',
   promo_super_lv: '265000', promo_clasic_lj: '310000', promo_clasic_finde: '335000',
   promo_clasic_sena: '150000', promo_full_lj: '370000', promo_full_finde: '399000',
   adic_hora_extra: '103000', adic_invitado_extra: '5170', adic_moza: '40500',
@@ -411,6 +413,12 @@ export default function BigBangWeb() {
 
       {/* WA flotante */}
       <a href={waLink(DEFAULT_MSG)} target="_blank" rel="noopener noreferrer" className="bb-wa-fixed">💬</a>
+
+      {/* Promo Low Cost: llega en una nave desde la esquina inferior derecha */}
+      <PopupLowCost
+        precio={$$(precios, 'promo_lowcost')}
+        waHref={waLink(`¡Hola! Quiero info de la Promo Low Cost de ${$$(precios, 'promo_lowcost')} 🚀`)}
+      />
 
       {/* NAV */}
       <nav className={`bb-nav${navScrolled ? ' scrolled' : ''}`}>
