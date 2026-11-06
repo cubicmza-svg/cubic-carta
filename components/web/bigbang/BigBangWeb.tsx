@@ -775,7 +775,7 @@ export default function BigBangWeb() {
                 <div style={{ fontSize: 22, marginBottom: 4 }}>{p.emoji}</div>
                 <div className="bb-font" style={{ color: p.color, fontSize: 14, marginBottom: 6 }}>{p.name}</div>
                 <div style={{ fontSize: 18, fontWeight: 900, color: '#fff', marginBottom: 2 }}>{$$(precios, p.precios[0].precioKey)}</div>
-                <div style={{ fontSize: 10, color: '#475569' }}>{p.diasLabel}</div>
+                {p.diasLabel !== 'Todos los días' && <div style={{ fontSize: 10, color: '#475569' }}>{p.diasLabel}</div>}
               </div>
             ))}
           </div>
