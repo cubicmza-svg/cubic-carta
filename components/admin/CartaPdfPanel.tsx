@@ -10,6 +10,7 @@ const CARTAS: { id: CartaId; nombre: string; url: string }[] = [
   { id: 'cafeteria', nombre: 'Cafetería & brunch', url: 'https://cubicmza.netlify.app/cafeteria' },
   { id: 'resto', nombre: 'Resto & bar', url: 'https://cubicmza.netlify.app/resto' },
 ];
+const IMPRIMIR = 'https://cubicmza.netlify.app/imprimir';
 interface Estado { actualizado: string | null; archivo: string; secciones: number; productos: number; historial: { id: number; creado: string; archivo: string; nota: string }[] }
 interface Resultado { productos: number; antes: number; secciones: number; cambios: { n: string; sec: string; antes: number | null; ahora: number | null }[]; nuevos: string[]; quitados: string[] }
 
@@ -84,6 +85,12 @@ function TarjetaCarta({ c, estado, alCambiar }: { c: (typeof CARTAS)[number]; es
         </div>
         <a href={c.url} target="_blank" rel="noopener" className="shrink-0 font-dm text-xs text-cubic-muted hover:text-cubic-accent border border-cubic-border rounded-lg px-3 py-1.5">Ver carta ↗</a>
       </div>
+
+      {/* la misma carta online armada en hojas A4: abre el diálogo de imprimir para guardarla como PDF */}
+      <a href={`${IMPRIMIR}?c=${c.id}&auto=1`} target="_blank" rel="noopener" className="flex items-center justify-center gap-2 py-3 rounded-xl border border-cubic-accent/50 text-cubic-accent font-bebas text-xl tracking-widest hover:bg-cubic-accent/10">
+        ⬇ DESCARGAR PDF A4
+      </a>
+      <p className="font-dm text-xs text-cubic-muted text-center -mt-2">Se abre la carta lista para imprimir: en “Destino” elegí <b>Guardar como PDF</b>.</p>
 
       <button
         type="button"
