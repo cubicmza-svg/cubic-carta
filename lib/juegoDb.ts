@@ -24,6 +24,7 @@ const PREMIOS_INICIALES = [
 ];
 
 export const DIAS_VALIDEZ = 7;
+export const MAX_POR_MES = 4;   // jugadas por WhatsApp por mes calendario (además de una por día)
 export const CONDICIONES = 'Válido por 7 días en Cubic (25 de Mayo 2985). Uno por persona, no acumulable con otras promos. Mostrale el código al mozo antes de pedir la cuenta.';
 
 export interface Cupon {
@@ -121,6 +122,14 @@ export async function jugar(nombre: string, telCrudo: string, promos: boolean) {
       return { yaJugo: true, nombre, premio: String(previa[0].premio), cupon: c.length ? aCupon(c[0]) : null };
     }
 
+    // tope mensual: con las 4 del mes usadas, vuelve el 1 del mes que viene
+    const [{ n: delMes }] = await sql`SELECT COUNT(*)::int AS n FROM juego_jugadas WHERE tel = ${tel} AND date_trunc('month', fecha) = date_trunc('month', ${fecha}::date)`;
+    if (delMes >= MAX_POR_MES) {
+      const [y, m] = fecha.split('-').map(Number);
+      const vuelve = `${m === 12 ? y + 1 : y}-${String(m === 12 ? 1 : m + 1).padStart(2, '0')}-01`;
+      return { agotado: true, nombre, max: MAX_POR_MES, vuelve, cupon: null };
+    }
+
     // sorteo entre los premios activos con stock; si las chances suman más de 100 se reparten proporcional
     const disponibles = (await sql`SELECT id, titulo, detalle, chance::float AS chance FROM juego_premios WHERE activo AND stock > 0 ORDER BY orden, id`)
       .map(x => ({ id: Number(x.id), titulo: String(x.titulo), detalle: String(x.detalle), chance: Number(x.chance) }));
@@ -157,7 +166,7 @@ export async function jugar(nombre: string, telCrudo: string, promos: boolean) {
     // lo que había "en los otros vasos" (solo para el show; el premio real es el de arriba)
     const show = disponibles.filter(x => x.chance >= 5).map(x => x.titulo).concat('esta vez no');
     const otras = [0, 1].map(() => show[randomInt(0, show.length)]);
-    return { nombre, premio: premioId, titulo: p?.titulo ?? 'esta vez no', cupon: c.length ? aCupon(c[0]) : null, otras };
+    return { nombre, premio: premioId, titulo: p?.titulo ?? 'esta vez no', cupon: c.length ? aCupon(c[0]) : null, otras, quedan: MAX_POR_MES - delMes - 1 };
   } finally {
     await sql.end();
   }
