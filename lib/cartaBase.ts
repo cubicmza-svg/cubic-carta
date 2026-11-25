@@ -1,4 +1,4 @@
-// Carta inicial de Cubic (la que estaba en cubicmza.netlify.app/datos.js, pasada de los PDF 2026).
+// Carta de Cubic (pasada a mano desde "CARTA CAFETERIA para APP.pdf" y "CARTA RESTAURANT para APP.pdf", 25/11/2026; misma que cubicmza.netlify.app/datos.js).
 // Se usa como versión de partida y como ejemplo de formato para la IA; después manda lo que suben desde /admin/carta.
 import type { Carta } from './cartaTipos';
 
@@ -543,7 +543,7 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
         "p": 3500
        },
        {
-        "n": "Gatorade 500 cc",
+        "n": "Gatorade o Powerade 500 cc",
         "p": 4800
        }
       ]
@@ -719,6 +719,14 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
        {
         "n": "Pollo teriyaki",
         "p": 15000
+       },
+       {
+        "n": "Raviolones de jamón y muzzarella",
+        "p": 15000
+       },
+       {
+        "n": "Raviolones de calabaza, muzza y albahaca",
+        "p": 15000
        }
       ]
      }
@@ -733,34 +741,42 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
       "items": [
        {
         "n": "Cheeseburger",
+        "d": "burger de 125 g y cheddar",
         "p": 12500
        },
        {
         "n": "Barba burger",
+        "d": "burger de 125 g, salsa barbacoa, cebolla morada y cheddar",
         "p": 13500
        },
        {
         "n": "Classic burger",
+        "d": "burger de 125 g, lechuga, tomate, huevo y queso tybo",
         "p": 13500
        },
        {
         "n": "Americana",
+        "d": "burger de 125 g, panceta, pepinillos, salsa americana y cheddar en fetas",
         "p": 16500
        },
        {
         "n": "Bluecheese",
+        "d": "burger de 125 g, queso azul y cebolla caramelizada",
         "p": 18000
        },
        {
         "n": "Triple cheeseburger",
+        "d": "triple burger de 125 g y triple cheddar",
         "p": 18750
        },
        {
         "n": "Americana doble",
+        "d": "doble burger de 125 g, panceta, pepinillos, salsa americana y cheddar en fetas",
         "p": 21000
        },
        {
         "n": "Guacamole",
+        "d": "burger de 125 g, guacamole, queso tybo, lechuga y tomate",
         "p": 22500
        }
       ]
@@ -921,7 +937,7 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
      {
       "items": [
        {
-        "n": "Americana doble + Michelob 473 cc",
+        "n": "Americana doble + Stella Pure Gold",
         "p": 21000
        }
       ]
@@ -967,8 +983,8 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
        },
        {
         "n": "Lomo completo",
-        "d": "en pan ciabatta o focaccia, con huevo, tomate, lechuga y lactonesa",
-        "p": 21600
+        "d": "en pan ciabatta o focaccia, lomo, huevo, tomate, lechuga y lactonesa",
+        "p": 27000
        },
        {
         "n": "Tostón de campo",
@@ -1043,7 +1059,7 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
         "p": 15000
        },
        {
-        "n": "Aperol spritz",
+        "n": "Aperol spritz Mumm",
         "p": 15000
        },
        {
@@ -1051,7 +1067,7 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
         "p": 12500
        },
        {
-        "n": "Ramazzotti spritz",
+        "n": "Ramazzotti Mumm",
         "p": 15000
        },
        {
@@ -1060,6 +1076,10 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
        },
        {
         "n": "Boulevardier",
+        "p": 15000
+       },
+       {
+        "n": "Sbagliato",
         "p": 15000
        },
        {
@@ -1087,8 +1107,12 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
         "p": 17500
        },
        {
-        "n": "Vermut clásico",
+        "n": "Carpano clásico",
         "p": 11300
+       },
+       {
+        "n": "Buhero julep",
+        "p": 12500
        },
        {
         "n": "Daiquiri",
@@ -1143,24 +1167,13 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
         "p": 15000
        },
        {
-        "n": "Hanky Panky",
-        "p": 16250
-       },
-       {
         "n": "Jäger mule",
         "p": 15000
        }
       ]
-     }
-    ]
-   },
-   {
-    "id": "alcohol",
-    "t": "cervezas, vinos & más",
-    "foto": "img/fernet-papas.jpg",
-    "bloques": [
+     },
      {
-      "t": "promos",
+      "t": "combos",
       "items": [
        {
         "n": "Jarra de fernet",
@@ -1180,6 +1193,30 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
        }
       ]
      },
+     {
+      "t": "whisky · medida",
+      "items": [
+       {
+        "n": "Jameson",
+        "p": 12500
+       },
+       {
+        "n": "Ballantine’s",
+        "p": 16250
+       },
+       {
+        "n": "JW Black Label",
+        "p": 18750
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "alcohol",
+    "t": "cervezas, vinos & más",
+    "foto": "img/cervezas-stella.jpg",
+    "bloques": [
      {
       "t": "cervezas",
       "items": [
@@ -1253,10 +1290,6 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
         "p": null
        },
        {
-        "n": "Celeste y Blanco",
-        "p": 13500
-       },
-       {
         "n": "Portillo",
         "p": 15000
        },
@@ -1274,12 +1307,8 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
       "t": "champagne",
       "items": [
        {
-        "n": "Nave Robino",
-        "p": 21250
-       },
-       {
-        "n": "Capricio Fiore",
-        "p": 18500
+        "n": "Mumm 269 ml",
+        "p": 7000
        },
        {
         "n": "Novecento",
@@ -1288,23 +1317,6 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
        {
         "n": "Canciller",
         "p": 12300
-       }
-      ]
-     },
-     {
-      "t": "whisky · medida",
-      "items": [
-       {
-        "n": "Jameson",
-        "p": 12500
-       },
-       {
-        "n": "Ballantine’s",
-        "p": 16250
-       },
-       {
-        "n": "JW Black Label",
-        "p": 18750
        }
       ]
      }
@@ -1372,7 +1384,7 @@ export const CARTA_BASE: Record<'cafeteria' | 'resto', Carta> = {
         "p": 4200
        },
        {
-        "n": "Línea Coca-Cola 1,5 L",
+        "n": "Línea Coca-Cola 1,25 L",
         "p": 8800
        },
        {
